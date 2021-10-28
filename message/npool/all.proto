@@ -6,83 +6,40 @@ option go_package = "github.com/cyvadra/sphinx/message/npool";
 
 import "google/api/annotations.proto";
 
-// 钱包节点
-service WalletNode {
-  // 获取预签名信息
-  rpc GetSignInfo (GetSignInfoRequest) returns (SignInfo) {
-    option (google.api.http) = {
-      get: "/v1/wallet_node/sign_info"
-    };}
-  // 广播交易
-  rpc BroadcastScript (BroadcastScriptRequest) returns (SuccessCode) {
-    option (google.api.http) = {
-      post: "/v1/wallet_node/script/broadcast"
-      body: "*"
-    };}
-  // 查询交易状态
-  rpc StatusScript (StatusScriptRequest) returns (ScriptInfo) {
-    option (google.api.http) = {
-      get: "/v1/wallet_node/script/status"
-    };}
-}
-
-// 钱包代理
-service WalletAgent {
-  // 接收健康报告
-  rpc AcceptNode (NodeInfo) returns (SuccessCode) {
-    option (google.api.http) = {
-      post: "/v1/wallet_agent/status"
-      body: "*"
-    };}
-}
-
 // 交易服务
 service Trading {
+  // 查询单个币种
+  rpc GetCoinInfo (GetCoinInfoRequest) returns (CoinInfoRow) {
+    option (google.api.http) = {
+      get: "/v1/coin/single"
+    };}
+  // 查询全部币种
+  rpc GetCoinInfos (GetCoinInfosRequest) returns (CoinInfoList) {
+    option (google.api.http) = {
+      get: "/v1/coin/list"
+    };}
   // 创建账户
-  rpc RegisterUser (RegisterUserRequest) returns (UserAddress) {
+  rpc RegisterAccount (RegisterAccountRequest) returns (AccountAddress) {
     option (google.api.http) = {
       post: "/v1/account/register"
       body: "*"
     };}
-  // 用户申请提现
-  rpc WithdrawApply (WithdrawApplyRequest) returns (SuccessCode) {
+  // 余额查询
+  rpc GetBalance (GetBalanceRequest) returns (AccountBalance) {
     option (google.api.http) = {
-      post: "/v1/account/withdraw/apply"
+      get: "/v1/account/balance"
+    };}
+  // 转账 / 提现
+  rpc ApplyTransaction (ApplyTransactionRequest) returns (SuccessCode) {
+    option (google.api.http) = {
+      post: "/v1/account/transaction"
       body: "*"
     };}
-  // （非主动） 充值购买 - 异步扫描收款地址通知回调
-  rpc RechargeUser (RechargeUserRequest) returns (SuccessCode) {
-    option (google.api.http) = {
-      post: "/v1/account/recharge"
-      body: "*"
-    };}
-  // （非主动） 确认提现 - 从消息队列中获取确认提现的数据并操作
-  rpc WithdrawConfirmed (WithdrawConfirmedRequest) returns (SuccessCode) {
-    option (google.api.http) = {
-      post: "/v1/account/withdraw/confirm"
-      body: "*"
-    };}
-}
-
-// 审核服务
-service Review {
-  // 获取待审核列表
-  rpc GetList (GetListRequest) returns (ReviewList) {
-    option (google.api.http) = {
-        get: "/v1/review/list"
-    };}
-  // 设置管理员的审核权限
-  rpc SetAdminPermission (SetAdminPermissionRequest) returns (SuccessCode) {
-    option (google.api.http) = {
-        post: "/v1/review/permission"
-        body: "*"
-    };}
-  // 审核交易
-  rpc ProcessReview (ProcessReviewRequest) returns (ReviewList) {
-    option (google.api.http) = {
-        post: "/v1/review/process"
-        body: "*"
-    };}
+  // 近期交易查询
+  // rpc GetTxJSON (GetTxJSONRequest) returns (AccountTxJSON) {
+  //   option (google.api.http) = {
+  //     get: "/v1/account/txjson"
+  //   };}
 }
 
   // 通用返回码
@@ -90,121 +47,73 @@ service Review {
     bool success = 1;
   }
 
-  // GetSignInfo 参数
-  message GetSignInfoRequest {
+  // GetCoinInfo 参数
+  message GetCoinInfoRequest {
     int32 coin_id = 1;
-    string address_send = 2;
   }
-  // GetSignInfo 返回
-  message SignInfo {
-    string data_json = 1;
+  // GetCoinInfos 参数
+  message GetCoinInfosRequest {
+    repeated int32 coin_ids = 1;
+  }
+  // GetCoinInfo 返回
+  message CoinInfoRow {
+    int32 id = 1;
+    bool need_signinfo = 2;
+    string name = 3;
+    string unit = 4;
+  }
+  // GetCoinInfos 返回
+  message CoinInfoList {
+    repeated CoinInfoRow list = 1;
   }
 
-  // BroadcastScript 参数
-  message BroadcastScriptRequest {
+  // RegisterAccount 参数
+  message RegisterAccountRequest {
     int32 coin_id = 1;
-    uint32 review_id = 2;
-    string transaction_script = 3;
   }
-
-  // StatusScript 参数
-  message StatusScriptRequest {
+  // RegisterAccount 返回
+  message AccountAddress {
     int32 coin_id = 1;
-    uint32 review_id = 2;
-    string transaction_id = 3;
-  }
-  // StatusScript 返回
-  message ScriptInfo {
-    string data_json = 1;
+    string address = 2;
   }
 
-
-  // AcceptNode 参数
-  message NodeInfo {
+  // GetBalance 参数
+  message GetBalanceRequest {
     int32 coin_id = 1;
-    uint64 ip_uint64 = 2;
-    bool ip_is_public = 3;
-    string mac_address = 4;
-    string location = 5;
-  }
-
-
-  // RegisterUser 参数
-  message RegisterUserRequest {
-    int32 user_id = 1;
-    int32 coin_id = 2;
-  }
-  // RegisterUser 返回
-  message UserAddress {
-    int32 user_id = 1;
-    int32 coin_id = 2;
+    string address = 2;
     uint64 timestamp_utc = 3;
-    string address = 4;
   }
-
-  // WithdrawApply 参数
-  message WithdrawApplyRequest {
-    int32 user_id = 1;
-    int32 coin_id = 2;
-    double amount = 3;
-    uint64 timestamp_utc = 4;
-    uint64 sig_salt = 5;
-    string sign_user = 6;
-    string address = 7;
-  }
-
-  // RechargeUser 参数
-  message RechargeUserRequest {
-    int32 user_id = 1;
-    int32 coin_id = 2;
-    double amount = 3;
-    uint64 timestamp_utc = 4;
-    string address = 5;
-  }
-
-  // WithdrawConfirmed 参数
-  message WithdrawConfirmedRequest {
-    uint32 review_id = 1;
-  }
-
-  // GetList 参数
-  message GetListRequest {
+  // GetBalance 返回
+  message AccountBalance {
     int32 coin_id = 1;
-    bool return_all = 2;
-  }
-  // GetList 返回
-  message ReviewList {
-    repeated ReviewRow list = 1;
-  }
-  // 单行审核数据（暂定）
-  message ReviewRow {
-    uint32 id = 1;
-    int32 user_id = 2;
-    int32 coin_id = 3;
-    double amount = 4;
-    uint64 timestamp_utc = 5;
-    uint64 sig_salt = 6;
-    string sign_user = 7;
-    string sign_admin = 8;
-    string address = 9;
+    string address = 2;
+    uint64 timestamp_utc = 3;
+    int64 amount_int = 4;
+    int32 amount_digits = 5;
+    string amount_string = 6;
   }
 
-  // SetAdminPermission 参数
-  message SetAdminPermissionRequest {
+  // GetTxJSONRequest 参数
+  // message GetTxJSONRequest {
+  //   int32 coin_id = 1;
+  //   string address = 2;
+  //   uint64 timefrom_utc = 3;
+  //   uint64 timetill_utc = 4;
+  // }
+  // GetTxJSONRequest 返回
+  // message AccountTxJSON {
+  //   string json = 1;
+  // }
+
+  // ApplyTransaction 参数
+  message ApplyTransactionRequest {
     int32 coin_id = 1;
-    int32 admin_group_id = 2;
-    bool is_revoke = 3;
+    string transaction_id_insite = 2;
+    string address_from = 3;
+    string address_to = 4;
+    int64 amount_int = 5;
+    int32 amount_digits = 6;
   }
-
-  // ProcessReview 参数
-  message ProcessReviewRequest {
-    int32 admin_id = 1;
-    bool is_reject = 2;
-    bool is_approve = 3;
-    repeated uint32 review_ids = 4;
-  }
-
-
 
 
 
