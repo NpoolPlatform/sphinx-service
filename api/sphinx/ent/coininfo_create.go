@@ -8,7 +8,9 @@ import (
 	"fmt"
 	"sphinx/ent/coininfo"
 	"sphinx/ent/keystore"
+	"sphinx/ent/review"
 	"sphinx/ent/transaction"
+	"sphinx/ent/walletnode"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -75,6 +77,36 @@ func (cic *CoinInfoCreate) AddTransactions(t ...*Transaction) *CoinInfoCreate {
 		ids[i] = t[i].ID
 	}
 	return cic.AddTransactionIDs(ids...)
+}
+
+// AddReviewIDs adds the "reviews" edge to the Review entity by IDs.
+func (cic *CoinInfoCreate) AddReviewIDs(ids ...int) *CoinInfoCreate {
+	cic.mutation.AddReviewIDs(ids...)
+	return cic
+}
+
+// AddReviews adds the "reviews" edges to the Review entity.
+func (cic *CoinInfoCreate) AddReviews(r ...*Review) *CoinInfoCreate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return cic.AddReviewIDs(ids...)
+}
+
+// AddWalletNodeIDs adds the "wallet_nodes" edge to the WalletNode entity by IDs.
+func (cic *CoinInfoCreate) AddWalletNodeIDs(ids ...int) *CoinInfoCreate {
+	cic.mutation.AddWalletNodeIDs(ids...)
+	return cic
+}
+
+// AddWalletNodes adds the "wallet_nodes" edges to the WalletNode entity.
+func (cic *CoinInfoCreate) AddWalletNodes(w ...*WalletNode) *CoinInfoCreate {
+	ids := make([]int, len(w))
+	for i := range w {
+		ids[i] = w[i].ID
+	}
+	return cic.AddWalletNodeIDs(ids...)
 }
 
 // Mutation returns the CoinInfoMutation object of the builder.
@@ -256,6 +288,44 @@ func (cic *CoinInfoCreate) createSpec() (*CoinInfo, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: transaction.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cic.mutation.ReviewsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   coininfo.ReviewsTable,
+			Columns: []string{coininfo.ReviewsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: review.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cic.mutation.WalletNodesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   coininfo.WalletNodesTable,
+			Columns: []string{coininfo.WalletNodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: walletnode.FieldID,
 				},
 			},
 		}

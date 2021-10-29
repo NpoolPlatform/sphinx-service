@@ -17,6 +17,10 @@ const (
 	EdgeKeys = "keys"
 	// EdgeTransactions holds the string denoting the transactions edge name in mutations.
 	EdgeTransactions = "transactions"
+	// EdgeReviews holds the string denoting the reviews edge name in mutations.
+	EdgeReviews = "reviews"
+	// EdgeWalletNodes holds the string denoting the wallet_nodes edge name in mutations.
+	EdgeWalletNodes = "wallet_nodes"
 	// Table holds the table name of the coininfo in the database.
 	Table = "coin_infos"
 	// KeysTable is the table that holds the keys relation/edge.
@@ -33,6 +37,20 @@ const (
 	TransactionsInverseTable = "transactions"
 	// TransactionsColumn is the table column denoting the transactions relation/edge.
 	TransactionsColumn = "coin_info_transactions"
+	// ReviewsTable is the table that holds the reviews relation/edge.
+	ReviewsTable = "reviews"
+	// ReviewsInverseTable is the table name for the Review entity.
+	// It exists in this package in order to avoid circular dependency with the "review" package.
+	ReviewsInverseTable = "reviews"
+	// ReviewsColumn is the table column denoting the reviews relation/edge.
+	ReviewsColumn = "coin_info_reviews"
+	// WalletNodesTable is the table that holds the wallet_nodes relation/edge.
+	WalletNodesTable = "wallet_nodes"
+	// WalletNodesInverseTable is the table name for the WalletNode entity.
+	// It exists in this package in order to avoid circular dependency with the "walletnode" package.
+	WalletNodesInverseTable = "wallet_nodes"
+	// WalletNodesColumn is the table column denoting the wallet_nodes relation/edge.
+	WalletNodesColumn = "coin_info_wallet_nodes"
 )
 
 // Columns holds all SQL columns for coininfo fields.

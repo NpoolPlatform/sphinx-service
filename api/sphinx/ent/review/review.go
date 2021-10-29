@@ -17,6 +17,8 @@ const (
 	FieldUpdatetimeUtc = "updatetime_utc"
 	// EdgeTransaction holds the string denoting the transaction edge name in mutations.
 	EdgeTransaction = "transaction"
+	// EdgeCoin holds the string denoting the coin edge name in mutations.
+	EdgeCoin = "coin"
 	// Table holds the table name of the review in the database.
 	Table = "reviews"
 	// TransactionTable is the table that holds the transaction relation/edge.
@@ -26,6 +28,13 @@ const (
 	TransactionInverseTable = "transactions"
 	// TransactionColumn is the table column denoting the transaction relation/edge.
 	TransactionColumn = "transaction_review"
+	// CoinTable is the table that holds the coin relation/edge.
+	CoinTable = "reviews"
+	// CoinInverseTable is the table name for the CoinInfo entity.
+	// It exists in this package in order to avoid circular dependency with the "coininfo" package.
+	CoinInverseTable = "coin_infos"
+	// CoinColumn is the table column denoting the coin relation/edge.
+	CoinColumn = "coin_info_reviews"
 )
 
 // Columns holds all SQL columns for review fields.
@@ -40,6 +49,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "reviews"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
+	"coin_info_reviews",
 	"transaction_review",
 }
 

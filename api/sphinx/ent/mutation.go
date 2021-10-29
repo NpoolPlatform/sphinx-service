@@ -10,6 +10,7 @@ import (
 	"sphinx/ent/predicate"
 	"sphinx/ent/review"
 	"sphinx/ent/transaction"
+	"sphinx/ent/walletnode"
 	"sync"
 
 	"entgo.io/ent"
@@ -28,6 +29,7 @@ const (
 	TypeKeyStore    = "KeyStore"
 	TypeReview      = "Review"
 	TypeTransaction = "Transaction"
+	TypeWalletNode  = "WalletNode"
 )
 
 // CoinInfoMutation represents an operation that mutates the CoinInfo nodes in the graph.
@@ -46,6 +48,12 @@ type CoinInfoMutation struct {
 	transactions        map[int]struct{}
 	removedtransactions map[int]struct{}
 	clearedtransactions bool
+	reviews             map[int]struct{}
+	removedreviews      map[int]struct{}
+	clearedreviews      bool
+	wallet_nodes        map[int]struct{}
+	removedwallet_nodes map[int]struct{}
+	clearedwallet_nodes bool
 	done                bool
 	oldValue            func(context.Context) (*CoinInfo, error)
 	predicates          []predicate.CoinInfo
@@ -346,6 +354,114 @@ func (m *CoinInfoMutation) ResetTransactions() {
 	m.removedtransactions = nil
 }
 
+// AddReviewIDs adds the "reviews" edge to the Review entity by ids.
+func (m *CoinInfoMutation) AddReviewIDs(ids ...int) {
+	if m.reviews == nil {
+		m.reviews = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.reviews[ids[i]] = struct{}{}
+	}
+}
+
+// ClearReviews clears the "reviews" edge to the Review entity.
+func (m *CoinInfoMutation) ClearReviews() {
+	m.clearedreviews = true
+}
+
+// ReviewsCleared reports if the "reviews" edge to the Review entity was cleared.
+func (m *CoinInfoMutation) ReviewsCleared() bool {
+	return m.clearedreviews
+}
+
+// RemoveReviewIDs removes the "reviews" edge to the Review entity by IDs.
+func (m *CoinInfoMutation) RemoveReviewIDs(ids ...int) {
+	if m.removedreviews == nil {
+		m.removedreviews = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.reviews, ids[i])
+		m.removedreviews[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedReviews returns the removed IDs of the "reviews" edge to the Review entity.
+func (m *CoinInfoMutation) RemovedReviewsIDs() (ids []int) {
+	for id := range m.removedreviews {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ReviewsIDs returns the "reviews" edge IDs in the mutation.
+func (m *CoinInfoMutation) ReviewsIDs() (ids []int) {
+	for id := range m.reviews {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetReviews resets all changes to the "reviews" edge.
+func (m *CoinInfoMutation) ResetReviews() {
+	m.reviews = nil
+	m.clearedreviews = false
+	m.removedreviews = nil
+}
+
+// AddWalletNodeIDs adds the "wallet_nodes" edge to the WalletNode entity by ids.
+func (m *CoinInfoMutation) AddWalletNodeIDs(ids ...int) {
+	if m.wallet_nodes == nil {
+		m.wallet_nodes = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.wallet_nodes[ids[i]] = struct{}{}
+	}
+}
+
+// ClearWalletNodes clears the "wallet_nodes" edge to the WalletNode entity.
+func (m *CoinInfoMutation) ClearWalletNodes() {
+	m.clearedwallet_nodes = true
+}
+
+// WalletNodesCleared reports if the "wallet_nodes" edge to the WalletNode entity was cleared.
+func (m *CoinInfoMutation) WalletNodesCleared() bool {
+	return m.clearedwallet_nodes
+}
+
+// RemoveWalletNodeIDs removes the "wallet_nodes" edge to the WalletNode entity by IDs.
+func (m *CoinInfoMutation) RemoveWalletNodeIDs(ids ...int) {
+	if m.removedwallet_nodes == nil {
+		m.removedwallet_nodes = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.wallet_nodes, ids[i])
+		m.removedwallet_nodes[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedWalletNodes returns the removed IDs of the "wallet_nodes" edge to the WalletNode entity.
+func (m *CoinInfoMutation) RemovedWalletNodesIDs() (ids []int) {
+	for id := range m.removedwallet_nodes {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// WalletNodesIDs returns the "wallet_nodes" edge IDs in the mutation.
+func (m *CoinInfoMutation) WalletNodesIDs() (ids []int) {
+	for id := range m.wallet_nodes {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetWalletNodes resets all changes to the "wallet_nodes" edge.
+func (m *CoinInfoMutation) ResetWalletNodes() {
+	m.wallet_nodes = nil
+	m.clearedwallet_nodes = false
+	m.removedwallet_nodes = nil
+}
+
 // Where appends a list predicates to the CoinInfoMutation builder.
 func (m *CoinInfoMutation) Where(ps ...predicate.CoinInfo) {
 	m.predicates = append(m.predicates, ps...)
@@ -498,12 +614,18 @@ func (m *CoinInfoMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *CoinInfoMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 4)
 	if m.keys != nil {
 		edges = append(edges, coininfo.EdgeKeys)
 	}
 	if m.transactions != nil {
 		edges = append(edges, coininfo.EdgeTransactions)
+	}
+	if m.reviews != nil {
+		edges = append(edges, coininfo.EdgeReviews)
+	}
+	if m.wallet_nodes != nil {
+		edges = append(edges, coininfo.EdgeWalletNodes)
 	}
 	return edges
 }
@@ -524,18 +646,36 @@ func (m *CoinInfoMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case coininfo.EdgeReviews:
+		ids := make([]ent.Value, 0, len(m.reviews))
+		for id := range m.reviews {
+			ids = append(ids, id)
+		}
+		return ids
+	case coininfo.EdgeWalletNodes:
+		ids := make([]ent.Value, 0, len(m.wallet_nodes))
+		for id := range m.wallet_nodes {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *CoinInfoMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 4)
 	if m.removedkeys != nil {
 		edges = append(edges, coininfo.EdgeKeys)
 	}
 	if m.removedtransactions != nil {
 		edges = append(edges, coininfo.EdgeTransactions)
+	}
+	if m.removedreviews != nil {
+		edges = append(edges, coininfo.EdgeReviews)
+	}
+	if m.removedwallet_nodes != nil {
+		edges = append(edges, coininfo.EdgeWalletNodes)
 	}
 	return edges
 }
@@ -556,18 +696,36 @@ func (m *CoinInfoMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case coininfo.EdgeReviews:
+		ids := make([]ent.Value, 0, len(m.removedreviews))
+		for id := range m.removedreviews {
+			ids = append(ids, id)
+		}
+		return ids
+	case coininfo.EdgeWalletNodes:
+		ids := make([]ent.Value, 0, len(m.removedwallet_nodes))
+		for id := range m.removedwallet_nodes {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *CoinInfoMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 4)
 	if m.clearedkeys {
 		edges = append(edges, coininfo.EdgeKeys)
 	}
 	if m.clearedtransactions {
 		edges = append(edges, coininfo.EdgeTransactions)
+	}
+	if m.clearedreviews {
+		edges = append(edges, coininfo.EdgeReviews)
+	}
+	if m.clearedwallet_nodes {
+		edges = append(edges, coininfo.EdgeWalletNodes)
 	}
 	return edges
 }
@@ -580,6 +738,10 @@ func (m *CoinInfoMutation) EdgeCleared(name string) bool {
 		return m.clearedkeys
 	case coininfo.EdgeTransactions:
 		return m.clearedtransactions
+	case coininfo.EdgeReviews:
+		return m.clearedreviews
+	case coininfo.EdgeWalletNodes:
+		return m.clearedwallet_nodes
 	}
 	return false
 }
@@ -601,6 +763,12 @@ func (m *CoinInfoMutation) ResetEdge(name string) error {
 		return nil
 	case coininfo.EdgeTransactions:
 		m.ResetTransactions()
+		return nil
+	case coininfo.EdgeReviews:
+		m.ResetReviews()
+		return nil
+	case coininfo.EdgeWalletNodes:
+		m.ResetWalletNodes()
 		return nil
 	}
 	return fmt.Errorf("unknown CoinInfo edge %s", name)
@@ -1036,6 +1204,8 @@ type ReviewMutation struct {
 	clearedFields      map[string]struct{}
 	transaction        *int
 	clearedtransaction bool
+	coin               *int
+	clearedcoin        bool
 	done               bool
 	oldValue           func(context.Context) (*Review, error)
 	predicates         []predicate.Review
@@ -1343,6 +1513,45 @@ func (m *ReviewMutation) ResetTransaction() {
 	m.clearedtransaction = false
 }
 
+// SetCoinID sets the "coin" edge to the CoinInfo entity by id.
+func (m *ReviewMutation) SetCoinID(id int) {
+	m.coin = &id
+}
+
+// ClearCoin clears the "coin" edge to the CoinInfo entity.
+func (m *ReviewMutation) ClearCoin() {
+	m.clearedcoin = true
+}
+
+// CoinCleared reports if the "coin" edge to the CoinInfo entity was cleared.
+func (m *ReviewMutation) CoinCleared() bool {
+	return m.clearedcoin
+}
+
+// CoinID returns the "coin" edge ID in the mutation.
+func (m *ReviewMutation) CoinID() (id int, exists bool) {
+	if m.coin != nil {
+		return *m.coin, true
+	}
+	return
+}
+
+// CoinIDs returns the "coin" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CoinID instead. It exists only for internal usage by the builders.
+func (m *ReviewMutation) CoinIDs() (ids []int) {
+	if id := m.coin; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCoin resets all changes to the "coin" edge.
+func (m *ReviewMutation) ResetCoin() {
+	m.coin = nil
+	m.clearedcoin = false
+}
+
 // Where appends a list predicates to the ReviewMutation builder.
 func (m *ReviewMutation) Where(ps ...predicate.Review) {
 	m.predicates = append(m.predicates, ps...)
@@ -1539,9 +1748,12 @@ func (m *ReviewMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ReviewMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.transaction != nil {
 		edges = append(edges, review.EdgeTransaction)
+	}
+	if m.coin != nil {
+		edges = append(edges, review.EdgeCoin)
 	}
 	return edges
 }
@@ -1554,13 +1766,17 @@ func (m *ReviewMutation) AddedIDs(name string) []ent.Value {
 		if id := m.transaction; id != nil {
 			return []ent.Value{*id}
 		}
+	case review.EdgeCoin:
+		if id := m.coin; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ReviewMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	return edges
 }
 
@@ -1574,9 +1790,12 @@ func (m *ReviewMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ReviewMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.clearedtransaction {
 		edges = append(edges, review.EdgeTransaction)
+	}
+	if m.clearedcoin {
+		edges = append(edges, review.EdgeCoin)
 	}
 	return edges
 }
@@ -1587,6 +1806,8 @@ func (m *ReviewMutation) EdgeCleared(name string) bool {
 	switch name {
 	case review.EdgeTransaction:
 		return m.clearedtransaction
+	case review.EdgeCoin:
+		return m.clearedcoin
 	}
 	return false
 }
@@ -1598,6 +1819,9 @@ func (m *ReviewMutation) ClearEdge(name string) error {
 	case review.EdgeTransaction:
 		m.ClearTransaction()
 		return nil
+	case review.EdgeCoin:
+		m.ClearCoin()
+		return nil
 	}
 	return fmt.Errorf("unknown Review unique edge %s", name)
 }
@@ -1608,6 +1832,9 @@ func (m *ReviewMutation) ResetEdge(name string) error {
 	switch name {
 	case review.EdgeTransaction:
 		m.ResetTransaction()
+		return nil
+	case review.EdgeCoin:
+		m.ResetCoin()
 		return nil
 	}
 	return fmt.Errorf("unknown Review edge %s", name)
@@ -2784,4 +3011,758 @@ func (m *TransactionMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Transaction edge %s", name)
+}
+
+// WalletNodeMutation represents an operation that mutates the WalletNode nodes in the graph.
+type WalletNodeMutation struct {
+	config
+	op                      Op
+	typ                     string
+	id                      *int
+	uuid                    *string
+	location                *string
+	host_vendor             *string
+	public_ip               *string
+	local_ip                *string
+	createtime_utc          *int
+	addcreatetime_utc       *int
+	last_online_time_utc    *int
+	addlast_online_time_utc *int
+	clearedFields           map[string]struct{}
+	coin                    *int
+	clearedcoin             bool
+	done                    bool
+	oldValue                func(context.Context) (*WalletNode, error)
+	predicates              []predicate.WalletNode
+}
+
+var _ ent.Mutation = (*WalletNodeMutation)(nil)
+
+// walletnodeOption allows management of the mutation configuration using functional options.
+type walletnodeOption func(*WalletNodeMutation)
+
+// newWalletNodeMutation creates new mutation for the WalletNode entity.
+func newWalletNodeMutation(c config, op Op, opts ...walletnodeOption) *WalletNodeMutation {
+	m := &WalletNodeMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeWalletNode,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withWalletNodeID sets the ID field of the mutation.
+func withWalletNodeID(id int) walletnodeOption {
+	return func(m *WalletNodeMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *WalletNode
+		)
+		m.oldValue = func(ctx context.Context) (*WalletNode, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().WalletNode.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withWalletNode sets the old WalletNode of the mutation.
+func withWalletNode(node *WalletNode) walletnodeOption {
+	return func(m *WalletNodeMutation) {
+		m.oldValue = func(context.Context) (*WalletNode, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m WalletNodeMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m WalletNodeMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *WalletNodeMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetUUID sets the "uuid" field.
+func (m *WalletNodeMutation) SetUUID(s string) {
+	m.uuid = &s
+}
+
+// UUID returns the value of the "uuid" field in the mutation.
+func (m *WalletNodeMutation) UUID() (r string, exists bool) {
+	v := m.uuid
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUUID returns the old "uuid" field's value of the WalletNode entity.
+// If the WalletNode object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WalletNodeMutation) OldUUID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldUUID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldUUID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUUID: %w", err)
+	}
+	return oldValue.UUID, nil
+}
+
+// ResetUUID resets all changes to the "uuid" field.
+func (m *WalletNodeMutation) ResetUUID() {
+	m.uuid = nil
+}
+
+// SetLocation sets the "location" field.
+func (m *WalletNodeMutation) SetLocation(s string) {
+	m.location = &s
+}
+
+// Location returns the value of the "location" field in the mutation.
+func (m *WalletNodeMutation) Location() (r string, exists bool) {
+	v := m.location
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLocation returns the old "location" field's value of the WalletNode entity.
+// If the WalletNode object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WalletNodeMutation) OldLocation(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldLocation is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldLocation requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLocation: %w", err)
+	}
+	return oldValue.Location, nil
+}
+
+// ResetLocation resets all changes to the "location" field.
+func (m *WalletNodeMutation) ResetLocation() {
+	m.location = nil
+}
+
+// SetHostVendor sets the "host_vendor" field.
+func (m *WalletNodeMutation) SetHostVendor(s string) {
+	m.host_vendor = &s
+}
+
+// HostVendor returns the value of the "host_vendor" field in the mutation.
+func (m *WalletNodeMutation) HostVendor() (r string, exists bool) {
+	v := m.host_vendor
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldHostVendor returns the old "host_vendor" field's value of the WalletNode entity.
+// If the WalletNode object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WalletNodeMutation) OldHostVendor(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldHostVendor is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldHostVendor requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldHostVendor: %w", err)
+	}
+	return oldValue.HostVendor, nil
+}
+
+// ResetHostVendor resets all changes to the "host_vendor" field.
+func (m *WalletNodeMutation) ResetHostVendor() {
+	m.host_vendor = nil
+}
+
+// SetPublicIP sets the "public_ip" field.
+func (m *WalletNodeMutation) SetPublicIP(s string) {
+	m.public_ip = &s
+}
+
+// PublicIP returns the value of the "public_ip" field in the mutation.
+func (m *WalletNodeMutation) PublicIP() (r string, exists bool) {
+	v := m.public_ip
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPublicIP returns the old "public_ip" field's value of the WalletNode entity.
+// If the WalletNode object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WalletNodeMutation) OldPublicIP(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldPublicIP is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldPublicIP requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPublicIP: %w", err)
+	}
+	return oldValue.PublicIP, nil
+}
+
+// ResetPublicIP resets all changes to the "public_ip" field.
+func (m *WalletNodeMutation) ResetPublicIP() {
+	m.public_ip = nil
+}
+
+// SetLocalIP sets the "local_ip" field.
+func (m *WalletNodeMutation) SetLocalIP(s string) {
+	m.local_ip = &s
+}
+
+// LocalIP returns the value of the "local_ip" field in the mutation.
+func (m *WalletNodeMutation) LocalIP() (r string, exists bool) {
+	v := m.local_ip
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLocalIP returns the old "local_ip" field's value of the WalletNode entity.
+// If the WalletNode object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WalletNodeMutation) OldLocalIP(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldLocalIP is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldLocalIP requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLocalIP: %w", err)
+	}
+	return oldValue.LocalIP, nil
+}
+
+// ResetLocalIP resets all changes to the "local_ip" field.
+func (m *WalletNodeMutation) ResetLocalIP() {
+	m.local_ip = nil
+}
+
+// SetCreatetimeUtc sets the "createtime_utc" field.
+func (m *WalletNodeMutation) SetCreatetimeUtc(i int) {
+	m.createtime_utc = &i
+	m.addcreatetime_utc = nil
+}
+
+// CreatetimeUtc returns the value of the "createtime_utc" field in the mutation.
+func (m *WalletNodeMutation) CreatetimeUtc() (r int, exists bool) {
+	v := m.createtime_utc
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatetimeUtc returns the old "createtime_utc" field's value of the WalletNode entity.
+// If the WalletNode object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WalletNodeMutation) OldCreatetimeUtc(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldCreatetimeUtc is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldCreatetimeUtc requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatetimeUtc: %w", err)
+	}
+	return oldValue.CreatetimeUtc, nil
+}
+
+// AddCreatetimeUtc adds i to the "createtime_utc" field.
+func (m *WalletNodeMutation) AddCreatetimeUtc(i int) {
+	if m.addcreatetime_utc != nil {
+		*m.addcreatetime_utc += i
+	} else {
+		m.addcreatetime_utc = &i
+	}
+}
+
+// AddedCreatetimeUtc returns the value that was added to the "createtime_utc" field in this mutation.
+func (m *WalletNodeMutation) AddedCreatetimeUtc() (r int, exists bool) {
+	v := m.addcreatetime_utc
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCreatetimeUtc resets all changes to the "createtime_utc" field.
+func (m *WalletNodeMutation) ResetCreatetimeUtc() {
+	m.createtime_utc = nil
+	m.addcreatetime_utc = nil
+}
+
+// SetLastOnlineTimeUtc sets the "last_online_time_utc" field.
+func (m *WalletNodeMutation) SetLastOnlineTimeUtc(i int) {
+	m.last_online_time_utc = &i
+	m.addlast_online_time_utc = nil
+}
+
+// LastOnlineTimeUtc returns the value of the "last_online_time_utc" field in the mutation.
+func (m *WalletNodeMutation) LastOnlineTimeUtc() (r int, exists bool) {
+	v := m.last_online_time_utc
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLastOnlineTimeUtc returns the old "last_online_time_utc" field's value of the WalletNode entity.
+// If the WalletNode object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WalletNodeMutation) OldLastOnlineTimeUtc(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldLastOnlineTimeUtc is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldLastOnlineTimeUtc requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLastOnlineTimeUtc: %w", err)
+	}
+	return oldValue.LastOnlineTimeUtc, nil
+}
+
+// AddLastOnlineTimeUtc adds i to the "last_online_time_utc" field.
+func (m *WalletNodeMutation) AddLastOnlineTimeUtc(i int) {
+	if m.addlast_online_time_utc != nil {
+		*m.addlast_online_time_utc += i
+	} else {
+		m.addlast_online_time_utc = &i
+	}
+}
+
+// AddedLastOnlineTimeUtc returns the value that was added to the "last_online_time_utc" field in this mutation.
+func (m *WalletNodeMutation) AddedLastOnlineTimeUtc() (r int, exists bool) {
+	v := m.addlast_online_time_utc
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetLastOnlineTimeUtc resets all changes to the "last_online_time_utc" field.
+func (m *WalletNodeMutation) ResetLastOnlineTimeUtc() {
+	m.last_online_time_utc = nil
+	m.addlast_online_time_utc = nil
+}
+
+// SetCoinID sets the "coin" edge to the CoinInfo entity by id.
+func (m *WalletNodeMutation) SetCoinID(id int) {
+	m.coin = &id
+}
+
+// ClearCoin clears the "coin" edge to the CoinInfo entity.
+func (m *WalletNodeMutation) ClearCoin() {
+	m.clearedcoin = true
+}
+
+// CoinCleared reports if the "coin" edge to the CoinInfo entity was cleared.
+func (m *WalletNodeMutation) CoinCleared() bool {
+	return m.clearedcoin
+}
+
+// CoinID returns the "coin" edge ID in the mutation.
+func (m *WalletNodeMutation) CoinID() (id int, exists bool) {
+	if m.coin != nil {
+		return *m.coin, true
+	}
+	return
+}
+
+// CoinIDs returns the "coin" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CoinID instead. It exists only for internal usage by the builders.
+func (m *WalletNodeMutation) CoinIDs() (ids []int) {
+	if id := m.coin; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCoin resets all changes to the "coin" edge.
+func (m *WalletNodeMutation) ResetCoin() {
+	m.coin = nil
+	m.clearedcoin = false
+}
+
+// Where appends a list predicates to the WalletNodeMutation builder.
+func (m *WalletNodeMutation) Where(ps ...predicate.WalletNode) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *WalletNodeMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (WalletNode).
+func (m *WalletNodeMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *WalletNodeMutation) Fields() []string {
+	fields := make([]string, 0, 7)
+	if m.uuid != nil {
+		fields = append(fields, walletnode.FieldUUID)
+	}
+	if m.location != nil {
+		fields = append(fields, walletnode.FieldLocation)
+	}
+	if m.host_vendor != nil {
+		fields = append(fields, walletnode.FieldHostVendor)
+	}
+	if m.public_ip != nil {
+		fields = append(fields, walletnode.FieldPublicIP)
+	}
+	if m.local_ip != nil {
+		fields = append(fields, walletnode.FieldLocalIP)
+	}
+	if m.createtime_utc != nil {
+		fields = append(fields, walletnode.FieldCreatetimeUtc)
+	}
+	if m.last_online_time_utc != nil {
+		fields = append(fields, walletnode.FieldLastOnlineTimeUtc)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *WalletNodeMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case walletnode.FieldUUID:
+		return m.UUID()
+	case walletnode.FieldLocation:
+		return m.Location()
+	case walletnode.FieldHostVendor:
+		return m.HostVendor()
+	case walletnode.FieldPublicIP:
+		return m.PublicIP()
+	case walletnode.FieldLocalIP:
+		return m.LocalIP()
+	case walletnode.FieldCreatetimeUtc:
+		return m.CreatetimeUtc()
+	case walletnode.FieldLastOnlineTimeUtc:
+		return m.LastOnlineTimeUtc()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *WalletNodeMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case walletnode.FieldUUID:
+		return m.OldUUID(ctx)
+	case walletnode.FieldLocation:
+		return m.OldLocation(ctx)
+	case walletnode.FieldHostVendor:
+		return m.OldHostVendor(ctx)
+	case walletnode.FieldPublicIP:
+		return m.OldPublicIP(ctx)
+	case walletnode.FieldLocalIP:
+		return m.OldLocalIP(ctx)
+	case walletnode.FieldCreatetimeUtc:
+		return m.OldCreatetimeUtc(ctx)
+	case walletnode.FieldLastOnlineTimeUtc:
+		return m.OldLastOnlineTimeUtc(ctx)
+	}
+	return nil, fmt.Errorf("unknown WalletNode field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *WalletNodeMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case walletnode.FieldUUID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUUID(v)
+		return nil
+	case walletnode.FieldLocation:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLocation(v)
+		return nil
+	case walletnode.FieldHostVendor:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetHostVendor(v)
+		return nil
+	case walletnode.FieldPublicIP:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPublicIP(v)
+		return nil
+	case walletnode.FieldLocalIP:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLocalIP(v)
+		return nil
+	case walletnode.FieldCreatetimeUtc:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatetimeUtc(v)
+		return nil
+	case walletnode.FieldLastOnlineTimeUtc:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLastOnlineTimeUtc(v)
+		return nil
+	}
+	return fmt.Errorf("unknown WalletNode field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *WalletNodeMutation) AddedFields() []string {
+	var fields []string
+	if m.addcreatetime_utc != nil {
+		fields = append(fields, walletnode.FieldCreatetimeUtc)
+	}
+	if m.addlast_online_time_utc != nil {
+		fields = append(fields, walletnode.FieldLastOnlineTimeUtc)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *WalletNodeMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case walletnode.FieldCreatetimeUtc:
+		return m.AddedCreatetimeUtc()
+	case walletnode.FieldLastOnlineTimeUtc:
+		return m.AddedLastOnlineTimeUtc()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *WalletNodeMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case walletnode.FieldCreatetimeUtc:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCreatetimeUtc(v)
+		return nil
+	case walletnode.FieldLastOnlineTimeUtc:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddLastOnlineTimeUtc(v)
+		return nil
+	}
+	return fmt.Errorf("unknown WalletNode numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *WalletNodeMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *WalletNodeMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *WalletNodeMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown WalletNode nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *WalletNodeMutation) ResetField(name string) error {
+	switch name {
+	case walletnode.FieldUUID:
+		m.ResetUUID()
+		return nil
+	case walletnode.FieldLocation:
+		m.ResetLocation()
+		return nil
+	case walletnode.FieldHostVendor:
+		m.ResetHostVendor()
+		return nil
+	case walletnode.FieldPublicIP:
+		m.ResetPublicIP()
+		return nil
+	case walletnode.FieldLocalIP:
+		m.ResetLocalIP()
+		return nil
+	case walletnode.FieldCreatetimeUtc:
+		m.ResetCreatetimeUtc()
+		return nil
+	case walletnode.FieldLastOnlineTimeUtc:
+		m.ResetLastOnlineTimeUtc()
+		return nil
+	}
+	return fmt.Errorf("unknown WalletNode field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *WalletNodeMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.coin != nil {
+		edges = append(edges, walletnode.EdgeCoin)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *WalletNodeMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case walletnode.EdgeCoin:
+		if id := m.coin; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *WalletNodeMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *WalletNodeMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *WalletNodeMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedcoin {
+		edges = append(edges, walletnode.EdgeCoin)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *WalletNodeMutation) EdgeCleared(name string) bool {
+	switch name {
+	case walletnode.EdgeCoin:
+		return m.clearedcoin
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *WalletNodeMutation) ClearEdge(name string) error {
+	switch name {
+	case walletnode.EdgeCoin:
+		m.ClearCoin()
+		return nil
+	}
+	return fmt.Errorf("unknown WalletNode unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *WalletNodeMutation) ResetEdge(name string) error {
+	switch name {
+	case walletnode.EdgeCoin:
+		m.ResetCoin()
+		return nil
+	}
+	return fmt.Errorf("unknown WalletNode edge %s", name)
 }

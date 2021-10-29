@@ -9,6 +9,7 @@ import (
 	"sphinx/ent/keystore"
 	"sphinx/ent/review"
 	"sphinx/ent/transaction"
+	"sphinx/ent/walletnode"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -36,6 +37,7 @@ func columnChecker(table string) func(string) error {
 		keystore.Table:    keystore.ValidColumn,
 		review.Table:      review.ValidColumn,
 		transaction.Table: transaction.ValidColumn,
+		walletnode.Table:  walletnode.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sphinx/ent/coininfo"
 	"sphinx/ent/review"
 	"sphinx/ent/transaction"
 
@@ -61,6 +62,17 @@ func (rc *ReviewCreate) SetTransactionID(id int) *ReviewCreate {
 // SetTransaction sets the "transaction" edge to the Transaction entity.
 func (rc *ReviewCreate) SetTransaction(t *Transaction) *ReviewCreate {
 	return rc.SetTransactionID(t.ID)
+}
+
+// SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
+func (rc *ReviewCreate) SetCoinID(id int) *ReviewCreate {
+	rc.mutation.SetCoinID(id)
+	return rc
+}
+
+// SetCoin sets the "coin" edge to the CoinInfo entity.
+func (rc *ReviewCreate) SetCoin(c *CoinInfo) *ReviewCreate {
+	return rc.SetCoinID(c.ID)
 }
 
 // Mutation returns the ReviewMutation object of the builder.
@@ -162,6 +174,9 @@ func (rc *ReviewCreate) check() error {
 	if _, ok := rc.mutation.TransactionID(); !ok {
 		return &ValidationError{Name: "transaction", err: errors.New("ent: missing required edge \"transaction\"")}
 	}
+	if _, ok := rc.mutation.CoinID(); !ok {
+		return &ValidationError{Name: "coin", err: errors.New("ent: missing required edge \"coin\"")}
+	}
 	return nil
 }
 
@@ -239,6 +254,26 @@ func (rc *ReviewCreate) createSpec() (*Review, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.transaction_review = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := rc.mutation.CoinIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   review.CoinTable,
+			Columns: []string{review.CoinColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: coininfo.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.coin_info_reviews = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

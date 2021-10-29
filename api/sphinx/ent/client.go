@@ -13,6 +13,7 @@ import (
 	"sphinx/ent/keystore"
 	"sphinx/ent/review"
 	"sphinx/ent/transaction"
+	"sphinx/ent/walletnode"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -32,6 +33,8 @@ type Client struct {
 	Review *ReviewClient
 	// Transaction is the client for interacting with the Transaction builders.
 	Transaction *TransactionClient
+	// WalletNode is the client for interacting with the WalletNode builders.
+	WalletNode *WalletNodeClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -49,6 +52,7 @@ func (c *Client) init() {
 	c.KeyStore = NewKeyStoreClient(c.config)
 	c.Review = NewReviewClient(c.config)
 	c.Transaction = NewTransactionClient(c.config)
+	c.WalletNode = NewWalletNodeClient(c.config)
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -86,6 +90,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		KeyStore:    NewKeyStoreClient(cfg),
 		Review:      NewReviewClient(cfg),
 		Transaction: NewTransactionClient(cfg),
+		WalletNode:  NewWalletNodeClient(cfg),
 	}, nil
 }
 
@@ -108,6 +113,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		KeyStore:    NewKeyStoreClient(cfg),
 		Review:      NewReviewClient(cfg),
 		Transaction: NewTransactionClient(cfg),
+		WalletNode:  NewWalletNodeClient(cfg),
 	}, nil
 }
 
@@ -141,6 +147,7 @@ func (c *Client) Use(hooks ...Hook) {
 	c.KeyStore.Use(hooks...)
 	c.Review.Use(hooks...)
 	c.Transaction.Use(hooks...)
+	c.WalletNode.Use(hooks...)
 }
 
 // CoinInfoClient is a client for the CoinInfo schema.
@@ -253,6 +260,38 @@ func (c *CoinInfoClient) QueryTransactions(ci *CoinInfo) *TransactionQuery {
 			sqlgraph.From(coininfo.Table, coininfo.FieldID, id),
 			sqlgraph.To(transaction.Table, transaction.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, coininfo.TransactionsTable, coininfo.TransactionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(ci.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryReviews queries the reviews edge of a CoinInfo.
+func (c *CoinInfoClient) QueryReviews(ci *CoinInfo) *ReviewQuery {
+	query := &ReviewQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := ci.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(coininfo.Table, coininfo.FieldID, id),
+			sqlgraph.To(review.Table, review.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, coininfo.ReviewsTable, coininfo.ReviewsColumn),
+		)
+		fromV = sqlgraph.Neighbors(ci.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryWalletNodes queries the wallet_nodes edge of a CoinInfo.
+func (c *CoinInfoClient) QueryWalletNodes(ci *CoinInfo) *WalletNodeQuery {
+	query := &WalletNodeQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := ci.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(coininfo.Table, coininfo.FieldID, id),
+			sqlgraph.To(walletnode.Table, walletnode.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, coininfo.WalletNodesTable, coininfo.WalletNodesColumn),
 		)
 		fromV = sqlgraph.Neighbors(ci.driver.Dialect(), step)
 		return fromV, nil
@@ -472,6 +511,22 @@ func (c *ReviewClient) QueryTransaction(r *Review) *TransactionQuery {
 	return query
 }
 
+// QueryCoin queries the coin edge of a Review.
+func (c *ReviewClient) QueryCoin(r *Review) *CoinInfoQuery {
+	query := &CoinInfoQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := r.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(review.Table, review.FieldID, id),
+			sqlgraph.To(coininfo.Table, coininfo.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, review.CoinTable, review.CoinColumn),
+		)
+		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *ReviewClient) Hooks() []Hook {
 	return c.hooks.Review
@@ -597,4 +652,110 @@ func (c *TransactionClient) QueryReview(t *Transaction) *ReviewQuery {
 // Hooks returns the client hooks.
 func (c *TransactionClient) Hooks() []Hook {
 	return c.hooks.Transaction
+}
+
+// WalletNodeClient is a client for the WalletNode schema.
+type WalletNodeClient struct {
+	config
+}
+
+// NewWalletNodeClient returns a client for the WalletNode from the given config.
+func NewWalletNodeClient(c config) *WalletNodeClient {
+	return &WalletNodeClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `walletnode.Hooks(f(g(h())))`.
+func (c *WalletNodeClient) Use(hooks ...Hook) {
+	c.hooks.WalletNode = append(c.hooks.WalletNode, hooks...)
+}
+
+// Create returns a create builder for WalletNode.
+func (c *WalletNodeClient) Create() *WalletNodeCreate {
+	mutation := newWalletNodeMutation(c.config, OpCreate)
+	return &WalletNodeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of WalletNode entities.
+func (c *WalletNodeClient) CreateBulk(builders ...*WalletNodeCreate) *WalletNodeCreateBulk {
+	return &WalletNodeCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for WalletNode.
+func (c *WalletNodeClient) Update() *WalletNodeUpdate {
+	mutation := newWalletNodeMutation(c.config, OpUpdate)
+	return &WalletNodeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *WalletNodeClient) UpdateOne(wn *WalletNode) *WalletNodeUpdateOne {
+	mutation := newWalletNodeMutation(c.config, OpUpdateOne, withWalletNode(wn))
+	return &WalletNodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *WalletNodeClient) UpdateOneID(id int) *WalletNodeUpdateOne {
+	mutation := newWalletNodeMutation(c.config, OpUpdateOne, withWalletNodeID(id))
+	return &WalletNodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for WalletNode.
+func (c *WalletNodeClient) Delete() *WalletNodeDelete {
+	mutation := newWalletNodeMutation(c.config, OpDelete)
+	return &WalletNodeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *WalletNodeClient) DeleteOne(wn *WalletNode) *WalletNodeDeleteOne {
+	return c.DeleteOneID(wn.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *WalletNodeClient) DeleteOneID(id int) *WalletNodeDeleteOne {
+	builder := c.Delete().Where(walletnode.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &WalletNodeDeleteOne{builder}
+}
+
+// Query returns a query builder for WalletNode.
+func (c *WalletNodeClient) Query() *WalletNodeQuery {
+	return &WalletNodeQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a WalletNode entity by its id.
+func (c *WalletNodeClient) Get(ctx context.Context, id int) (*WalletNode, error) {
+	return c.Query().Where(walletnode.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *WalletNodeClient) GetX(ctx context.Context, id int) *WalletNode {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCoin queries the coin edge of a WalletNode.
+func (c *WalletNodeClient) QueryCoin(wn *WalletNode) *CoinInfoQuery {
+	query := &CoinInfoQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := wn.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(walletnode.Table, walletnode.FieldID, id),
+			sqlgraph.To(coininfo.Table, coininfo.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, walletnode.CoinTable, walletnode.CoinColumn),
+		)
+		fromV = sqlgraph.Neighbors(wn.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *WalletNodeClient) Hooks() []Hook {
+	return c.hooks.WalletNode
 }

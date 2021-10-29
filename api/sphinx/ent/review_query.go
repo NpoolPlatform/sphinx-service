@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"sphinx/ent/coininfo"
 	"sphinx/ent/predicate"
 	"sphinx/ent/review"
 	"sphinx/ent/transaction"
@@ -27,6 +28,7 @@ type ReviewQuery struct {
 	predicates []predicate.Review
 	// eager-loading edges.
 	withTransaction *TransactionQuery
+	withCoin        *CoinInfoQuery
 	withFKs         bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -79,6 +81,28 @@ func (rq *ReviewQuery) QueryTransaction() *TransactionQuery {
 			sqlgraph.From(review.Table, review.FieldID, selector),
 			sqlgraph.To(transaction.Table, transaction.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, review.TransactionTable, review.TransactionColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryCoin chains the current query on the "coin" edge.
+func (rq *ReviewQuery) QueryCoin() *CoinInfoQuery {
+	query := &CoinInfoQuery{config: rq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := rq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := rq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(review.Table, review.FieldID, selector),
+			sqlgraph.To(coininfo.Table, coininfo.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, review.CoinTable, review.CoinColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
 		return fromU, nil
@@ -268,6 +292,7 @@ func (rq *ReviewQuery) Clone() *ReviewQuery {
 		order:           append([]OrderFunc{}, rq.order...),
 		predicates:      append([]predicate.Review{}, rq.predicates...),
 		withTransaction: rq.withTransaction.Clone(),
+		withCoin:        rq.withCoin.Clone(),
 		// clone intermediate query.
 		sql:  rq.sql.Clone(),
 		path: rq.path,
@@ -282,6 +307,17 @@ func (rq *ReviewQuery) WithTransaction(opts ...func(*TransactionQuery)) *ReviewQ
 		opt(query)
 	}
 	rq.withTransaction = query
+	return rq
+}
+
+// WithCoin tells the query-builder to eager-load the nodes that are connected to
+// the "coin" edge. The optional arguments are used to configure the query builder of the edge.
+func (rq *ReviewQuery) WithCoin(opts ...func(*CoinInfoQuery)) *ReviewQuery {
+	query := &CoinInfoQuery{config: rq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	rq.withCoin = query
 	return rq
 }
 
@@ -351,11 +387,12 @@ func (rq *ReviewQuery) sqlAll(ctx context.Context) ([]*Review, error) {
 		nodes       = []*Review{}
 		withFKs     = rq.withFKs
 		_spec       = rq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			rq.withTransaction != nil,
+			rq.withCoin != nil,
 		}
 	)
-	if rq.withTransaction != nil {
+	if rq.withTransaction != nil || rq.withCoin != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -406,6 +443,35 @@ func (rq *ReviewQuery) sqlAll(ctx context.Context) ([]*Review, error) {
 			}
 			for i := range nodes {
 				nodes[i].Edges.Transaction = n
+			}
+		}
+	}
+
+	if query := rq.withCoin; query != nil {
+		ids := make([]int, 0, len(nodes))
+		nodeids := make(map[int][]*Review)
+		for i := range nodes {
+			if nodes[i].coin_info_reviews == nil {
+				continue
+			}
+			fk := *nodes[i].coin_info_reviews
+			if _, ok := nodeids[fk]; !ok {
+				ids = append(ids, fk)
+			}
+			nodeids[fk] = append(nodeids[fk], nodes[i])
+		}
+		query.Where(coininfo.IDIn(ids...))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			nodes, ok := nodeids[n.ID]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "coin_info_reviews" returned %v`, n.ID)
+			}
+			for i := range nodes {
+				nodes[i].Edges.Coin = n
 			}
 		}
 	}

@@ -17,3 +17,6 @@ type Review func(*sql.Selector)
 
 // Transaction is the predicate function for transaction builders.
 type Transaction func(*sql.Selector)
+
+// WalletNode is the predicate function for walletnode builders.
+type WalletNode func(*sql.Selector)

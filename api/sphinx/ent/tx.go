@@ -20,6 +20,8 @@ type Tx struct {
 	Review *ReviewClient
 	// Transaction is the client for interacting with the Transaction builders.
 	Transaction *TransactionClient
+	// WalletNode is the client for interacting with the WalletNode builders.
+	WalletNode *WalletNodeClient
 
 	// lazily loaded.
 	client     *Client
@@ -159,6 +161,7 @@ func (tx *Tx) init() {
 	tx.KeyStore = NewKeyStoreClient(tx.config)
 	tx.Review = NewReviewClient(tx.config)
 	tx.Transaction = NewTransactionClient(tx.config)
+	tx.WalletNode = NewWalletNodeClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

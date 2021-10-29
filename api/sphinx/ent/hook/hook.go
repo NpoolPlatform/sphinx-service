@@ -60,6 +60,19 @@ func (f TransactionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value,
 	return f(ctx, mv)
 }
 
+// The WalletNodeFunc type is an adapter to allow the use of ordinary
+// function as WalletNode mutator.
+type WalletNodeFunc func(context.Context, *ent.WalletNodeMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f WalletNodeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.WalletNodeMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.WalletNodeMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // Condition is a hook condition function.
 type Condition func(context.Context, ent.Mutation) bool
 

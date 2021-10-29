@@ -405,6 +405,62 @@ func HasTransactionsWith(preds ...predicate.Transaction) predicate.CoinInfo {
 	})
 }
 
+// HasReviews applies the HasEdge predicate on the "reviews" edge.
+func HasReviews() predicate.CoinInfo {
+	return predicate.CoinInfo(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ReviewsTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ReviewsTable, ReviewsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasReviewsWith applies the HasEdge predicate on the "reviews" edge with a given conditions (other predicates).
+func HasReviewsWith(preds ...predicate.Review) predicate.CoinInfo {
+	return predicate.CoinInfo(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ReviewsInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ReviewsTable, ReviewsColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasWalletNodes applies the HasEdge predicate on the "wallet_nodes" edge.
+func HasWalletNodes() predicate.CoinInfo {
+	return predicate.CoinInfo(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(WalletNodesTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, WalletNodesTable, WalletNodesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasWalletNodesWith applies the HasEdge predicate on the "wallet_nodes" edge with a given conditions (other predicates).
+func HasWalletNodesWith(preds ...predicate.WalletNode) predicate.CoinInfo {
+	return predicate.CoinInfo(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(WalletNodesInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, WalletNodesTable, WalletNodesColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.CoinInfo) predicate.CoinInfo {
 	return predicate.CoinInfo(func(s *sql.Selector) {

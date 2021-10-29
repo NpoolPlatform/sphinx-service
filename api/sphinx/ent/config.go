@@ -28,6 +28,7 @@ type hooks struct {
 	KeyStore    []ent.Hook
 	Review      []ent.Hook
 	Transaction []ent.Hook
+	WalletNode  []ent.Hook
 }
 
 // Options applies the options on the config object.

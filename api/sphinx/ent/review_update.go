@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sphinx/ent/coininfo"
 	"sphinx/ent/predicate"
 	"sphinx/ent/review"
 	"sphinx/ent/transaction"
@@ -85,6 +86,17 @@ func (ru *ReviewUpdate) SetTransaction(t *Transaction) *ReviewUpdate {
 	return ru.SetTransactionID(t.ID)
 }
 
+// SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
+func (ru *ReviewUpdate) SetCoinID(id int) *ReviewUpdate {
+	ru.mutation.SetCoinID(id)
+	return ru
+}
+
+// SetCoin sets the "coin" edge to the CoinInfo entity.
+func (ru *ReviewUpdate) SetCoin(c *CoinInfo) *ReviewUpdate {
+	return ru.SetCoinID(c.ID)
+}
+
 // Mutation returns the ReviewMutation object of the builder.
 func (ru *ReviewUpdate) Mutation() *ReviewMutation {
 	return ru.mutation
@@ -93,6 +105,12 @@ func (ru *ReviewUpdate) Mutation() *ReviewMutation {
 // ClearTransaction clears the "transaction" edge to the Transaction entity.
 func (ru *ReviewUpdate) ClearTransaction() *ReviewUpdate {
 	ru.mutation.ClearTransaction()
+	return ru
+}
+
+// ClearCoin clears the "coin" edge to the CoinInfo entity.
+func (ru *ReviewUpdate) ClearCoin() *ReviewUpdate {
+	ru.mutation.ClearCoin()
 	return ru
 }
 
@@ -165,6 +183,9 @@ func (ru *ReviewUpdate) check() error {
 	}
 	if _, ok := ru.mutation.TransactionID(); ru.mutation.TransactionCleared() && !ok {
 		return errors.New("ent: clearing a required unique edge \"transaction\"")
+	}
+	if _, ok := ru.mutation.CoinID(); ru.mutation.CoinCleared() && !ok {
+		return errors.New("ent: clearing a required unique edge \"coin\"")
 	}
 	return nil
 }
@@ -264,6 +285,41 @@ func (ru *ReviewUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if ru.mutation.CoinCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   review.CoinTable,
+			Columns: []string{review.CoinColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: coininfo.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ru.mutation.CoinIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   review.CoinTable,
+			Columns: []string{review.CoinColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: coininfo.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, ru.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{review.Label}
@@ -340,6 +396,17 @@ func (ruo *ReviewUpdateOne) SetTransaction(t *Transaction) *ReviewUpdateOne {
 	return ruo.SetTransactionID(t.ID)
 }
 
+// SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
+func (ruo *ReviewUpdateOne) SetCoinID(id int) *ReviewUpdateOne {
+	ruo.mutation.SetCoinID(id)
+	return ruo
+}
+
+// SetCoin sets the "coin" edge to the CoinInfo entity.
+func (ruo *ReviewUpdateOne) SetCoin(c *CoinInfo) *ReviewUpdateOne {
+	return ruo.SetCoinID(c.ID)
+}
+
 // Mutation returns the ReviewMutation object of the builder.
 func (ruo *ReviewUpdateOne) Mutation() *ReviewMutation {
 	return ruo.mutation
@@ -348,6 +415,12 @@ func (ruo *ReviewUpdateOne) Mutation() *ReviewMutation {
 // ClearTransaction clears the "transaction" edge to the Transaction entity.
 func (ruo *ReviewUpdateOne) ClearTransaction() *ReviewUpdateOne {
 	ruo.mutation.ClearTransaction()
+	return ruo
+}
+
+// ClearCoin clears the "coin" edge to the CoinInfo entity.
+func (ruo *ReviewUpdateOne) ClearCoin() *ReviewUpdateOne {
+	ruo.mutation.ClearCoin()
 	return ruo
 }
 
@@ -427,6 +500,9 @@ func (ruo *ReviewUpdateOne) check() error {
 	}
 	if _, ok := ruo.mutation.TransactionID(); ruo.mutation.TransactionCleared() && !ok {
 		return errors.New("ent: clearing a required unique edge \"transaction\"")
+	}
+	if _, ok := ruo.mutation.CoinID(); ruo.mutation.CoinCleared() && !ok {
+		return errors.New("ent: clearing a required unique edge \"coin\"")
 	}
 	return nil
 }
@@ -535,6 +611,41 @@ func (ruo *ReviewUpdateOne) sqlSave(ctx context.Context) (_node *Review, err err
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: transaction.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if ruo.mutation.CoinCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   review.CoinTable,
+			Columns: []string{review.CoinColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: coininfo.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ruo.mutation.CoinIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   review.CoinTable,
+			Columns: []string{review.CoinColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: coininfo.FieldID,
 				},
 			},
 		}

@@ -425,6 +425,34 @@ func HasTransactionWith(preds ...predicate.Transaction) predicate.Review {
 	})
 }
 
+// HasCoin applies the HasEdge predicate on the "coin" edge.
+func HasCoin() predicate.Review {
+	return predicate.Review(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(CoinTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, CoinTable, CoinColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCoinWith applies the HasEdge predicate on the "coin" edge with a given conditions (other predicates).
+func HasCoinWith(preds ...predicate.CoinInfo) predicate.Review {
+	return predicate.Review(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(CoinInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, CoinTable, CoinColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Review) predicate.Review {
 	return predicate.Review(func(s *sql.Selector) {

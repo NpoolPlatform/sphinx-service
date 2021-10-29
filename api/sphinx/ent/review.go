@@ -4,6 +4,7 @@ package ent
 
 import (
 	"fmt"
+	"sphinx/ent/coininfo"
 	"sphinx/ent/review"
 	"sphinx/ent/transaction"
 	"strings"
@@ -27,6 +28,7 @@ type Review struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ReviewQuery when eager-loading is set.
 	Edges              ReviewEdges `json:"edges"`
+	coin_info_reviews  *int
 	transaction_review *int
 }
 
@@ -34,9 +36,11 @@ type Review struct {
 type ReviewEdges struct {
 	// Transaction holds the value of the transaction edge.
 	Transaction *Transaction `json:"transaction,omitempty"`
+	// Coin holds the value of the coin edge.
+	Coin *CoinInfo `json:"coin,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // TransactionOrErr returns the Transaction value or an error if the edge
@@ -53,6 +57,20 @@ func (e ReviewEdges) TransactionOrErr() (*Transaction, error) {
 	return nil, &NotLoadedError{edge: "transaction"}
 }
 
+// CoinOrErr returns the Coin value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ReviewEdges) CoinOrErr() (*CoinInfo, error) {
+	if e.loadedTypes[1] {
+		if e.Coin == nil {
+			// The edge coin was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: coininfo.Label}
+		}
+		return e.Coin, nil
+	}
+	return nil, &NotLoadedError{edge: "coin"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Review) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
@@ -64,7 +82,9 @@ func (*Review) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullInt64)
 		case review.FieldOperatorNote:
 			values[i] = new(sql.NullString)
-		case review.ForeignKeys[0]: // transaction_review
+		case review.ForeignKeys[0]: // coin_info_reviews
+			values[i] = new(sql.NullInt64)
+		case review.ForeignKeys[1]: // transaction_review
 			values[i] = new(sql.NullInt64)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Review", columns[i])
@@ -113,6 +133,13 @@ func (r *Review) assignValues(columns []string, values []interface{}) error {
 			}
 		case review.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field coin_info_reviews", value)
+			} else if value.Valid {
+				r.coin_info_reviews = new(int)
+				*r.coin_info_reviews = int(value.Int64)
+			}
+		case review.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field transaction_review", value)
 			} else if value.Valid {
 				r.transaction_review = new(int)
@@ -126,6 +153,11 @@ func (r *Review) assignValues(columns []string, values []interface{}) error {
 // QueryTransaction queries the "transaction" edge of the Review entity.
 func (r *Review) QueryTransaction() *TransactionQuery {
 	return (&ReviewClient{config: r.config}).QueryTransaction(r)
+}
+
+// QueryCoin queries the "coin" edge of the Review entity.
+func (r *Review) QueryCoin() *CoinInfoQuery {
+	return (&ReviewClient{config: r.config}).QueryCoin(r)
 }
 
 // Update returns a builder for updating this Review.

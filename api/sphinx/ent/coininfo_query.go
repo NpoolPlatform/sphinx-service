@@ -11,7 +11,9 @@ import (
 	"sphinx/ent/coininfo"
 	"sphinx/ent/keystore"
 	"sphinx/ent/predicate"
+	"sphinx/ent/review"
 	"sphinx/ent/transaction"
+	"sphinx/ent/walletnode"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -30,6 +32,8 @@ type CoinInfoQuery struct {
 	// eager-loading edges.
 	withKeys         *KeyStoreQuery
 	withTransactions *TransactionQuery
+	withReviews      *ReviewQuery
+	withWalletNodes  *WalletNodeQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -103,6 +107,50 @@ func (ciq *CoinInfoQuery) QueryTransactions() *TransactionQuery {
 			sqlgraph.From(coininfo.Table, coininfo.FieldID, selector),
 			sqlgraph.To(transaction.Table, transaction.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, coininfo.TransactionsTable, coininfo.TransactionsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(ciq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryReviews chains the current query on the "reviews" edge.
+func (ciq *CoinInfoQuery) QueryReviews() *ReviewQuery {
+	query := &ReviewQuery{config: ciq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := ciq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := ciq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(coininfo.Table, coininfo.FieldID, selector),
+			sqlgraph.To(review.Table, review.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, coininfo.ReviewsTable, coininfo.ReviewsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(ciq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryWalletNodes chains the current query on the "wallet_nodes" edge.
+func (ciq *CoinInfoQuery) QueryWalletNodes() *WalletNodeQuery {
+	query := &WalletNodeQuery{config: ciq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := ciq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := ciq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(coininfo.Table, coininfo.FieldID, selector),
+			sqlgraph.To(walletnode.Table, walletnode.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, coininfo.WalletNodesTable, coininfo.WalletNodesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(ciq.driver.Dialect(), step)
 		return fromU, nil
@@ -293,6 +341,8 @@ func (ciq *CoinInfoQuery) Clone() *CoinInfoQuery {
 		predicates:       append([]predicate.CoinInfo{}, ciq.predicates...),
 		withKeys:         ciq.withKeys.Clone(),
 		withTransactions: ciq.withTransactions.Clone(),
+		withReviews:      ciq.withReviews.Clone(),
+		withWalletNodes:  ciq.withWalletNodes.Clone(),
 		// clone intermediate query.
 		sql:  ciq.sql.Clone(),
 		path: ciq.path,
@@ -318,6 +368,28 @@ func (ciq *CoinInfoQuery) WithTransactions(opts ...func(*TransactionQuery)) *Coi
 		opt(query)
 	}
 	ciq.withTransactions = query
+	return ciq
+}
+
+// WithReviews tells the query-builder to eager-load the nodes that are connected to
+// the "reviews" edge. The optional arguments are used to configure the query builder of the edge.
+func (ciq *CoinInfoQuery) WithReviews(opts ...func(*ReviewQuery)) *CoinInfoQuery {
+	query := &ReviewQuery{config: ciq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	ciq.withReviews = query
+	return ciq
+}
+
+// WithWalletNodes tells the query-builder to eager-load the nodes that are connected to
+// the "wallet_nodes" edge. The optional arguments are used to configure the query builder of the edge.
+func (ciq *CoinInfoQuery) WithWalletNodes(opts ...func(*WalletNodeQuery)) *CoinInfoQuery {
+	query := &WalletNodeQuery{config: ciq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	ciq.withWalletNodes = query
 	return ciq
 }
 
@@ -386,9 +458,11 @@ func (ciq *CoinInfoQuery) sqlAll(ctx context.Context) ([]*CoinInfo, error) {
 	var (
 		nodes       = []*CoinInfo{}
 		_spec       = ciq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [4]bool{
 			ciq.withKeys != nil,
 			ciq.withTransactions != nil,
+			ciq.withReviews != nil,
+			ciq.withWalletNodes != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
@@ -466,6 +540,64 @@ func (ciq *CoinInfoQuery) sqlAll(ctx context.Context) ([]*CoinInfo, error) {
 				return nil, fmt.Errorf(`unexpected foreign-key "coin_info_transactions" returned %v for node %v`, *fk, n.ID)
 			}
 			node.Edges.Transactions = append(node.Edges.Transactions, n)
+		}
+	}
+
+	if query := ciq.withReviews; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		nodeids := make(map[int]*CoinInfo)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+			nodes[i].Edges.Reviews = []*Review{}
+		}
+		query.withFKs = true
+		query.Where(predicate.Review(func(s *sql.Selector) {
+			s.Where(sql.InValues(coininfo.ReviewsColumn, fks...))
+		}))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			fk := n.coin_info_reviews
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "coin_info_reviews" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "coin_info_reviews" returned %v for node %v`, *fk, n.ID)
+			}
+			node.Edges.Reviews = append(node.Edges.Reviews, n)
+		}
+	}
+
+	if query := ciq.withWalletNodes; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		nodeids := make(map[int]*CoinInfo)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+			nodes[i].Edges.WalletNodes = []*WalletNode{}
+		}
+		query.withFKs = true
+		query.Where(predicate.WalletNode(func(s *sql.Selector) {
+			s.Where(sql.InValues(coininfo.WalletNodesColumn, fks...))
+		}))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			fk := n.coin_info_wallet_nodes
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "coin_info_wallet_nodes" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "coin_info_wallet_nodes" returned %v for node %v`, *fk, n.ID)
+			}
+			node.Edges.WalletNodes = append(node.Edges.WalletNodes, n)
 		}
 	}
 
