@@ -81,13 +81,13 @@ service Trading {
   message GetBalanceRequest {
     int32 coin_id = 1;
     string address = 2;
-    uint64 timestamp_utc = 3;
+    int64 timestamp_utc = 3;
   }
   // GetBalance 返回
   message AccountBalance {
     int32 coin_id = 1;
     string address = 2;
-    uint64 timestamp_utc = 3;
+    int64 timestamp_utc = 3;
     int64 amount_int = 4;
     int32 amount_digits = 5;
     string amount_string = 6;
