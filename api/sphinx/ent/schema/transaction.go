@@ -43,7 +43,11 @@ func (Transaction) Edges() []ent.Edge {
 
 func (Transaction) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("address_from", "address_to", "type", "status", "createtime_utc"),
+		index.Fields("address_from"),
+		index.Fields("address_to"),
+		index.Fields("type"),
+		index.Fields("status"),
+		index.Fields("createtime_utc"),
 		index.Fields("transaction_id_insite").
 			Edges("coin").Unique(),
 		index.Fields("transaction_id_chain").

@@ -4,7 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-  "entgo.io/ent/schema/index"
+	"entgo.io/ent/schema/index"
 )
 
 type CoinInfo struct {
@@ -23,6 +23,7 @@ func (CoinInfo) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("keys", KeyStore.Type),
 		edge.To("transactions", Transaction.Type),
+		edge.To("reviews", Review.Type),
 	}
 }
 

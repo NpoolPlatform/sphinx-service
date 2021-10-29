@@ -24,12 +24,14 @@ func (Review) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("transaction", Transaction.Type).
 			Ref("review").Unique().Required(),
+		edge.From("coin", CoinInfo.Type).Ref("reviews").
+			Unique().Required(),
 	}
 }
 
 func (Review) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("is_approved", "createtime_utc"),
+		index.Fields("is_approved"),
+		index.Fields("createtime_utc"),
 	}
 }
-
