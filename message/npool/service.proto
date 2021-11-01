@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package sphinx.v1;
 
-option go_package = "github.com/cyvadra/sphinx/message/npool";
+option go_package = "github.com/NpoolPlatform/sphinx-service/message/npool";
 
 import "google/api/annotations.proto";
 import "google/protobuf/Empty.proto";
@@ -95,10 +95,9 @@ message AccountBalance {
   int32 coin_id = 1;
   string address = 2; // 查询的钱包地址
   int64 timestamp_utc = 3; // 长整型时间戳
-  string address_to = 4; // 接收方
-  int64 amount_int = 5; // 金额整数
-  int32 amount_digits = 6; // 金额*了10的^n，默认为9
-  string amount_string = 7; // 金额字符串，"123.45678901"
+  int64 amount_int = 4; // 金额整数
+  int32 amount_digits = 5; // 金额*了10的^n，默认为9
+  string amount_string = 6; // 金额字符串，"123.45678901"
 }
 
 // GetTxJSONRequest 参数
@@ -126,16 +125,17 @@ message GetInsiteTxStatusResponse {
   int64 amount_int = 2; // 放大后的金额整数
   int32 amount_digits = 3; // amount_int == amount*10^n
   string address_from = 4; // 发送方
-  string amount_string = 5; // 便于验证，数据库里不存
-  string insite_tx_type = 6; // recharge, payment, withdraw, unknown
-  string transaction_id_insite = 7; // 站内交易ID
-  string transaction_id_chain = 8; // 公链交易ID（如有）
-  string status = 9; // 为done则成功；全部状态："pending_review", "pending_process", "pending_signinfo", "pending_signaction", "pending_broadcast", "pending_confirm", "done", "rejected", "error", "error_expected"
-  bool is_processing = 10; // 对应数据库中mutex
-  int64 createtime_utc = 11; // 创建时间
-  int64 updatetime_utc = 12; // 上次更新时间
-  bool is_success = 13; // 便于调用方判断
-  bool is_failed = 14; // 不success不fail就是pending了
+  string address_to = 5; // 接收方
+  string amount_string = 6; // 便于验证，数据库里不存
+  string insite_tx_type = 7; // recharge, payment, withdraw, unknown
+  string transaction_id_insite = 8; // 站内交易ID
+  string transaction_id_chain = 9; // 公链交易ID（如有）
+  string status = 10; // 为done则成功；全部状态："pending_review", "pending_process", "pending_signinfo", "pending_signaction", "pending_broadcast", "pending_confirm", "done", "rejected", "error", "error_expected"
+  bool is_processing = 11; // 对应数据库中mutex
+  int64 createtime_utc = 12; // 创建时间
+  int64 updatetime_utc = 13; // 上次更新时间
+  bool is_success = 14; // 便于调用方判断
+  bool is_failed = 15; // 不success不fail就是pending了
 }
 
 // ApplyTransaction 参数
@@ -143,9 +143,12 @@ message ApplyTransactionRequest {
   int32 coin_id = 1;
   string transaction_id_insite = 2; // 站内交易ID
   string address_from = 3; // 发送方
-  int64 amount_int = 4; // 放大后的金额整数
-  int32 amount_digits = 5; // 放大倍数，默认为9
-  string amount_string = 6; // str格式金额，便于确认，如：0.000500021，则amount_int为500021, amount_digits为9；如80231310000.0000，可选amount_int为8023131，amount_digits为-4；注意amount_int为int64类型，可存储18位有效数字
+  string address_to = 4; // 接收方
+  int64 amount_int = 5; // 放大后的金额整数
+  int32 amount_digits = 6; // 放大倍数，默认为9
+  string amount_string = 7; // str格式金额，便于确认，如：0.000500021，则amount_int为500021, amount_digits为9；如80231310000.0000，可选amount_int为8023131，amount_digits为-4；注意amount_int为int64类型，可存储18位有效数字
+  string uuid_signature = 8; // 2FA的时效性验证码，前期可以留空
+  // 因验证码缘故，服务端务必保存好createtime_utc
 }
 
 // PortalSignInit 参数

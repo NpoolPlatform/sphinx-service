@@ -3,7 +3,7 @@
 
 ## Table of Contents
 
-- [npool/all.proto](#npool/all.proto)
+- [npool/service.proto](#npool/service.proto)
     - [AccountAddress](#sphinx.v1.AccountAddress)
     - [AccountBalance](#sphinx.v1.AccountBalance)
     - [AccountTxJSON](#sphinx.v1.AccountTxJSON)
@@ -27,10 +27,10 @@
 
 
 
-<a name="npool/all.proto"></a>
+<a name="npool/service.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## npool/all.proto
+## npool/service.proto
 
 
 
@@ -62,7 +62,6 @@ GetBalance 返回
 | coin_id | [int32](#int32) |  |  |
 | address | [string](#string) |  | 查询的钱包地址 |
 | timestamp_utc | [int64](#int64) |  | 长整型时间戳 |
-| address_to | [string](#string) |  | 接收方 |
 | amount_int | [int64](#int64) |  | 金额整数 |
 | amount_digits | [int32](#int32) |  | 金额*了10的^n，默认为9 |
 | amount_string | [string](#string) |  | 金额字符串，&#34;123.45678901&#34; |
@@ -98,9 +97,11 @@ ApplyTransaction 参数
 | coin_id | [int32](#int32) |  |  |
 | transaction_id_insite | [string](#string) |  | 站内交易ID |
 | address_from | [string](#string) |  | 发送方 |
+| address_to | [string](#string) |  | 接收方 |
 | amount_int | [int64](#int64) |  | 放大后的金额整数 |
 | amount_digits | [int32](#int32) |  | 放大倍数，默认为9 |
 | amount_string | [string](#string) |  | str格式金额，便于确认，如：0.000500021，则amount_int为500021, amount_digits为9；如80231310000.0000，可选amount_int为8023131，amount_digits为-4；注意amount_int为int64类型，可存储18位有效数字 |
+| uuid_signature | [string](#string) |  | 2FA的时效性验证码，前期可以留空 |
 
 
 
@@ -214,6 +215,7 @@ GetInsiteTxStatus 返回
 | amount_int | [int64](#int64) |  | 放大后的金额整数 |
 | amount_digits | [int32](#int32) |  | amount_int == amount*10^n |
 | address_from | [string](#string) |  | 发送方 |
+| address_to | [string](#string) |  | 接收方 |
 | amount_string | [string](#string) |  | 便于验证，数据库里不存 |
 | insite_tx_type | [string](#string) |  | recharge, payment, withdraw, unknown |
 | transaction_id_insite | [string](#string) |  | 站内交易ID |

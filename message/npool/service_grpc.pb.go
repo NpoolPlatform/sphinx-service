@@ -404,5 +404,5 @@ var Trading_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "npool/all.proto",
+	Metadata: "npool/service.proto",
 }
