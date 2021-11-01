@@ -252,6 +252,8 @@ SignScript 参数
 | amount_int | [int64](#int64) |  | 金额整数 |
 | amount_digits | [int32](#int32) |  | 默认为9 |
 | amount_string | [string](#string) |  | 字符串格式数据，便于确认 |
+| uuid_signature | [string](#string) |  | 2FA签名 |
+| createtime_utc | [int64](#int64) |  | 用户发起提现的时间，与2FA绑定 |
 
 
 

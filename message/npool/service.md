@@ -102,6 +102,7 @@ ApplyTransaction 参数
 | amount_digits | [int32](#int32) |  | 放大倍数，默认为9 |
 | amount_string | [string](#string) |  | str格式金额，便于确认，如：0.000500021，则amount_int为500021, amount_digits为9；如80231310000.0000，可选amount_int为8023131，amount_digits为-4；注意amount_int为int64类型，可存储18位有效数字 |
 | uuid_signature | [string](#string) |  | 2FA的时效性验证码，前期可以留空 |
+| createtime_utc | [int64](#int64) |  | 用户提交请求时的时间戳，与2FA绑定 |
 
 
 
