@@ -7,6 +7,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -27,7 +28,15 @@ type TradingClient interface {
 	// 余额查询
 	GetBalance(ctx context.Context, in *GetBalanceRequest, opts ...grpc.CallOption) (*AccountBalance, error)
 	// 转账 / 提现
-	ApplyTransaction(ctx context.Context, in *ApplyTransactionRequest, opts ...grpc.CallOption) (*SuccessCode, error)
+	ApplyTransaction(ctx context.Context, in *ApplyTransactionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// 签名服务接入点
+	PortalSign(ctx context.Context, in *PortalSignInit, opts ...grpc.CallOption) (*IdentityProof, error)
+	// 代理服务接入点
+	PortalWallet(ctx context.Context, in *PortalWalletInit, opts ...grpc.CallOption) (*IdentityProof, error)
+	// 账户交易查询
+	GetTxJSON(ctx context.Context, in *GetTxJSONRequest, opts ...grpc.CallOption) (*AccountTxJSON, error)
+	// 交易状态查询
+	GetInsiteTxStatus(ctx context.Context, in *GetInsiteTxStatusRequest, opts ...grpc.CallOption) (*GetInsiteTxStatusResponse, error)
 }
 
 type tradingClient struct {
@@ -74,9 +83,45 @@ func (c *tradingClient) GetBalance(ctx context.Context, in *GetBalanceRequest, o
 	return out, nil
 }
 
-func (c *tradingClient) ApplyTransaction(ctx context.Context, in *ApplyTransactionRequest, opts ...grpc.CallOption) (*SuccessCode, error) {
-	out := new(SuccessCode)
+func (c *tradingClient) ApplyTransaction(ctx context.Context, in *ApplyTransactionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/sphinx.v1.Trading/ApplyTransaction", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tradingClient) PortalSign(ctx context.Context, in *PortalSignInit, opts ...grpc.CallOption) (*IdentityProof, error) {
+	out := new(IdentityProof)
+	err := c.cc.Invoke(ctx, "/sphinx.v1.Trading/PortalSign", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tradingClient) PortalWallet(ctx context.Context, in *PortalWalletInit, opts ...grpc.CallOption) (*IdentityProof, error) {
+	out := new(IdentityProof)
+	err := c.cc.Invoke(ctx, "/sphinx.v1.Trading/PortalWallet", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tradingClient) GetTxJSON(ctx context.Context, in *GetTxJSONRequest, opts ...grpc.CallOption) (*AccountTxJSON, error) {
+	out := new(AccountTxJSON)
+	err := c.cc.Invoke(ctx, "/sphinx.v1.Trading/GetTxJSON", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tradingClient) GetInsiteTxStatus(ctx context.Context, in *GetInsiteTxStatusRequest, opts ...grpc.CallOption) (*GetInsiteTxStatusResponse, error) {
+	out := new(GetInsiteTxStatusResponse)
+	err := c.cc.Invoke(ctx, "/sphinx.v1.Trading/GetInsiteTxStatus", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +141,15 @@ type TradingServer interface {
 	// 余额查询
 	GetBalance(context.Context, *GetBalanceRequest) (*AccountBalance, error)
 	// 转账 / 提现
-	ApplyTransaction(context.Context, *ApplyTransactionRequest) (*SuccessCode, error)
+	ApplyTransaction(context.Context, *ApplyTransactionRequest) (*emptypb.Empty, error)
+	// 签名服务接入点
+	PortalSign(context.Context, *PortalSignInit) (*IdentityProof, error)
+	// 代理服务接入点
+	PortalWallet(context.Context, *PortalWalletInit) (*IdentityProof, error)
+	// 账户交易查询
+	GetTxJSON(context.Context, *GetTxJSONRequest) (*AccountTxJSON, error)
+	// 交易状态查询
+	GetInsiteTxStatus(context.Context, *GetInsiteTxStatusRequest) (*GetInsiteTxStatusResponse, error)
 	mustEmbedUnimplementedTradingServer()
 }
 
@@ -116,8 +169,20 @@ func (UnimplementedTradingServer) RegisterAccount(context.Context, *RegisterAcco
 func (UnimplementedTradingServer) GetBalance(context.Context, *GetBalanceRequest) (*AccountBalance, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBalance not implemented")
 }
-func (UnimplementedTradingServer) ApplyTransaction(context.Context, *ApplyTransactionRequest) (*SuccessCode, error) {
+func (UnimplementedTradingServer) ApplyTransaction(context.Context, *ApplyTransactionRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ApplyTransaction not implemented")
+}
+func (UnimplementedTradingServer) PortalSign(context.Context, *PortalSignInit) (*IdentityProof, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PortalSign not implemented")
+}
+func (UnimplementedTradingServer) PortalWallet(context.Context, *PortalWalletInit) (*IdentityProof, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PortalWallet not implemented")
+}
+func (UnimplementedTradingServer) GetTxJSON(context.Context, *GetTxJSONRequest) (*AccountTxJSON, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTxJSON not implemented")
+}
+func (UnimplementedTradingServer) GetInsiteTxStatus(context.Context, *GetInsiteTxStatusRequest) (*GetInsiteTxStatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetInsiteTxStatus not implemented")
 }
 func (UnimplementedTradingServer) mustEmbedUnimplementedTradingServer() {}
 
@@ -222,6 +287,78 @@ func _Trading_ApplyTransaction_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Trading_PortalSign_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PortalSignInit)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TradingServer).PortalSign(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sphinx.v1.Trading/PortalSign",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TradingServer).PortalSign(ctx, req.(*PortalSignInit))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Trading_PortalWallet_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PortalWalletInit)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TradingServer).PortalWallet(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sphinx.v1.Trading/PortalWallet",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TradingServer).PortalWallet(ctx, req.(*PortalWalletInit))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Trading_GetTxJSON_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTxJSONRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TradingServer).GetTxJSON(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sphinx.v1.Trading/GetTxJSON",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TradingServer).GetTxJSON(ctx, req.(*GetTxJSONRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Trading_GetInsiteTxStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetInsiteTxStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TradingServer).GetInsiteTxStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sphinx.v1.Trading/GetInsiteTxStatus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TradingServer).GetInsiteTxStatus(ctx, req.(*GetInsiteTxStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Trading_ServiceDesc is the grpc.ServiceDesc for Trading service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -248,6 +385,22 @@ var Trading_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ApplyTransaction",
 			Handler:    _Trading_ApplyTransaction_Handler,
+		},
+		{
+			MethodName: "PortalSign",
+			Handler:    _Trading_PortalSign_Handler,
+		},
+		{
+			MethodName: "PortalWallet",
+			Handler:    _Trading_PortalWallet_Handler,
+		},
+		{
+			MethodName: "GetTxJSON",
+			Handler:    _Trading_GetTxJSON_Handler,
+		},
+		{
+			MethodName: "GetInsiteTxStatus",
+			Handler:    _Trading_GetInsiteTxStatus_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -25,7 +25,7 @@ func (Transaction) Fields() []ent.Field {
 		field.String("transaction_id_chain").
 			MaxLen(80),
 		field.Enum("status").
-			Values("pending_review", "pending_process", "pending_signinfo", "pending_signaction", "pending_broadcast", "pending_confirm", "done", "rejected", "error_expected", "error_unexpected"),
+			Values("pending_review", "pending_process", "pending_signinfo", "pending_signaction", "pending_broadcast", "pending_confirm", "done", "rejected", "error", "error_expected"),
 		field.Bool("mutex").
 			Default(false),
 		field.Int("createtime_utc"),
