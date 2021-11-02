@@ -1,0 +1,204 @@
+syntax = "proto3";
+
+package sphinx.v1;
+
+option go_package = "github.com/NpoolPlatform/sphinx-service/message/npool";
+
+import "google/api/annotations.proto";
+import "google/protobuf/Empty.proto";
+
+// 交易服务
+service Trading {
+  // 查询单个币种
+  rpc GetCoinInfo (GetCoinInfoRequest) returns (CoinInfoRow) {
+    option (google.api.http) = {
+      get: "/v1/coin/single"
+    };}
+  // 查询全部币种
+  rpc GetCoinInfos (GetCoinInfosRequest) returns (CoinInfoList) {
+    option (google.api.http) = {
+      get: "/v1/coin/list"
+    };}
+  // 创建账户
+  rpc RegisterAccount (RegisterAccountRequest) returns (AccountAddress) {
+    option (google.api.http) = {
+      post: "/v1/account/register"
+      body: "*"
+    };}
+  // 余额查询
+  rpc GetBalance (GetBalanceRequest) returns (AccountBalance) {
+    option (google.api.http) = {
+      get: "/v1/account/balance"
+    };}
+  // 转账 / 提现
+  rpc ApplyTransaction (ApplyTransactionRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/account/transaction"
+      body: "*"
+    };}
+  // 签名服务接入点
+  rpc PortalSign (PortalSignInit) returns (IdentityProof) {}
+  // 代理服务接入点
+  rpc PortalWallet (PortalWalletInit) returns (IdentityProof) {}
+  // 账户交易查询
+  rpc GetTxJSON (GetTxJSONRequest) returns (AccountTxJSON) {
+    option (google.api.http) = {
+      get: "/v1/account/txjson"
+    };}
+  // 交易状态查询
+  rpc GetInsiteTxStatus (GetInsiteTxStatusRequest) returns (GetInsiteTxStatusResponse) {
+    option (google.api.http) = {
+      get: "/v1/account/transaction"
+    };}
+}
+
+// GetCoinInfo 参数
+message GetCoinInfoRequest {
+  int32 coin_id = 1;
+}
+// GetCoinInfos 参数
+message GetCoinInfosRequest {
+  repeated int32 coin_ids = 1;
+}
+// GetCoinInfo 返回
+message CoinInfoRow {
+  int32 id = 1;
+  bool need_signinfo = 2; // 是否需要预签名信息
+  string name = 3; // 币种名称：Filecoin
+  string unit = 4; // 单位：FIL
+}
+// GetCoinInfos 返回
+message CoinInfoList {
+  repeated CoinInfoRow list = 1; // 返回对象，取list字段
+}
+
+// RegisterAccount 参数
+message RegisterAccountRequest {
+  int32 coin_id = 1;
+  string uuid = 2; // user_id或与其绑定的唯一标识符
+}
+// RegisterAccount 返回
+message AccountAddress {
+  int32 coin_id = 1;
+  string address = 2; // 创建的钱包地址
+  string uuid = 3; // uuid将用于加密私钥，提高整体安全性
+}
+
+// GetBalance 参数
+message GetBalanceRequest {
+  int32 coin_id = 1;
+  string address = 2; // 查询的钱包地址
+  int64 timestamp_utc = 3; // 长整型时间戳
+}
+// GetBalance 返回
+message AccountBalance {
+  int32 coin_id = 1;
+  string address = 2; // 查询的钱包地址
+  int64 timestamp_utc = 3; // 长整型时间戳
+  int64 amount_int = 4; // 金额整数
+  int32 amount_digits = 5; // 金额*了10的^n，默认为9
+  string amount_string = 6; // 金额字符串，"123.45678901"
+}
+
+// GetTxJSONRequest 参数
+message GetTxJSONRequest {
+  // 继承钱包节点基础功能，预留
+  int32 coin_id = 1;
+  string address = 2; // 要查询的钱包地址
+  uint64 timefrom_utc = 3; // 开始时间
+  uint64 timetill_utc = 4; // 结束时间
+  int32 limit_n = 5; // 服务端限制返回条数
+}
+// GetTxJSONRequest 返回
+message AccountTxJSON {
+  string json = 1;
+}
+
+// GetInsiteTxStatus 参数
+message GetInsiteTxStatusRequest {
+  string transaction_id_insite = 1; // 站内交易ID
+}
+
+// GetInsiteTxStatus 返回
+message GetInsiteTxStatusResponse {
+  int32 coin_id = 1;
+  int64 amount_int = 2; // 放大后的金额整数
+  int32 amount_digits = 3; // amount_int == amount*10^n
+  string address_from = 4; // 发送方
+  string address_to = 5; // 接收方
+  string amount_string = 6; // 便于验证，数据库里不存
+  string insite_tx_type = 7; // recharge, payment, withdraw, unknown
+  string transaction_id_insite = 8; // 站内交易ID
+  string transaction_id_chain = 9; // 公链交易ID（如有）
+  string status = 10; // 为done则成功；全部状态："pending_review", "pending_process", "pending_signinfo", "pending_signaction", "pending_broadcast", "pending_confirm", "done", "rejected", "error", "error_expected"
+  bool is_processing = 11; // 对应数据库中mutex
+  int64 createtime_utc = 12; // 创建时间
+  int64 updatetime_utc = 13; // 上次更新时间
+  bool is_success = 14; // 便于调用方判断
+  bool is_failed = 15; // 不success不fail就是pending了
+}
+
+// ApplyTransaction 参数
+message ApplyTransactionRequest {
+  int32 coin_id = 1;
+  string transaction_id_insite = 2; // 站内交易ID
+  string address_from = 3; // 发送方
+  string address_to = 4; // 接收方
+  int64 amount_int = 5; // 放大后的金额整数
+  int32 amount_digits = 6; // 放大倍数，默认为9
+  string amount_string = 7; // str格式金额，便于确认，如：0.000500021，则amount_int为500021, amount_digits为9；如80231310000.0000，可选amount_int为8023131，amount_digits为-4；注意amount_int为int64类型，可存储18位有效数字
+  string uuid_signature = 8; // 2FA的时效性验证码，前期可以留空
+  int64 createtime_utc = 9; // 用户提交请求时的时间戳，与2FA绑定
+}
+
+// PortalSignInit 参数
+message PortalSignInit {
+  int32 coin_id = 1;
+  string uuid = 2; // 机器标识符
+}
+
+// PortalWalletInit 参数
+message PortalWalletInit {
+  int32 coin_id = 1;
+  string uuid = 2; // 机器标识符
+  string location = 3; // 硬件所在地点（看板用到的节点信息，下同）
+  string host_vendor = 4; // 硬件供应商
+  string mac_address = 5; // MAC地址
+  string public_ip = 6; // 公网ip，也可能没有
+  string local_ip = 7; // 内网ip
+  int64 timestamp_utc = 8; // 汇报时间
+}
+
+// 返回给节点的身份认证
+message IdentityProof {
+  int64 timestamp_utc = 1; // 时间戳，用于加盐
+  string prikey_version = 2; // 私钥版本；节点hardcode钱包代理的公钥，以便认证
+  string hostname = 3; // k8s集群中的身份标识符，如有需要，节点可通过该项，确认是否已连接全部钱包代理服务
+  string signature = 4; // 参数加签，前期可选
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
