@@ -2,8 +2,8 @@ package db
 
 import (
 	"context"
-	"github.com/NpoolPlatform/cloud-hashing-goods/pkg/db/ent"
 	"github.com/NpoolPlatform/go-service-framework/pkg/app"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent"
 )
 
 var myClient *ent.Client
@@ -16,4 +16,3 @@ func Init() error {
 func Client() *ent.Client {
 	return myClient
 }
-
