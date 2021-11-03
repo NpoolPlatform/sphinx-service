@@ -3,6 +3,7 @@ package core
 import (
 	"context"
 
+	"github.com/NpoolPlatform/sphinx-service/message/npool"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
@@ -10,25 +11,47 @@ import (
 
 var client *ent.Client
 
+type Server struct {
+	npool.UnimplementedTradingServer
+}
+
 func init() {
 	client = db.Client()
 }
 
 // 查询全部币种
-func (s *Server) GetCoinInfos(ctx context.Context, req *GetCoinInfosRequest) (cilist *CoinInfoList, err error) {
-	cilist, err = client.CoinInfo.Query().All(ctx)
+func GetCoinInfos(ctx context.Context, req *npool.GetCoinInfosRequest) (cilist *npool.CoinInfoList, err error) {
+	ent_resp := []*ent.CoinInfo{}
+	ent_resp, err = client.CoinInfo.Query().All(ctx)
+	var tmp_cir []*npool.CoinInfoRow
+	for _, row := range ent_resp {
+		tmp_cir = append(tmp_cir, &npool.CoinInfoRow{
+				Id: row.ID,
+				Name: row.Name,
+				Unit: row.Unit,
+				NeedSigninfo: row.NeedSigninfo,
+		})
+	}
+	cilist = &npool.CoinInfoList{
+		List: tmp_cir,
+	}
 	return cilist, err
 }
 
 // 查询单个币种
-func (s *Server) GetCoinInfo(ctx context.Context, req *GetCoinInfoRequest) ( coin_info *CoinInfoRow, err error) {
-	coin_info, err = client.CoinInfo.
+func GetCoinInfo(ctx context.Context, req *npool.GetCoinInfoRequest) ( coin_info *npool.CoinInfoRow, err error) {
+	ent_resp := &ent.CoinInfo{}
+	ent_resp, err = client.CoinInfo.
 	Query().
 	Where(
-		coininfo.Or(
 			coininfo.ID(req.CoinId),
-		),
-	).All(ctx)
+	).First(ctx)
+	coin_info = &npool.CoinInfoRow{
+		Id:           ent_resp.ID,
+		NeedSigninfo: ent_resp.NeedSigninfo,
+		Name:         ent_resp.Name,
+		Unit:         ent_resp.Unit,
+	}
 	return coin_info, err
 }
 
