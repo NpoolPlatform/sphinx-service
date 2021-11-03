@@ -4,12 +4,12 @@ package ent
 
 import (
 	"fmt"
-	"sphinx/ent/coininfo"
-	"sphinx/ent/review"
-	"sphinx/ent/transaction"
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/review"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
 )
 
 // Review is the model entity for the Review schema.

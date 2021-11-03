@@ -5,12 +5,12 @@ package ent
 import (
 	"context"
 	"fmt"
-	"sphinx/ent/predicate"
-	"sphinx/ent/transaction"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/predicate"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
 )
 
 // TransactionDelete is the builder for deleting a Transaction entity.

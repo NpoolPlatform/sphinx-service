@@ -5,14 +5,14 @@ package ent
 import (
 	"errors"
 	"fmt"
-	"sphinx/ent/coininfo"
-	"sphinx/ent/keystore"
-	"sphinx/ent/review"
-	"sphinx/ent/transaction"
-	"sphinx/ent/walletnode"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/keystore"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/review"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/walletnode"
 )
 
 // ent aliases to avoid import conflicts in user's code.

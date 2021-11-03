@@ -5,7 +5,8 @@ package hook
 import (
 	"context"
 	"fmt"
-	"sphinx/ent"
+
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent"
 )
 
 // The CoinInfoFunc type is an adapter to allow the use of ordinary

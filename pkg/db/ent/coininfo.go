@@ -4,10 +4,10 @@ package ent
 
 import (
 	"fmt"
-	"sphinx/ent/coininfo"
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
 )
 
 // CoinInfo is the model entity for the CoinInfo schema.

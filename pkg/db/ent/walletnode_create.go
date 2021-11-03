@@ -6,11 +6,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"sphinx/ent/coininfo"
-	"sphinx/ent/walletnode"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/walletnode"
 )
 
 // WalletNodeCreate is the builder for creating a WalletNode entity.

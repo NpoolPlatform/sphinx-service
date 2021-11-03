@@ -5,12 +5,12 @@ package ent
 import (
 	"context"
 	"fmt"
-	"sphinx/ent/predicate"
-	"sphinx/ent/review"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/predicate"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/review"
 )
 
 // ReviewDelete is the builder for deleting a Review entity.

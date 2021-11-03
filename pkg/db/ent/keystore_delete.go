@@ -5,12 +5,12 @@ package ent
 import (
 	"context"
 	"fmt"
-	"sphinx/ent/keystore"
-	"sphinx/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/keystore"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/predicate"
 )
 
 // KeyStoreDelete is the builder for deleting a KeyStore entity.

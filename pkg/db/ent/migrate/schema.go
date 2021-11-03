@@ -114,7 +114,7 @@ var (
 		{Name: "type", Type: field.TypeEnum, Enums: []string{"recharge", "payment", "withdraw", "unknown"}},
 		{Name: "transaction_id_insite", Type: field.TypeString, Unique: true, Size: 64},
 		{Name: "transaction_id_chain", Type: field.TypeString, Size: 80},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"pending_review", "pending_process", "pending_signinfo", "pending_signaction", "pending_broadcast", "pending_confirm", "done", "rejected", "error_expected", "error_unexpected"}},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"pending_review", "pending_process", "pending_signinfo", "pending_signaction", "pending_broadcast", "pending_confirm", "done", "rejected", "error", "error_expected"}},
 		{Name: "mutex", Type: field.TypeBool, Default: false},
 		{Name: "createtime_utc", Type: field.TypeInt},
 		{Name: "updatetime_utc", Type: field.TypeInt},

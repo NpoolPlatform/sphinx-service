@@ -154,8 +154,8 @@ const (
 	StatusPendingConfirm    Status = "pending_confirm"
 	StatusDone              Status = "done"
 	StatusRejected          Status = "rejected"
+	StatusError             Status = "error"
 	StatusErrorExpected     Status = "error_expected"
-	StatusErrorUnexpected   Status = "error_unexpected"
 )
 
 func (s Status) String() string {
@@ -165,7 +165,7 @@ func (s Status) String() string {
 // StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
 func StatusValidator(s Status) error {
 	switch s {
-	case StatusPendingReview, StatusPendingProcess, StatusPendingSigninfo, StatusPendingSignaction, StatusPendingBroadcast, StatusPendingConfirm, StatusDone, StatusRejected, StatusErrorExpected, StatusErrorUnexpected:
+	case StatusPendingReview, StatusPendingProcess, StatusPendingSigninfo, StatusPendingSignaction, StatusPendingBroadcast, StatusPendingConfirm, StatusDone, StatusRejected, StatusError, StatusErrorExpected:
 		return nil
 	default:
 		return fmt.Errorf("transaction: invalid enum value for status field: %q", s)

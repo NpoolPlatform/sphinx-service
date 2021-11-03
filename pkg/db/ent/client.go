@@ -7,13 +7,13 @@ import (
 	"fmt"
 	"log"
 
-	"sphinx/ent/migrate"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/migrate"
 
-	"sphinx/ent/coininfo"
-	"sphinx/ent/keystore"
-	"sphinx/ent/review"
-	"sphinx/ent/transaction"
-	"sphinx/ent/walletnode"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/keystore"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/review"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/walletnode"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"

@@ -5,16 +5,16 @@ package ent
 import (
 	"context"
 	"fmt"
-	"sphinx/ent/coininfo"
-	"sphinx/ent/keystore"
-	"sphinx/ent/predicate"
-	"sphinx/ent/review"
-	"sphinx/ent/transaction"
-	"sphinx/ent/walletnode"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/keystore"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/predicate"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/review"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/walletnode"
 )
 
 // CoinInfoUpdate is the builder for updating CoinInfo entities.

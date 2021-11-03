@@ -28,11 +28,6 @@ func (s *Server) GetCoinInfo(context.Context, *GetCoinInfoRequest) (*CoinInfoRow
 	return nil, nil
 }
 
-// 查询全部币种
-func (s *Server) GetCoinInfos(context.Context, *GetCoinInfosRequest) (*CoinInfoList, error) {
-	return nil, nil
-}
-
 // 创建账户
 func (s *Server) RegisterAccount(context.Context, *RegisterAccountRequest) (*AccountAddress, error) {
 	return nil, nil

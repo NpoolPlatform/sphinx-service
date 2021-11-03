@@ -5,13 +5,14 @@ package ent
 import (
 	"context"
 	"fmt"
-	"sphinx/ent/coininfo"
-	"sphinx/ent/keystore"
-	"sphinx/ent/predicate"
-	"sphinx/ent/review"
-	"sphinx/ent/transaction"
-	"sphinx/ent/walletnode"
 	"sync"
+
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/keystore"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/predicate"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/review"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/walletnode"
 
 	"entgo.io/ent"
 )
