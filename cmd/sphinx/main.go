@@ -53,7 +53,10 @@ import (
 	cli "github.com/urfave/cli/v2"
 )
 
-const serviceName = "Sphinx"
+const (
+	serviceName = "Sphinx"
+	description = "Trading service and Wallet agent."
+)
 
 func main() {
 	commands := cli.Commands{

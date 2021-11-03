@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent"
+	"github.com/NpoolPlatform/go-service-framework/pkg/app"
 )
 
 var myClient *ent.Client

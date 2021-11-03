@@ -20,13 +20,11 @@ func GetTradingServer() *TradingServer {
 	return Server
 }
 
+
+
+
+
 // 没写完的放这里，写完删
-
-// 查询单个币种
-
-func (s *Server) GetCoinInfo(context.Context, *GetCoinInfoRequest) (*CoinInfoRow, error) {
-	return nil, nil
-}
 
 // 创建账户
 func (s *Server) RegisterAccount(context.Context, *RegisterAccountRequest) (*AccountAddress, error) {

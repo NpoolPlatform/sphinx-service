@@ -14,7 +14,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/NpoolPlatform/go-service-app-template/message/npool"
+	"github.com/NpoolPlatform/sphinx-service/message/npool"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
