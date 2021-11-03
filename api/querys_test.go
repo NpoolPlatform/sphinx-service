@@ -43,7 +43,7 @@ func run(wg *sync.WaitGroup) {
 	)
 
 	go func() {
-		npool.RegisterServiceExampleServer(server, &Server{})
+		npool.RegisterTradingServer(server, &Server{})
 		grpc_prometheus.EnableHandlingTimeHistogram()
 		grpc_prometheus.Register(server)
 		go func() {
@@ -65,7 +65,7 @@ func run(wg *sync.WaitGroup) {
 		}
 		server.GracefulStop()
 	}()
-	if err := npool.RegisterServiceExampleHandlerFromEndpoint(context.Background(), mux, "127.0.0.1:9090", []grpc.DialOption{grpc.WithInsecure()}); err != nil {
+	if err := npool.RegisterTradingHandlerFromEndpoint(context.Background(), mux, "127.0.0.1:9090", []grpc.DialOption{grpc.WithInsecure()}); err != nil {
 		log.Panic(err)
 	}
 	if err := mux.HandlePath(http.MethodGet, "/healthz", func(w http.ResponseWriter, r *http.Request, pathParams map[string]string) {
@@ -104,8 +104,8 @@ loop:
 			cancel()
 			continue
 		}
-		client := npool.NewServiceExampleClient(conn)
-		out, err := client.Echo(ctx, &npool.StringMessage{Value: "hello world"})
+		client := npool.NewTradingClient(conn)
+		out, err := client.Echo(ctx, &npool.GetCoinInfoRequest{})
 		if err != nil {
 			cancel()
 			continue
