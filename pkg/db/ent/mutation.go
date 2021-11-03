@@ -38,22 +38,22 @@ type CoinInfoMutation struct {
 	config
 	op                  Op
 	typ                 string
-	id                  *int
+	id                  *int32
 	name                *string
 	unit                *string
 	need_signinfo       *bool
 	clearedFields       map[string]struct{}
-	keys                map[int]struct{}
-	removedkeys         map[int]struct{}
+	keys                map[int32]struct{}
+	removedkeys         map[int32]struct{}
 	clearedkeys         bool
-	transactions        map[int]struct{}
-	removedtransactions map[int]struct{}
+	transactions        map[int32]struct{}
+	removedtransactions map[int32]struct{}
 	clearedtransactions bool
-	reviews             map[int]struct{}
-	removedreviews      map[int]struct{}
+	reviews             map[int32]struct{}
+	removedreviews      map[int32]struct{}
 	clearedreviews      bool
-	wallet_nodes        map[int]struct{}
-	removedwallet_nodes map[int]struct{}
+	wallet_nodes        map[int32]struct{}
+	removedwallet_nodes map[int32]struct{}
 	clearedwallet_nodes bool
 	done                bool
 	oldValue            func(context.Context) (*CoinInfo, error)
@@ -80,7 +80,7 @@ func newCoinInfoMutation(c config, op Op, opts ...coininfoOption) *CoinInfoMutat
 }
 
 // withCoinInfoID sets the ID field of the mutation.
-func withCoinInfoID(id int) coininfoOption {
+func withCoinInfoID(id int32) coininfoOption {
 	return func(m *CoinInfoMutation) {
 		var (
 			err   error
@@ -130,9 +130,15 @@ func (m CoinInfoMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of CoinInfo entities.
+func (m *CoinInfoMutation) SetID(id int32) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *CoinInfoMutation) ID() (id int, exists bool) {
+func (m *CoinInfoMutation) ID() (id int32, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -248,9 +254,9 @@ func (m *CoinInfoMutation) ResetNeedSigninfo() {
 }
 
 // AddKeyIDs adds the "keys" edge to the KeyStore entity by ids.
-func (m *CoinInfoMutation) AddKeyIDs(ids ...int) {
+func (m *CoinInfoMutation) AddKeyIDs(ids ...int32) {
 	if m.keys == nil {
-		m.keys = make(map[int]struct{})
+		m.keys = make(map[int32]struct{})
 	}
 	for i := range ids {
 		m.keys[ids[i]] = struct{}{}
@@ -268,9 +274,9 @@ func (m *CoinInfoMutation) KeysCleared() bool {
 }
 
 // RemoveKeyIDs removes the "keys" edge to the KeyStore entity by IDs.
-func (m *CoinInfoMutation) RemoveKeyIDs(ids ...int) {
+func (m *CoinInfoMutation) RemoveKeyIDs(ids ...int32) {
 	if m.removedkeys == nil {
-		m.removedkeys = make(map[int]struct{})
+		m.removedkeys = make(map[int32]struct{})
 	}
 	for i := range ids {
 		delete(m.keys, ids[i])
@@ -279,7 +285,7 @@ func (m *CoinInfoMutation) RemoveKeyIDs(ids ...int) {
 }
 
 // RemovedKeys returns the removed IDs of the "keys" edge to the KeyStore entity.
-func (m *CoinInfoMutation) RemovedKeysIDs() (ids []int) {
+func (m *CoinInfoMutation) RemovedKeysIDs() (ids []int32) {
 	for id := range m.removedkeys {
 		ids = append(ids, id)
 	}
@@ -287,7 +293,7 @@ func (m *CoinInfoMutation) RemovedKeysIDs() (ids []int) {
 }
 
 // KeysIDs returns the "keys" edge IDs in the mutation.
-func (m *CoinInfoMutation) KeysIDs() (ids []int) {
+func (m *CoinInfoMutation) KeysIDs() (ids []int32) {
 	for id := range m.keys {
 		ids = append(ids, id)
 	}
@@ -302,9 +308,9 @@ func (m *CoinInfoMutation) ResetKeys() {
 }
 
 // AddTransactionIDs adds the "transactions" edge to the Transaction entity by ids.
-func (m *CoinInfoMutation) AddTransactionIDs(ids ...int) {
+func (m *CoinInfoMutation) AddTransactionIDs(ids ...int32) {
 	if m.transactions == nil {
-		m.transactions = make(map[int]struct{})
+		m.transactions = make(map[int32]struct{})
 	}
 	for i := range ids {
 		m.transactions[ids[i]] = struct{}{}
@@ -322,9 +328,9 @@ func (m *CoinInfoMutation) TransactionsCleared() bool {
 }
 
 // RemoveTransactionIDs removes the "transactions" edge to the Transaction entity by IDs.
-func (m *CoinInfoMutation) RemoveTransactionIDs(ids ...int) {
+func (m *CoinInfoMutation) RemoveTransactionIDs(ids ...int32) {
 	if m.removedtransactions == nil {
-		m.removedtransactions = make(map[int]struct{})
+		m.removedtransactions = make(map[int32]struct{})
 	}
 	for i := range ids {
 		delete(m.transactions, ids[i])
@@ -333,7 +339,7 @@ func (m *CoinInfoMutation) RemoveTransactionIDs(ids ...int) {
 }
 
 // RemovedTransactions returns the removed IDs of the "transactions" edge to the Transaction entity.
-func (m *CoinInfoMutation) RemovedTransactionsIDs() (ids []int) {
+func (m *CoinInfoMutation) RemovedTransactionsIDs() (ids []int32) {
 	for id := range m.removedtransactions {
 		ids = append(ids, id)
 	}
@@ -341,7 +347,7 @@ func (m *CoinInfoMutation) RemovedTransactionsIDs() (ids []int) {
 }
 
 // TransactionsIDs returns the "transactions" edge IDs in the mutation.
-func (m *CoinInfoMutation) TransactionsIDs() (ids []int) {
+func (m *CoinInfoMutation) TransactionsIDs() (ids []int32) {
 	for id := range m.transactions {
 		ids = append(ids, id)
 	}
@@ -356,9 +362,9 @@ func (m *CoinInfoMutation) ResetTransactions() {
 }
 
 // AddReviewIDs adds the "reviews" edge to the Review entity by ids.
-func (m *CoinInfoMutation) AddReviewIDs(ids ...int) {
+func (m *CoinInfoMutation) AddReviewIDs(ids ...int32) {
 	if m.reviews == nil {
-		m.reviews = make(map[int]struct{})
+		m.reviews = make(map[int32]struct{})
 	}
 	for i := range ids {
 		m.reviews[ids[i]] = struct{}{}
@@ -376,9 +382,9 @@ func (m *CoinInfoMutation) ReviewsCleared() bool {
 }
 
 // RemoveReviewIDs removes the "reviews" edge to the Review entity by IDs.
-func (m *CoinInfoMutation) RemoveReviewIDs(ids ...int) {
+func (m *CoinInfoMutation) RemoveReviewIDs(ids ...int32) {
 	if m.removedreviews == nil {
-		m.removedreviews = make(map[int]struct{})
+		m.removedreviews = make(map[int32]struct{})
 	}
 	for i := range ids {
 		delete(m.reviews, ids[i])
@@ -387,7 +393,7 @@ func (m *CoinInfoMutation) RemoveReviewIDs(ids ...int) {
 }
 
 // RemovedReviews returns the removed IDs of the "reviews" edge to the Review entity.
-func (m *CoinInfoMutation) RemovedReviewsIDs() (ids []int) {
+func (m *CoinInfoMutation) RemovedReviewsIDs() (ids []int32) {
 	for id := range m.removedreviews {
 		ids = append(ids, id)
 	}
@@ -395,7 +401,7 @@ func (m *CoinInfoMutation) RemovedReviewsIDs() (ids []int) {
 }
 
 // ReviewsIDs returns the "reviews" edge IDs in the mutation.
-func (m *CoinInfoMutation) ReviewsIDs() (ids []int) {
+func (m *CoinInfoMutation) ReviewsIDs() (ids []int32) {
 	for id := range m.reviews {
 		ids = append(ids, id)
 	}
@@ -410,9 +416,9 @@ func (m *CoinInfoMutation) ResetReviews() {
 }
 
 // AddWalletNodeIDs adds the "wallet_nodes" edge to the WalletNode entity by ids.
-func (m *CoinInfoMutation) AddWalletNodeIDs(ids ...int) {
+func (m *CoinInfoMutation) AddWalletNodeIDs(ids ...int32) {
 	if m.wallet_nodes == nil {
-		m.wallet_nodes = make(map[int]struct{})
+		m.wallet_nodes = make(map[int32]struct{})
 	}
 	for i := range ids {
 		m.wallet_nodes[ids[i]] = struct{}{}
@@ -430,9 +436,9 @@ func (m *CoinInfoMutation) WalletNodesCleared() bool {
 }
 
 // RemoveWalletNodeIDs removes the "wallet_nodes" edge to the WalletNode entity by IDs.
-func (m *CoinInfoMutation) RemoveWalletNodeIDs(ids ...int) {
+func (m *CoinInfoMutation) RemoveWalletNodeIDs(ids ...int32) {
 	if m.removedwallet_nodes == nil {
-		m.removedwallet_nodes = make(map[int]struct{})
+		m.removedwallet_nodes = make(map[int32]struct{})
 	}
 	for i := range ids {
 		delete(m.wallet_nodes, ids[i])
@@ -441,7 +447,7 @@ func (m *CoinInfoMutation) RemoveWalletNodeIDs(ids ...int) {
 }
 
 // RemovedWalletNodes returns the removed IDs of the "wallet_nodes" edge to the WalletNode entity.
-func (m *CoinInfoMutation) RemovedWalletNodesIDs() (ids []int) {
+func (m *CoinInfoMutation) RemovedWalletNodesIDs() (ids []int32) {
 	for id := range m.removedwallet_nodes {
 		ids = append(ids, id)
 	}
@@ -449,7 +455,7 @@ func (m *CoinInfoMutation) RemovedWalletNodesIDs() (ids []int) {
 }
 
 // WalletNodesIDs returns the "wallet_nodes" edge IDs in the mutation.
-func (m *CoinInfoMutation) WalletNodesIDs() (ids []int) {
+func (m *CoinInfoMutation) WalletNodesIDs() (ids []int32) {
 	for id := range m.wallet_nodes {
 		ids = append(ids, id)
 	}
@@ -780,11 +786,11 @@ type KeyStoreMutation struct {
 	config
 	op            Op
 	typ           string
-	id            *int
+	id            *int32
 	address       *string
 	private_key   *string
 	clearedFields map[string]struct{}
-	coin          *int
+	coin          *int32
 	clearedcoin   bool
 	done          bool
 	oldValue      func(context.Context) (*KeyStore, error)
@@ -811,7 +817,7 @@ func newKeyStoreMutation(c config, op Op, opts ...keystoreOption) *KeyStoreMutat
 }
 
 // withKeyStoreID sets the ID field of the mutation.
-func withKeyStoreID(id int) keystoreOption {
+func withKeyStoreID(id int32) keystoreOption {
 	return func(m *KeyStoreMutation) {
 		var (
 			err   error
@@ -861,9 +867,15 @@ func (m KeyStoreMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of KeyStore entities.
+func (m *KeyStoreMutation) SetID(id int32) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *KeyStoreMutation) ID() (id int, exists bool) {
+func (m *KeyStoreMutation) ID() (id int32, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -943,7 +955,7 @@ func (m *KeyStoreMutation) ResetPrivateKey() {
 }
 
 // SetCoinID sets the "coin" edge to the CoinInfo entity by id.
-func (m *KeyStoreMutation) SetCoinID(id int) {
+func (m *KeyStoreMutation) SetCoinID(id int32) {
 	m.coin = &id
 }
 
@@ -958,7 +970,7 @@ func (m *KeyStoreMutation) CoinCleared() bool {
 }
 
 // CoinID returns the "coin" edge ID in the mutation.
-func (m *KeyStoreMutation) CoinID() (id int, exists bool) {
+func (m *KeyStoreMutation) CoinID() (id int32, exists bool) {
 	if m.coin != nil {
 		return *m.coin, true
 	}
@@ -968,7 +980,7 @@ func (m *KeyStoreMutation) CoinID() (id int, exists bool) {
 // CoinIDs returns the "coin" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // CoinID instead. It exists only for internal usage by the builders.
-func (m *KeyStoreMutation) CoinIDs() (ids []int) {
+func (m *KeyStoreMutation) CoinIDs() (ids []int32) {
 	if id := m.coin; id != nil {
 		ids = append(ids, *id)
 	}
@@ -1195,7 +1207,7 @@ type ReviewMutation struct {
 	config
 	op                 Op
 	typ                string
-	id                 *int
+	id                 *int32
 	is_approved        *bool
 	operator_note      *string
 	createtime_utc     *int
@@ -1203,9 +1215,9 @@ type ReviewMutation struct {
 	updatetime_utc     *int
 	addupdatetime_utc  *int
 	clearedFields      map[string]struct{}
-	transaction        *int
+	transaction        *int32
 	clearedtransaction bool
-	coin               *int
+	coin               *int32
 	clearedcoin        bool
 	done               bool
 	oldValue           func(context.Context) (*Review, error)
@@ -1232,7 +1244,7 @@ func newReviewMutation(c config, op Op, opts ...reviewOption) *ReviewMutation {
 }
 
 // withReviewID sets the ID field of the mutation.
-func withReviewID(id int) reviewOption {
+func withReviewID(id int32) reviewOption {
 	return func(m *ReviewMutation) {
 		var (
 			err   error
@@ -1282,9 +1294,15 @@ func (m ReviewMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Review entities.
+func (m *ReviewMutation) SetID(id int32) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *ReviewMutation) ID() (id int, exists bool) {
+func (m *ReviewMutation) ID() (id int32, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -1476,7 +1494,7 @@ func (m *ReviewMutation) ResetUpdatetimeUtc() {
 }
 
 // SetTransactionID sets the "transaction" edge to the Transaction entity by id.
-func (m *ReviewMutation) SetTransactionID(id int) {
+func (m *ReviewMutation) SetTransactionID(id int32) {
 	m.transaction = &id
 }
 
@@ -1491,7 +1509,7 @@ func (m *ReviewMutation) TransactionCleared() bool {
 }
 
 // TransactionID returns the "transaction" edge ID in the mutation.
-func (m *ReviewMutation) TransactionID() (id int, exists bool) {
+func (m *ReviewMutation) TransactionID() (id int32, exists bool) {
 	if m.transaction != nil {
 		return *m.transaction, true
 	}
@@ -1501,7 +1519,7 @@ func (m *ReviewMutation) TransactionID() (id int, exists bool) {
 // TransactionIDs returns the "transaction" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // TransactionID instead. It exists only for internal usage by the builders.
-func (m *ReviewMutation) TransactionIDs() (ids []int) {
+func (m *ReviewMutation) TransactionIDs() (ids []int32) {
 	if id := m.transaction; id != nil {
 		ids = append(ids, *id)
 	}
@@ -1515,7 +1533,7 @@ func (m *ReviewMutation) ResetTransaction() {
 }
 
 // SetCoinID sets the "coin" edge to the CoinInfo entity by id.
-func (m *ReviewMutation) SetCoinID(id int) {
+func (m *ReviewMutation) SetCoinID(id int32) {
 	m.coin = &id
 }
 
@@ -1530,7 +1548,7 @@ func (m *ReviewMutation) CoinCleared() bool {
 }
 
 // CoinID returns the "coin" edge ID in the mutation.
-func (m *ReviewMutation) CoinID() (id int, exists bool) {
+func (m *ReviewMutation) CoinID() (id int32, exists bool) {
 	if m.coin != nil {
 		return *m.coin, true
 	}
@@ -1540,7 +1558,7 @@ func (m *ReviewMutation) CoinID() (id int, exists bool) {
 // CoinIDs returns the "coin" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // CoinID instead. It exists only for internal usage by the builders.
-func (m *ReviewMutation) CoinIDs() (ids []int) {
+func (m *ReviewMutation) CoinIDs() (ids []int32) {
 	if id := m.coin; id != nil {
 		ids = append(ids, *id)
 	}
@@ -1846,7 +1864,7 @@ type TransactionMutation struct {
 	config
 	op                    Op
 	typ                   string
-	id                    *int
+	id                    *int32
 	amount_int            *int
 	addamount_int         *int
 	amount_digits         *int
@@ -1864,10 +1882,10 @@ type TransactionMutation struct {
 	updatetime_utc        *int
 	addupdatetime_utc     *int
 	clearedFields         map[string]struct{}
-	coin                  *int
+	coin                  *int32
 	clearedcoin           bool
-	review                map[int]struct{}
-	removedreview         map[int]struct{}
+	review                map[int32]struct{}
+	removedreview         map[int32]struct{}
 	clearedreview         bool
 	done                  bool
 	oldValue              func(context.Context) (*Transaction, error)
@@ -1894,7 +1912,7 @@ func newTransactionMutation(c config, op Op, opts ...transactionOption) *Transac
 }
 
 // withTransactionID sets the ID field of the mutation.
-func withTransactionID(id int) transactionOption {
+func withTransactionID(id int32) transactionOption {
 	return func(m *TransactionMutation) {
 		var (
 			err   error
@@ -1944,9 +1962,15 @@ func (m TransactionMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Transaction entities.
+func (m *TransactionMutation) SetID(id int32) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *TransactionMutation) ID() (id int, exists bool) {
+func (m *TransactionMutation) ID() (id int32, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -2466,7 +2490,7 @@ func (m *TransactionMutation) ResetUpdatetimeUtc() {
 }
 
 // SetCoinID sets the "coin" edge to the CoinInfo entity by id.
-func (m *TransactionMutation) SetCoinID(id int) {
+func (m *TransactionMutation) SetCoinID(id int32) {
 	m.coin = &id
 }
 
@@ -2481,7 +2505,7 @@ func (m *TransactionMutation) CoinCleared() bool {
 }
 
 // CoinID returns the "coin" edge ID in the mutation.
-func (m *TransactionMutation) CoinID() (id int, exists bool) {
+func (m *TransactionMutation) CoinID() (id int32, exists bool) {
 	if m.coin != nil {
 		return *m.coin, true
 	}
@@ -2491,7 +2515,7 @@ func (m *TransactionMutation) CoinID() (id int, exists bool) {
 // CoinIDs returns the "coin" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // CoinID instead. It exists only for internal usage by the builders.
-func (m *TransactionMutation) CoinIDs() (ids []int) {
+func (m *TransactionMutation) CoinIDs() (ids []int32) {
 	if id := m.coin; id != nil {
 		ids = append(ids, *id)
 	}
@@ -2505,9 +2529,9 @@ func (m *TransactionMutation) ResetCoin() {
 }
 
 // AddReviewIDs adds the "review" edge to the Review entity by ids.
-func (m *TransactionMutation) AddReviewIDs(ids ...int) {
+func (m *TransactionMutation) AddReviewIDs(ids ...int32) {
 	if m.review == nil {
-		m.review = make(map[int]struct{})
+		m.review = make(map[int32]struct{})
 	}
 	for i := range ids {
 		m.review[ids[i]] = struct{}{}
@@ -2525,9 +2549,9 @@ func (m *TransactionMutation) ReviewCleared() bool {
 }
 
 // RemoveReviewIDs removes the "review" edge to the Review entity by IDs.
-func (m *TransactionMutation) RemoveReviewIDs(ids ...int) {
+func (m *TransactionMutation) RemoveReviewIDs(ids ...int32) {
 	if m.removedreview == nil {
-		m.removedreview = make(map[int]struct{})
+		m.removedreview = make(map[int32]struct{})
 	}
 	for i := range ids {
 		delete(m.review, ids[i])
@@ -2536,7 +2560,7 @@ func (m *TransactionMutation) RemoveReviewIDs(ids ...int) {
 }
 
 // RemovedReview returns the removed IDs of the "review" edge to the Review entity.
-func (m *TransactionMutation) RemovedReviewIDs() (ids []int) {
+func (m *TransactionMutation) RemovedReviewIDs() (ids []int32) {
 	for id := range m.removedreview {
 		ids = append(ids, id)
 	}
@@ -2544,7 +2568,7 @@ func (m *TransactionMutation) RemovedReviewIDs() (ids []int) {
 }
 
 // ReviewIDs returns the "review" edge IDs in the mutation.
-func (m *TransactionMutation) ReviewIDs() (ids []int) {
+func (m *TransactionMutation) ReviewIDs() (ids []int32) {
 	for id := range m.review {
 		ids = append(ids, id)
 	}
@@ -3019,7 +3043,7 @@ type WalletNodeMutation struct {
 	config
 	op                      Op
 	typ                     string
-	id                      *int
+	id                      *int32
 	uuid                    *string
 	location                *string
 	host_vendor             *string
@@ -3030,7 +3054,7 @@ type WalletNodeMutation struct {
 	last_online_time_utc    *int
 	addlast_online_time_utc *int
 	clearedFields           map[string]struct{}
-	coin                    *int
+	coin                    *int32
 	clearedcoin             bool
 	done                    bool
 	oldValue                func(context.Context) (*WalletNode, error)
@@ -3057,7 +3081,7 @@ func newWalletNodeMutation(c config, op Op, opts ...walletnodeOption) *WalletNod
 }
 
 // withWalletNodeID sets the ID field of the mutation.
-func withWalletNodeID(id int) walletnodeOption {
+func withWalletNodeID(id int32) walletnodeOption {
 	return func(m *WalletNodeMutation) {
 		var (
 			err   error
@@ -3107,9 +3131,15 @@ func (m WalletNodeMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of WalletNode entities.
+func (m *WalletNodeMutation) SetID(id int32) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *WalletNodeMutation) ID() (id int, exists bool) {
+func (m *WalletNodeMutation) ID() (id int32, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -3409,7 +3439,7 @@ func (m *WalletNodeMutation) ResetLastOnlineTimeUtc() {
 }
 
 // SetCoinID sets the "coin" edge to the CoinInfo entity by id.
-func (m *WalletNodeMutation) SetCoinID(id int) {
+func (m *WalletNodeMutation) SetCoinID(id int32) {
 	m.coin = &id
 }
 
@@ -3424,7 +3454,7 @@ func (m *WalletNodeMutation) CoinCleared() bool {
 }
 
 // CoinID returns the "coin" edge ID in the mutation.
-func (m *WalletNodeMutation) CoinID() (id int, exists bool) {
+func (m *WalletNodeMutation) CoinID() (id int32, exists bool) {
 	if m.coin != nil {
 		return *m.coin, true
 	}
@@ -3434,7 +3464,7 @@ func (m *WalletNodeMutation) CoinID() (id int, exists bool) {
 // CoinIDs returns the "coin" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // CoinID instead. It exists only for internal usage by the builders.
-func (m *WalletNodeMutation) CoinIDs() (ids []int) {
+func (m *WalletNodeMutation) CoinIDs() (ids []int32) {
 	if id := m.coin; id != nil {
 		ids = append(ids, *id)
 	}

@@ -13,6 +13,7 @@ type Transaction struct {
 
 func (Transaction) Fields() []ent.Field {
 	return []ent.Field{
+		field.Int32("id"),
 		field.Int("amount_int").Positive(),
 		field.Int("amount_digits").NonNegative().Default(9),
 		field.String("address_from").MaxLen(64).NotEmpty(),

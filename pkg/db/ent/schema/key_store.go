@@ -13,6 +13,7 @@ type KeyStore struct {
 
 func (KeyStore) Fields() []ent.Field {
 	return []ent.Field{
+		field.Int32("id"),
 		field.String("address").MinLen(8).MaxLen(48),
 		field.String("private_key").
 			MinLen(8).

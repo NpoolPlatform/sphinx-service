@@ -85,7 +85,7 @@ func (wnu *WalletNodeUpdate) AddLastOnlineTimeUtc(i int) *WalletNodeUpdate {
 }
 
 // SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (wnu *WalletNodeUpdate) SetCoinID(id int) *WalletNodeUpdate {
+func (wnu *WalletNodeUpdate) SetCoinID(id int32) *WalletNodeUpdate {
 	wnu.mutation.SetCoinID(id)
 	return wnu
 }
@@ -180,7 +180,7 @@ func (wnu *WalletNodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   walletnode.Table,
 			Columns: walletnode.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeInt32,
 				Column: walletnode.FieldID,
 			},
 		},
@@ -264,7 +264,7 @@ func (wnu *WalletNodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: coininfo.FieldID,
 				},
 			},
@@ -280,7 +280,7 @@ func (wnu *WalletNodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: coininfo.FieldID,
 				},
 			},
@@ -366,7 +366,7 @@ func (wnuo *WalletNodeUpdateOne) AddLastOnlineTimeUtc(i int) *WalletNodeUpdateOn
 }
 
 // SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (wnuo *WalletNodeUpdateOne) SetCoinID(id int) *WalletNodeUpdateOne {
+func (wnuo *WalletNodeUpdateOne) SetCoinID(id int32) *WalletNodeUpdateOne {
 	wnuo.mutation.SetCoinID(id)
 	return wnuo
 }
@@ -468,7 +468,7 @@ func (wnuo *WalletNodeUpdateOne) sqlSave(ctx context.Context) (_node *WalletNode
 			Table:   walletnode.Table,
 			Columns: walletnode.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeInt32,
 				Column: walletnode.FieldID,
 			},
 		},
@@ -569,7 +569,7 @@ func (wnuo *WalletNodeUpdateOne) sqlSave(ctx context.Context) (_node *WalletNode
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: coininfo.FieldID,
 				},
 			},
@@ -585,7 +585,7 @@ func (wnuo *WalletNodeUpdateOne) sqlSave(ctx context.Context) (_node *WalletNode
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: coininfo.FieldID,
 				},
 			},

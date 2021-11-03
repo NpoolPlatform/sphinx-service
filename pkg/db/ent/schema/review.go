@@ -13,6 +13,7 @@ type Review struct {
 
 func (Review) Fields() []ent.Field {
 	return []ent.Field{
+		field.Int32("id"),
 		field.Bool("is_approved").Default(false),
 		field.String("operator_note").MaxLen(70),
 		field.Int("createtime_utc"),

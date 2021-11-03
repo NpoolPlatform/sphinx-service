@@ -14,7 +14,7 @@ import (
 type CoinInfo struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID int32 `json:"id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Unit holds the value of the "unit" field.
@@ -108,7 +108,7 @@ func (ci *CoinInfo) assignValues(columns []string, values []interface{}) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			ci.ID = int(value.Int64)
+			ci.ID = int32(value.Int64)
 		case coininfo.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])

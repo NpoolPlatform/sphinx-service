@@ -41,7 +41,7 @@ func (ksu *KeyStoreUpdate) SetPrivateKey(s string) *KeyStoreUpdate {
 }
 
 // SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (ksu *KeyStoreUpdate) SetCoinID(id int) *KeyStoreUpdate {
+func (ksu *KeyStoreUpdate) SetCoinID(id int32) *KeyStoreUpdate {
 	ksu.mutation.SetCoinID(id)
 	return ksu
 }
@@ -146,7 +146,7 @@ func (ksu *KeyStoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   keystore.Table,
 			Columns: keystore.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeInt32,
 				Column: keystore.FieldID,
 			},
 		},
@@ -181,7 +181,7 @@ func (ksu *KeyStoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: coininfo.FieldID,
 				},
 			},
@@ -197,7 +197,7 @@ func (ksu *KeyStoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: coininfo.FieldID,
 				},
 			},
@@ -239,7 +239,7 @@ func (ksuo *KeyStoreUpdateOne) SetPrivateKey(s string) *KeyStoreUpdateOne {
 }
 
 // SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (ksuo *KeyStoreUpdateOne) SetCoinID(id int) *KeyStoreUpdateOne {
+func (ksuo *KeyStoreUpdateOne) SetCoinID(id int32) *KeyStoreUpdateOne {
 	ksuo.mutation.SetCoinID(id)
 	return ksuo
 }
@@ -351,7 +351,7 @@ func (ksuo *KeyStoreUpdateOne) sqlSave(ctx context.Context) (_node *KeyStore, er
 			Table:   keystore.Table,
 			Columns: keystore.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeInt32,
 				Column: keystore.FieldID,
 			},
 		},
@@ -403,7 +403,7 @@ func (ksuo *KeyStoreUpdateOne) sqlSave(ctx context.Context) (_node *KeyStore, er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: coininfo.FieldID,
 				},
 			},
@@ -419,7 +419,7 @@ func (ksuo *KeyStoreUpdateOne) sqlSave(ctx context.Context) (_node *KeyStore, er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: coininfo.FieldID,
 				},
 			},

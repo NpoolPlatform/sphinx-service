@@ -117,8 +117,14 @@ func (tc *TransactionCreate) SetUpdatetimeUtc(i int) *TransactionCreate {
 	return tc
 }
 
+// SetID sets the "id" field.
+func (tc *TransactionCreate) SetID(i int32) *TransactionCreate {
+	tc.mutation.SetID(i)
+	return tc
+}
+
 // SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (tc *TransactionCreate) SetCoinID(id int) *TransactionCreate {
+func (tc *TransactionCreate) SetCoinID(id int32) *TransactionCreate {
 	tc.mutation.SetCoinID(id)
 	return tc
 }
@@ -129,14 +135,14 @@ func (tc *TransactionCreate) SetCoin(c *CoinInfo) *TransactionCreate {
 }
 
 // AddReviewIDs adds the "review" edge to the Review entity by IDs.
-func (tc *TransactionCreate) AddReviewIDs(ids ...int) *TransactionCreate {
+func (tc *TransactionCreate) AddReviewIDs(ids ...int32) *TransactionCreate {
 	tc.mutation.AddReviewIDs(ids...)
 	return tc
 }
 
 // AddReview adds the "review" edges to the Review entity.
 func (tc *TransactionCreate) AddReview(r ...*Review) *TransactionCreate {
-	ids := make([]int, len(r))
+	ids := make([]int32, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -320,8 +326,10 @@ func (tc *TransactionCreate) sqlSave(ctx context.Context) (*Transaction, error) 
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int32(id)
+	}
 	return _node, nil
 }
 
@@ -331,11 +339,15 @@ func (tc *TransactionCreate) createSpec() (*Transaction, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: transaction.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeInt32,
 				Column: transaction.FieldID,
 			},
 		}
 	)
+	if id, ok := tc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := tc.mutation.AmountInt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt,
@@ -441,7 +453,7 @@ func (tc *TransactionCreate) createSpec() (*Transaction, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: coininfo.FieldID,
 				},
 			},
@@ -461,7 +473,7 @@ func (tc *TransactionCreate) createSpec() (*Transaction, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: review.FieldID,
 				},
 			},
@@ -516,9 +528,9 @@ func (tcb *TransactionCreateBulk) Save(ctx context.Context) ([]*Transaction, err
 				}
 				mutation.id = &nodes[i].ID
 				mutation.done = true
-				if specs[i].ID.Value != nil {
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = int32(id)
 				}
 				return nodes[i], nil
 			})

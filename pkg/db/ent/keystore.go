@@ -15,7 +15,7 @@ import (
 type KeyStore struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID int32 `json:"id,omitempty"`
 	// Address holds the value of the "address" field.
 	Address string `json:"address,omitempty"`
 	// PrivateKey holds the value of the "private_key" field.
@@ -23,7 +23,7 @@ type KeyStore struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the KeyStoreQuery when eager-loading is set.
 	Edges          KeyStoreEdges `json:"edges"`
-	coin_info_keys *int
+	coin_info_keys *int32
 }
 
 // KeyStoreEdges holds the relations/edges for other nodes in the graph.
@@ -80,7 +80,7 @@ func (ks *KeyStore) assignValues(columns []string, values []interface{}) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			ks.ID = int(value.Int64)
+			ks.ID = int32(value.Int64)
 		case keystore.FieldAddress:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field address", values[i])
@@ -97,8 +97,8 @@ func (ks *KeyStore) assignValues(columns []string, values []interface{}) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field coin_info_keys", value)
 			} else if value.Valid {
-				ks.coin_info_keys = new(int)
-				*ks.coin_info_keys = int(value.Int64)
+				ks.coin_info_keys = new(int32)
+				*ks.coin_info_keys = int32(value.Int64)
 			}
 		}
 	}

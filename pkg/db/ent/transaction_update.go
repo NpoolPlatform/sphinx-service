@@ -154,7 +154,7 @@ func (tu *TransactionUpdate) AddUpdatetimeUtc(i int) *TransactionUpdate {
 }
 
 // SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (tu *TransactionUpdate) SetCoinID(id int) *TransactionUpdate {
+func (tu *TransactionUpdate) SetCoinID(id int32) *TransactionUpdate {
 	tu.mutation.SetCoinID(id)
 	return tu
 }
@@ -165,14 +165,14 @@ func (tu *TransactionUpdate) SetCoin(c *CoinInfo) *TransactionUpdate {
 }
 
 // AddReviewIDs adds the "review" edge to the Review entity by IDs.
-func (tu *TransactionUpdate) AddReviewIDs(ids ...int) *TransactionUpdate {
+func (tu *TransactionUpdate) AddReviewIDs(ids ...int32) *TransactionUpdate {
 	tu.mutation.AddReviewIDs(ids...)
 	return tu
 }
 
 // AddReview adds the "review" edges to the Review entity.
 func (tu *TransactionUpdate) AddReview(r ...*Review) *TransactionUpdate {
-	ids := make([]int, len(r))
+	ids := make([]int32, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -197,14 +197,14 @@ func (tu *TransactionUpdate) ClearReview() *TransactionUpdate {
 }
 
 // RemoveReviewIDs removes the "review" edge to Review entities by IDs.
-func (tu *TransactionUpdate) RemoveReviewIDs(ids ...int) *TransactionUpdate {
+func (tu *TransactionUpdate) RemoveReviewIDs(ids ...int32) *TransactionUpdate {
 	tu.mutation.RemoveReviewIDs(ids...)
 	return tu
 }
 
 // RemoveReview removes "review" edges to Review entities.
 func (tu *TransactionUpdate) RemoveReview(r ...*Review) *TransactionUpdate {
-	ids := make([]int, len(r))
+	ids := make([]int32, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -325,7 +325,7 @@ func (tu *TransactionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   transaction.Table,
 			Columns: transaction.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeInt32,
 				Column: transaction.FieldID,
 			},
 		},
@@ -458,7 +458,7 @@ func (tu *TransactionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: coininfo.FieldID,
 				},
 			},
@@ -474,7 +474,7 @@ func (tu *TransactionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: coininfo.FieldID,
 				},
 			},
@@ -493,7 +493,7 @@ func (tu *TransactionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: review.FieldID,
 				},
 			},
@@ -509,7 +509,7 @@ func (tu *TransactionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: review.FieldID,
 				},
 			},
@@ -528,7 +528,7 @@ func (tu *TransactionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: review.FieldID,
 				},
 			},
@@ -682,7 +682,7 @@ func (tuo *TransactionUpdateOne) AddUpdatetimeUtc(i int) *TransactionUpdateOne {
 }
 
 // SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (tuo *TransactionUpdateOne) SetCoinID(id int) *TransactionUpdateOne {
+func (tuo *TransactionUpdateOne) SetCoinID(id int32) *TransactionUpdateOne {
 	tuo.mutation.SetCoinID(id)
 	return tuo
 }
@@ -693,14 +693,14 @@ func (tuo *TransactionUpdateOne) SetCoin(c *CoinInfo) *TransactionUpdateOne {
 }
 
 // AddReviewIDs adds the "review" edge to the Review entity by IDs.
-func (tuo *TransactionUpdateOne) AddReviewIDs(ids ...int) *TransactionUpdateOne {
+func (tuo *TransactionUpdateOne) AddReviewIDs(ids ...int32) *TransactionUpdateOne {
 	tuo.mutation.AddReviewIDs(ids...)
 	return tuo
 }
 
 // AddReview adds the "review" edges to the Review entity.
 func (tuo *TransactionUpdateOne) AddReview(r ...*Review) *TransactionUpdateOne {
-	ids := make([]int, len(r))
+	ids := make([]int32, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -725,14 +725,14 @@ func (tuo *TransactionUpdateOne) ClearReview() *TransactionUpdateOne {
 }
 
 // RemoveReviewIDs removes the "review" edge to Review entities by IDs.
-func (tuo *TransactionUpdateOne) RemoveReviewIDs(ids ...int) *TransactionUpdateOne {
+func (tuo *TransactionUpdateOne) RemoveReviewIDs(ids ...int32) *TransactionUpdateOne {
 	tuo.mutation.RemoveReviewIDs(ids...)
 	return tuo
 }
 
 // RemoveReview removes "review" edges to Review entities.
 func (tuo *TransactionUpdateOne) RemoveReview(r ...*Review) *TransactionUpdateOne {
-	ids := make([]int, len(r))
+	ids := make([]int32, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -860,7 +860,7 @@ func (tuo *TransactionUpdateOne) sqlSave(ctx context.Context) (_node *Transactio
 			Table:   transaction.Table,
 			Columns: transaction.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeInt32,
 				Column: transaction.FieldID,
 			},
 		},
@@ -1010,7 +1010,7 @@ func (tuo *TransactionUpdateOne) sqlSave(ctx context.Context) (_node *Transactio
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: coininfo.FieldID,
 				},
 			},
@@ -1026,7 +1026,7 @@ func (tuo *TransactionUpdateOne) sqlSave(ctx context.Context) (_node *Transactio
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: coininfo.FieldID,
 				},
 			},
@@ -1045,7 +1045,7 @@ func (tuo *TransactionUpdateOne) sqlSave(ctx context.Context) (_node *Transactio
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: review.FieldID,
 				},
 			},
@@ -1061,7 +1061,7 @@ func (tuo *TransactionUpdateOne) sqlSave(ctx context.Context) (_node *Transactio
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: review.FieldID,
 				},
 			},
@@ -1080,7 +1080,7 @@ func (tuo *TransactionUpdateOne) sqlSave(ctx context.Context) (_node *Transactio
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: review.FieldID,
 				},
 			},

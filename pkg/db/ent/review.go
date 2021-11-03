@@ -16,7 +16,7 @@ import (
 type Review struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID int32 `json:"id,omitempty"`
 	// IsApproved holds the value of the "is_approved" field.
 	IsApproved bool `json:"is_approved,omitempty"`
 	// OperatorNote holds the value of the "operator_note" field.
@@ -28,8 +28,8 @@ type Review struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ReviewQuery when eager-loading is set.
 	Edges              ReviewEdges `json:"edges"`
-	coin_info_reviews  *int
-	transaction_review *int
+	coin_info_reviews  *int32
+	transaction_review *int32
 }
 
 // ReviewEdges holds the relations/edges for other nodes in the graph.
@@ -106,7 +106,7 @@ func (r *Review) assignValues(columns []string, values []interface{}) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			r.ID = int(value.Int64)
+			r.ID = int32(value.Int64)
 		case review.FieldIsApproved:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field is_approved", values[i])
@@ -135,15 +135,15 @@ func (r *Review) assignValues(columns []string, values []interface{}) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field coin_info_reviews", value)
 			} else if value.Valid {
-				r.coin_info_reviews = new(int)
-				*r.coin_info_reviews = int(value.Int64)
+				r.coin_info_reviews = new(int32)
+				*r.coin_info_reviews = int32(value.Int64)
 			}
 		case review.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field transaction_review", value)
 			} else if value.Valid {
-				r.transaction_review = new(int)
-				*r.transaction_review = int(value.Int64)
+				r.transaction_review = new(int32)
+				*r.transaction_review = int32(value.Int64)
 			}
 		}
 	}

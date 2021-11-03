@@ -10,7 +10,7 @@ import (
 var (
 	// CoinInfosColumns holds the columns for the "coin_infos" table.
 	CoinInfosColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id", Type: field.TypeInt32, Increment: true},
 		{Name: "name", Type: field.TypeString, Unique: true, Size: 16},
 		{Name: "unit", Type: field.TypeString, Size: 4},
 		{Name: "need_signinfo", Type: field.TypeBool, Default: false},
@@ -35,10 +35,10 @@ var (
 	}
 	// KeyStoresColumns holds the columns for the "key_stores" table.
 	KeyStoresColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id", Type: field.TypeInt32, Increment: true},
 		{Name: "address", Type: field.TypeString, Size: 48},
 		{Name: "private_key", Type: field.TypeString, Size: 80},
-		{Name: "coin_info_keys", Type: field.TypeInt, Nullable: true},
+		{Name: "coin_info_keys", Type: field.TypeInt32, Nullable: true},
 	}
 	// KeyStoresTable holds the schema information for the "key_stores" table.
 	KeyStoresTable = &schema.Table{
@@ -63,13 +63,13 @@ var (
 	}
 	// ReviewsColumns holds the columns for the "reviews" table.
 	ReviewsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id", Type: field.TypeInt32, Increment: true},
 		{Name: "is_approved", Type: field.TypeBool, Default: false},
 		{Name: "operator_note", Type: field.TypeString, Size: 70},
 		{Name: "createtime_utc", Type: field.TypeInt},
 		{Name: "updatetime_utc", Type: field.TypeInt},
-		{Name: "coin_info_reviews", Type: field.TypeInt, Nullable: true},
-		{Name: "transaction_review", Type: field.TypeInt, Nullable: true},
+		{Name: "coin_info_reviews", Type: field.TypeInt32, Nullable: true},
+		{Name: "transaction_review", Type: field.TypeInt32, Nullable: true},
 	}
 	// ReviewsTable holds the schema information for the "reviews" table.
 	ReviewsTable = &schema.Table{
@@ -105,7 +105,7 @@ var (
 	}
 	// TransactionsColumns holds the columns for the "transactions" table.
 	TransactionsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id", Type: field.TypeInt32, Increment: true},
 		{Name: "amount_int", Type: field.TypeInt},
 		{Name: "amount_digits", Type: field.TypeInt, Default: 9},
 		{Name: "address_from", Type: field.TypeString, Size: 64},
@@ -118,7 +118,7 @@ var (
 		{Name: "mutex", Type: field.TypeBool, Default: false},
 		{Name: "createtime_utc", Type: field.TypeInt},
 		{Name: "updatetime_utc", Type: field.TypeInt},
-		{Name: "coin_info_transactions", Type: field.TypeInt, Nullable: true},
+		{Name: "coin_info_transactions", Type: field.TypeInt32, Nullable: true},
 	}
 	// TransactionsTable holds the schema information for the "transactions" table.
 	TransactionsTable = &schema.Table{
@@ -173,7 +173,7 @@ var (
 	}
 	// WalletNodesColumns holds the columns for the "wallet_nodes" table.
 	WalletNodesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id", Type: field.TypeInt32, Increment: true},
 		{Name: "uuid", Type: field.TypeString, Unique: true},
 		{Name: "location", Type: field.TypeString},
 		{Name: "host_vendor", Type: field.TypeString},
@@ -181,7 +181,7 @@ var (
 		{Name: "local_ip", Type: field.TypeString},
 		{Name: "createtime_utc", Type: field.TypeInt},
 		{Name: "last_online_time_utc", Type: field.TypeInt},
-		{Name: "coin_info_wallet_nodes", Type: field.TypeInt, Nullable: true},
+		{Name: "coin_info_wallet_nodes", Type: field.TypeInt32, Nullable: true},
 	}
 	// WalletNodesTable holds the schema information for the "wallet_nodes" table.
 	WalletNodesTable = &schema.Table{

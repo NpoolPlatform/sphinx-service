@@ -110,8 +110,8 @@ func (wnq *WalletNodeQuery) FirstX(ctx context.Context) *WalletNode {
 
 // FirstID returns the first WalletNode ID from the query.
 // Returns a *NotFoundError when no WalletNode ID was found.
-func (wnq *WalletNodeQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (wnq *WalletNodeQuery) FirstID(ctx context.Context) (id int32, err error) {
+	var ids []int32
 	if ids, err = wnq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -123,7 +123,7 @@ func (wnq *WalletNodeQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (wnq *WalletNodeQuery) FirstIDX(ctx context.Context) int {
+func (wnq *WalletNodeQuery) FirstIDX(ctx context.Context) int32 {
 	id, err := wnq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -161,8 +161,8 @@ func (wnq *WalletNodeQuery) OnlyX(ctx context.Context) *WalletNode {
 // OnlyID is like Only, but returns the only WalletNode ID in the query.
 // Returns a *NotSingularError when exactly one WalletNode ID is not found.
 // Returns a *NotFoundError when no entities are found.
-func (wnq *WalletNodeQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (wnq *WalletNodeQuery) OnlyID(ctx context.Context) (id int32, err error) {
+	var ids []int32
 	if ids, err = wnq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -178,7 +178,7 @@ func (wnq *WalletNodeQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (wnq *WalletNodeQuery) OnlyIDX(ctx context.Context) int {
+func (wnq *WalletNodeQuery) OnlyIDX(ctx context.Context) int32 {
 	id, err := wnq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -204,8 +204,8 @@ func (wnq *WalletNodeQuery) AllX(ctx context.Context) []*WalletNode {
 }
 
 // IDs executes the query and returns a list of WalletNode IDs.
-func (wnq *WalletNodeQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (wnq *WalletNodeQuery) IDs(ctx context.Context) ([]int32, error) {
+	var ids []int32
 	if err := wnq.Select(walletnode.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -213,7 +213,7 @@ func (wnq *WalletNodeQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (wnq *WalletNodeQuery) IDsX(ctx context.Context) []int {
+func (wnq *WalletNodeQuery) IDsX(ctx context.Context) []int32 {
 	ids, err := wnq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -382,8 +382,8 @@ func (wnq *WalletNodeQuery) sqlAll(ctx context.Context) ([]*WalletNode, error) {
 	}
 
 	if query := wnq.withCoin; query != nil {
-		ids := make([]int, 0, len(nodes))
-		nodeids := make(map[int][]*WalletNode)
+		ids := make([]int32, 0, len(nodes))
+		nodeids := make(map[int32][]*WalletNode)
 		for i := range nodes {
 			if nodes[i].coin_info_wallet_nodes == nil {
 				continue
@@ -432,7 +432,7 @@ func (wnq *WalletNodeQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   walletnode.Table,
 			Columns: walletnode.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeInt32,
 				Column: walletnode.FieldID,
 			},
 		},

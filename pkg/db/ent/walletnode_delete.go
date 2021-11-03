@@ -72,7 +72,7 @@ func (wnd *WalletNodeDelete) sqlExec(ctx context.Context) (int, error) {
 		Node: &sqlgraph.NodeSpec{
 			Table: walletnode.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeInt32,
 				Column: walletnode.FieldID,
 			},
 		},

@@ -15,7 +15,7 @@ import (
 type Transaction struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID int32 `json:"id,omitempty"`
 	// AmountInt holds the value of the "amount_int" field.
 	AmountInt int `json:"amount_int,omitempty"`
 	// AmountDigits holds the value of the "amount_digits" field.
@@ -43,7 +43,7 @@ type Transaction struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TransactionQuery when eager-loading is set.
 	Edges                  TransactionEdges `json:"edges"`
-	coin_info_transactions *int
+	coin_info_transactions *int32
 }
 
 // TransactionEdges holds the relations/edges for other nodes in the graph.
@@ -113,7 +113,7 @@ func (t *Transaction) assignValues(columns []string, values []interface{}) error
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			t.ID = int(value.Int64)
+			t.ID = int32(value.Int64)
 		case transaction.FieldAmountInt:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field amount_int", values[i])
@@ -190,8 +190,8 @@ func (t *Transaction) assignValues(columns []string, values []interface{}) error
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field coin_info_transactions", value)
 			} else if value.Valid {
-				t.coin_info_transactions = new(int)
-				*t.coin_info_transactions = int(value.Int64)
+				t.coin_info_transactions = new(int32)
+				*t.coin_info_transactions = int32(value.Int64)
 			}
 		}
 	}

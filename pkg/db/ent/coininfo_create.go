@@ -49,15 +49,21 @@ func (cic *CoinInfoCreate) SetNillableNeedSigninfo(b *bool) *CoinInfoCreate {
 	return cic
 }
 
+// SetID sets the "id" field.
+func (cic *CoinInfoCreate) SetID(i int32) *CoinInfoCreate {
+	cic.mutation.SetID(i)
+	return cic
+}
+
 // AddKeyIDs adds the "keys" edge to the KeyStore entity by IDs.
-func (cic *CoinInfoCreate) AddKeyIDs(ids ...int) *CoinInfoCreate {
+func (cic *CoinInfoCreate) AddKeyIDs(ids ...int32) *CoinInfoCreate {
 	cic.mutation.AddKeyIDs(ids...)
 	return cic
 }
 
 // AddKeys adds the "keys" edges to the KeyStore entity.
 func (cic *CoinInfoCreate) AddKeys(k ...*KeyStore) *CoinInfoCreate {
-	ids := make([]int, len(k))
+	ids := make([]int32, len(k))
 	for i := range k {
 		ids[i] = k[i].ID
 	}
@@ -65,14 +71,14 @@ func (cic *CoinInfoCreate) AddKeys(k ...*KeyStore) *CoinInfoCreate {
 }
 
 // AddTransactionIDs adds the "transactions" edge to the Transaction entity by IDs.
-func (cic *CoinInfoCreate) AddTransactionIDs(ids ...int) *CoinInfoCreate {
+func (cic *CoinInfoCreate) AddTransactionIDs(ids ...int32) *CoinInfoCreate {
 	cic.mutation.AddTransactionIDs(ids...)
 	return cic
 }
 
 // AddTransactions adds the "transactions" edges to the Transaction entity.
 func (cic *CoinInfoCreate) AddTransactions(t ...*Transaction) *CoinInfoCreate {
-	ids := make([]int, len(t))
+	ids := make([]int32, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
@@ -80,14 +86,14 @@ func (cic *CoinInfoCreate) AddTransactions(t ...*Transaction) *CoinInfoCreate {
 }
 
 // AddReviewIDs adds the "reviews" edge to the Review entity by IDs.
-func (cic *CoinInfoCreate) AddReviewIDs(ids ...int) *CoinInfoCreate {
+func (cic *CoinInfoCreate) AddReviewIDs(ids ...int32) *CoinInfoCreate {
 	cic.mutation.AddReviewIDs(ids...)
 	return cic
 }
 
 // AddReviews adds the "reviews" edges to the Review entity.
 func (cic *CoinInfoCreate) AddReviews(r ...*Review) *CoinInfoCreate {
-	ids := make([]int, len(r))
+	ids := make([]int32, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -95,14 +101,14 @@ func (cic *CoinInfoCreate) AddReviews(r ...*Review) *CoinInfoCreate {
 }
 
 // AddWalletNodeIDs adds the "wallet_nodes" edge to the WalletNode entity by IDs.
-func (cic *CoinInfoCreate) AddWalletNodeIDs(ids ...int) *CoinInfoCreate {
+func (cic *CoinInfoCreate) AddWalletNodeIDs(ids ...int32) *CoinInfoCreate {
 	cic.mutation.AddWalletNodeIDs(ids...)
 	return cic
 }
 
 // AddWalletNodes adds the "wallet_nodes" edges to the WalletNode entity.
 func (cic *CoinInfoCreate) AddWalletNodes(w ...*WalletNode) *CoinInfoCreate {
-	ids := make([]int, len(w))
+	ids := make([]int32, len(w))
 	for i := range w {
 		ids[i] = w[i].ID
 	}
@@ -218,8 +224,10 @@ func (cic *CoinInfoCreate) sqlSave(ctx context.Context) (*CoinInfo, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int32(id)
+	}
 	return _node, nil
 }
 
@@ -229,11 +237,15 @@ func (cic *CoinInfoCreate) createSpec() (*CoinInfo, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: coininfo.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeInt32,
 				Column: coininfo.FieldID,
 			},
 		}
 	)
+	if id, ok := cic.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := cic.mutation.Name(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -267,7 +279,7 @@ func (cic *CoinInfoCreate) createSpec() (*CoinInfo, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: keystore.FieldID,
 				},
 			},
@@ -286,7 +298,7 @@ func (cic *CoinInfoCreate) createSpec() (*CoinInfo, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: transaction.FieldID,
 				},
 			},
@@ -305,7 +317,7 @@ func (cic *CoinInfoCreate) createSpec() (*CoinInfo, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: review.FieldID,
 				},
 			},
@@ -324,7 +336,7 @@ func (cic *CoinInfoCreate) createSpec() (*CoinInfo, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: walletnode.FieldID,
 				},
 			},
@@ -379,9 +391,9 @@ func (cicb *CoinInfoCreateBulk) Save(ctx context.Context) ([]*CoinInfo, error) {
 				}
 				mutation.id = &nodes[i].ID
 				mutation.done = true
-				if specs[i].ID.Value != nil {
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = int32(id)
 				}
 				return nodes[i], nil
 			})

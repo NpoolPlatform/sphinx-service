@@ -13,6 +13,7 @@ type WalletNode struct {
 
 func (WalletNode) Fields() []ent.Field {
 	return []ent.Field{
+		field.Int32("id"),
 		field.String("uuid").Unique(),
 		field.String("location"),
 		field.String("host_vendor"),

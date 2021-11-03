@@ -57,14 +57,14 @@ func (ciu *CoinInfoUpdate) SetNillableNeedSigninfo(b *bool) *CoinInfoUpdate {
 }
 
 // AddKeyIDs adds the "keys" edge to the KeyStore entity by IDs.
-func (ciu *CoinInfoUpdate) AddKeyIDs(ids ...int) *CoinInfoUpdate {
+func (ciu *CoinInfoUpdate) AddKeyIDs(ids ...int32) *CoinInfoUpdate {
 	ciu.mutation.AddKeyIDs(ids...)
 	return ciu
 }
 
 // AddKeys adds the "keys" edges to the KeyStore entity.
 func (ciu *CoinInfoUpdate) AddKeys(k ...*KeyStore) *CoinInfoUpdate {
-	ids := make([]int, len(k))
+	ids := make([]int32, len(k))
 	for i := range k {
 		ids[i] = k[i].ID
 	}
@@ -72,14 +72,14 @@ func (ciu *CoinInfoUpdate) AddKeys(k ...*KeyStore) *CoinInfoUpdate {
 }
 
 // AddTransactionIDs adds the "transactions" edge to the Transaction entity by IDs.
-func (ciu *CoinInfoUpdate) AddTransactionIDs(ids ...int) *CoinInfoUpdate {
+func (ciu *CoinInfoUpdate) AddTransactionIDs(ids ...int32) *CoinInfoUpdate {
 	ciu.mutation.AddTransactionIDs(ids...)
 	return ciu
 }
 
 // AddTransactions adds the "transactions" edges to the Transaction entity.
 func (ciu *CoinInfoUpdate) AddTransactions(t ...*Transaction) *CoinInfoUpdate {
-	ids := make([]int, len(t))
+	ids := make([]int32, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
@@ -87,14 +87,14 @@ func (ciu *CoinInfoUpdate) AddTransactions(t ...*Transaction) *CoinInfoUpdate {
 }
 
 // AddReviewIDs adds the "reviews" edge to the Review entity by IDs.
-func (ciu *CoinInfoUpdate) AddReviewIDs(ids ...int) *CoinInfoUpdate {
+func (ciu *CoinInfoUpdate) AddReviewIDs(ids ...int32) *CoinInfoUpdate {
 	ciu.mutation.AddReviewIDs(ids...)
 	return ciu
 }
 
 // AddReviews adds the "reviews" edges to the Review entity.
 func (ciu *CoinInfoUpdate) AddReviews(r ...*Review) *CoinInfoUpdate {
-	ids := make([]int, len(r))
+	ids := make([]int32, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -102,14 +102,14 @@ func (ciu *CoinInfoUpdate) AddReviews(r ...*Review) *CoinInfoUpdate {
 }
 
 // AddWalletNodeIDs adds the "wallet_nodes" edge to the WalletNode entity by IDs.
-func (ciu *CoinInfoUpdate) AddWalletNodeIDs(ids ...int) *CoinInfoUpdate {
+func (ciu *CoinInfoUpdate) AddWalletNodeIDs(ids ...int32) *CoinInfoUpdate {
 	ciu.mutation.AddWalletNodeIDs(ids...)
 	return ciu
 }
 
 // AddWalletNodes adds the "wallet_nodes" edges to the WalletNode entity.
 func (ciu *CoinInfoUpdate) AddWalletNodes(w ...*WalletNode) *CoinInfoUpdate {
-	ids := make([]int, len(w))
+	ids := make([]int32, len(w))
 	for i := range w {
 		ids[i] = w[i].ID
 	}
@@ -128,14 +128,14 @@ func (ciu *CoinInfoUpdate) ClearKeys() *CoinInfoUpdate {
 }
 
 // RemoveKeyIDs removes the "keys" edge to KeyStore entities by IDs.
-func (ciu *CoinInfoUpdate) RemoveKeyIDs(ids ...int) *CoinInfoUpdate {
+func (ciu *CoinInfoUpdate) RemoveKeyIDs(ids ...int32) *CoinInfoUpdate {
 	ciu.mutation.RemoveKeyIDs(ids...)
 	return ciu
 }
 
 // RemoveKeys removes "keys" edges to KeyStore entities.
 func (ciu *CoinInfoUpdate) RemoveKeys(k ...*KeyStore) *CoinInfoUpdate {
-	ids := make([]int, len(k))
+	ids := make([]int32, len(k))
 	for i := range k {
 		ids[i] = k[i].ID
 	}
@@ -149,14 +149,14 @@ func (ciu *CoinInfoUpdate) ClearTransactions() *CoinInfoUpdate {
 }
 
 // RemoveTransactionIDs removes the "transactions" edge to Transaction entities by IDs.
-func (ciu *CoinInfoUpdate) RemoveTransactionIDs(ids ...int) *CoinInfoUpdate {
+func (ciu *CoinInfoUpdate) RemoveTransactionIDs(ids ...int32) *CoinInfoUpdate {
 	ciu.mutation.RemoveTransactionIDs(ids...)
 	return ciu
 }
 
 // RemoveTransactions removes "transactions" edges to Transaction entities.
 func (ciu *CoinInfoUpdate) RemoveTransactions(t ...*Transaction) *CoinInfoUpdate {
-	ids := make([]int, len(t))
+	ids := make([]int32, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
@@ -170,14 +170,14 @@ func (ciu *CoinInfoUpdate) ClearReviews() *CoinInfoUpdate {
 }
 
 // RemoveReviewIDs removes the "reviews" edge to Review entities by IDs.
-func (ciu *CoinInfoUpdate) RemoveReviewIDs(ids ...int) *CoinInfoUpdate {
+func (ciu *CoinInfoUpdate) RemoveReviewIDs(ids ...int32) *CoinInfoUpdate {
 	ciu.mutation.RemoveReviewIDs(ids...)
 	return ciu
 }
 
 // RemoveReviews removes "reviews" edges to Review entities.
 func (ciu *CoinInfoUpdate) RemoveReviews(r ...*Review) *CoinInfoUpdate {
-	ids := make([]int, len(r))
+	ids := make([]int32, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -191,14 +191,14 @@ func (ciu *CoinInfoUpdate) ClearWalletNodes() *CoinInfoUpdate {
 }
 
 // RemoveWalletNodeIDs removes the "wallet_nodes" edge to WalletNode entities by IDs.
-func (ciu *CoinInfoUpdate) RemoveWalletNodeIDs(ids ...int) *CoinInfoUpdate {
+func (ciu *CoinInfoUpdate) RemoveWalletNodeIDs(ids ...int32) *CoinInfoUpdate {
 	ciu.mutation.RemoveWalletNodeIDs(ids...)
 	return ciu
 }
 
 // RemoveWalletNodes removes "wallet_nodes" edges to WalletNode entities.
 func (ciu *CoinInfoUpdate) RemoveWalletNodes(w ...*WalletNode) *CoinInfoUpdate {
-	ids := make([]int, len(w))
+	ids := make([]int32, len(w))
 	for i := range w {
 		ids[i] = w[i].ID
 	}
@@ -286,7 +286,7 @@ func (ciu *CoinInfoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   coininfo.Table,
 			Columns: coininfo.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeInt32,
 				Column: coininfo.FieldID,
 			},
 		},
@@ -328,7 +328,7 @@ func (ciu *CoinInfoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: keystore.FieldID,
 				},
 			},
@@ -344,7 +344,7 @@ func (ciu *CoinInfoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: keystore.FieldID,
 				},
 			},
@@ -363,7 +363,7 @@ func (ciu *CoinInfoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: keystore.FieldID,
 				},
 			},
@@ -382,7 +382,7 @@ func (ciu *CoinInfoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: transaction.FieldID,
 				},
 			},
@@ -398,7 +398,7 @@ func (ciu *CoinInfoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: transaction.FieldID,
 				},
 			},
@@ -417,7 +417,7 @@ func (ciu *CoinInfoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: transaction.FieldID,
 				},
 			},
@@ -436,7 +436,7 @@ func (ciu *CoinInfoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: review.FieldID,
 				},
 			},
@@ -452,7 +452,7 @@ func (ciu *CoinInfoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: review.FieldID,
 				},
 			},
@@ -471,7 +471,7 @@ func (ciu *CoinInfoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: review.FieldID,
 				},
 			},
@@ -490,7 +490,7 @@ func (ciu *CoinInfoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: walletnode.FieldID,
 				},
 			},
@@ -506,7 +506,7 @@ func (ciu *CoinInfoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: walletnode.FieldID,
 				},
 			},
@@ -525,7 +525,7 @@ func (ciu *CoinInfoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: walletnode.FieldID,
 				},
 			},
@@ -581,14 +581,14 @@ func (ciuo *CoinInfoUpdateOne) SetNillableNeedSigninfo(b *bool) *CoinInfoUpdateO
 }
 
 // AddKeyIDs adds the "keys" edge to the KeyStore entity by IDs.
-func (ciuo *CoinInfoUpdateOne) AddKeyIDs(ids ...int) *CoinInfoUpdateOne {
+func (ciuo *CoinInfoUpdateOne) AddKeyIDs(ids ...int32) *CoinInfoUpdateOne {
 	ciuo.mutation.AddKeyIDs(ids...)
 	return ciuo
 }
 
 // AddKeys adds the "keys" edges to the KeyStore entity.
 func (ciuo *CoinInfoUpdateOne) AddKeys(k ...*KeyStore) *CoinInfoUpdateOne {
-	ids := make([]int, len(k))
+	ids := make([]int32, len(k))
 	for i := range k {
 		ids[i] = k[i].ID
 	}
@@ -596,14 +596,14 @@ func (ciuo *CoinInfoUpdateOne) AddKeys(k ...*KeyStore) *CoinInfoUpdateOne {
 }
 
 // AddTransactionIDs adds the "transactions" edge to the Transaction entity by IDs.
-func (ciuo *CoinInfoUpdateOne) AddTransactionIDs(ids ...int) *CoinInfoUpdateOne {
+func (ciuo *CoinInfoUpdateOne) AddTransactionIDs(ids ...int32) *CoinInfoUpdateOne {
 	ciuo.mutation.AddTransactionIDs(ids...)
 	return ciuo
 }
 
 // AddTransactions adds the "transactions" edges to the Transaction entity.
 func (ciuo *CoinInfoUpdateOne) AddTransactions(t ...*Transaction) *CoinInfoUpdateOne {
-	ids := make([]int, len(t))
+	ids := make([]int32, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
@@ -611,14 +611,14 @@ func (ciuo *CoinInfoUpdateOne) AddTransactions(t ...*Transaction) *CoinInfoUpdat
 }
 
 // AddReviewIDs adds the "reviews" edge to the Review entity by IDs.
-func (ciuo *CoinInfoUpdateOne) AddReviewIDs(ids ...int) *CoinInfoUpdateOne {
+func (ciuo *CoinInfoUpdateOne) AddReviewIDs(ids ...int32) *CoinInfoUpdateOne {
 	ciuo.mutation.AddReviewIDs(ids...)
 	return ciuo
 }
 
 // AddReviews adds the "reviews" edges to the Review entity.
 func (ciuo *CoinInfoUpdateOne) AddReviews(r ...*Review) *CoinInfoUpdateOne {
-	ids := make([]int, len(r))
+	ids := make([]int32, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -626,14 +626,14 @@ func (ciuo *CoinInfoUpdateOne) AddReviews(r ...*Review) *CoinInfoUpdateOne {
 }
 
 // AddWalletNodeIDs adds the "wallet_nodes" edge to the WalletNode entity by IDs.
-func (ciuo *CoinInfoUpdateOne) AddWalletNodeIDs(ids ...int) *CoinInfoUpdateOne {
+func (ciuo *CoinInfoUpdateOne) AddWalletNodeIDs(ids ...int32) *CoinInfoUpdateOne {
 	ciuo.mutation.AddWalletNodeIDs(ids...)
 	return ciuo
 }
 
 // AddWalletNodes adds the "wallet_nodes" edges to the WalletNode entity.
 func (ciuo *CoinInfoUpdateOne) AddWalletNodes(w ...*WalletNode) *CoinInfoUpdateOne {
-	ids := make([]int, len(w))
+	ids := make([]int32, len(w))
 	for i := range w {
 		ids[i] = w[i].ID
 	}
@@ -652,14 +652,14 @@ func (ciuo *CoinInfoUpdateOne) ClearKeys() *CoinInfoUpdateOne {
 }
 
 // RemoveKeyIDs removes the "keys" edge to KeyStore entities by IDs.
-func (ciuo *CoinInfoUpdateOne) RemoveKeyIDs(ids ...int) *CoinInfoUpdateOne {
+func (ciuo *CoinInfoUpdateOne) RemoveKeyIDs(ids ...int32) *CoinInfoUpdateOne {
 	ciuo.mutation.RemoveKeyIDs(ids...)
 	return ciuo
 }
 
 // RemoveKeys removes "keys" edges to KeyStore entities.
 func (ciuo *CoinInfoUpdateOne) RemoveKeys(k ...*KeyStore) *CoinInfoUpdateOne {
-	ids := make([]int, len(k))
+	ids := make([]int32, len(k))
 	for i := range k {
 		ids[i] = k[i].ID
 	}
@@ -673,14 +673,14 @@ func (ciuo *CoinInfoUpdateOne) ClearTransactions() *CoinInfoUpdateOne {
 }
 
 // RemoveTransactionIDs removes the "transactions" edge to Transaction entities by IDs.
-func (ciuo *CoinInfoUpdateOne) RemoveTransactionIDs(ids ...int) *CoinInfoUpdateOne {
+func (ciuo *CoinInfoUpdateOne) RemoveTransactionIDs(ids ...int32) *CoinInfoUpdateOne {
 	ciuo.mutation.RemoveTransactionIDs(ids...)
 	return ciuo
 }
 
 // RemoveTransactions removes "transactions" edges to Transaction entities.
 func (ciuo *CoinInfoUpdateOne) RemoveTransactions(t ...*Transaction) *CoinInfoUpdateOne {
-	ids := make([]int, len(t))
+	ids := make([]int32, len(t))
 	for i := range t {
 		ids[i] = t[i].ID
 	}
@@ -694,14 +694,14 @@ func (ciuo *CoinInfoUpdateOne) ClearReviews() *CoinInfoUpdateOne {
 }
 
 // RemoveReviewIDs removes the "reviews" edge to Review entities by IDs.
-func (ciuo *CoinInfoUpdateOne) RemoveReviewIDs(ids ...int) *CoinInfoUpdateOne {
+func (ciuo *CoinInfoUpdateOne) RemoveReviewIDs(ids ...int32) *CoinInfoUpdateOne {
 	ciuo.mutation.RemoveReviewIDs(ids...)
 	return ciuo
 }
 
 // RemoveReviews removes "reviews" edges to Review entities.
 func (ciuo *CoinInfoUpdateOne) RemoveReviews(r ...*Review) *CoinInfoUpdateOne {
-	ids := make([]int, len(r))
+	ids := make([]int32, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
@@ -715,14 +715,14 @@ func (ciuo *CoinInfoUpdateOne) ClearWalletNodes() *CoinInfoUpdateOne {
 }
 
 // RemoveWalletNodeIDs removes the "wallet_nodes" edge to WalletNode entities by IDs.
-func (ciuo *CoinInfoUpdateOne) RemoveWalletNodeIDs(ids ...int) *CoinInfoUpdateOne {
+func (ciuo *CoinInfoUpdateOne) RemoveWalletNodeIDs(ids ...int32) *CoinInfoUpdateOne {
 	ciuo.mutation.RemoveWalletNodeIDs(ids...)
 	return ciuo
 }
 
 // RemoveWalletNodes removes "wallet_nodes" edges to WalletNode entities.
 func (ciuo *CoinInfoUpdateOne) RemoveWalletNodes(w ...*WalletNode) *CoinInfoUpdateOne {
-	ids := make([]int, len(w))
+	ids := make([]int32, len(w))
 	for i := range w {
 		ids[i] = w[i].ID
 	}
@@ -817,7 +817,7 @@ func (ciuo *CoinInfoUpdateOne) sqlSave(ctx context.Context) (_node *CoinInfo, er
 			Table:   coininfo.Table,
 			Columns: coininfo.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeInt32,
 				Column: coininfo.FieldID,
 			},
 		},
@@ -876,7 +876,7 @@ func (ciuo *CoinInfoUpdateOne) sqlSave(ctx context.Context) (_node *CoinInfo, er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: keystore.FieldID,
 				},
 			},
@@ -892,7 +892,7 @@ func (ciuo *CoinInfoUpdateOne) sqlSave(ctx context.Context) (_node *CoinInfo, er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: keystore.FieldID,
 				},
 			},
@@ -911,7 +911,7 @@ func (ciuo *CoinInfoUpdateOne) sqlSave(ctx context.Context) (_node *CoinInfo, er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: keystore.FieldID,
 				},
 			},
@@ -930,7 +930,7 @@ func (ciuo *CoinInfoUpdateOne) sqlSave(ctx context.Context) (_node *CoinInfo, er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: transaction.FieldID,
 				},
 			},
@@ -946,7 +946,7 @@ func (ciuo *CoinInfoUpdateOne) sqlSave(ctx context.Context) (_node *CoinInfo, er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: transaction.FieldID,
 				},
 			},
@@ -965,7 +965,7 @@ func (ciuo *CoinInfoUpdateOne) sqlSave(ctx context.Context) (_node *CoinInfo, er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: transaction.FieldID,
 				},
 			},
@@ -984,7 +984,7 @@ func (ciuo *CoinInfoUpdateOne) sqlSave(ctx context.Context) (_node *CoinInfo, er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: review.FieldID,
 				},
 			},
@@ -1000,7 +1000,7 @@ func (ciuo *CoinInfoUpdateOne) sqlSave(ctx context.Context) (_node *CoinInfo, er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: review.FieldID,
 				},
 			},
@@ -1019,7 +1019,7 @@ func (ciuo *CoinInfoUpdateOne) sqlSave(ctx context.Context) (_node *CoinInfo, er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: review.FieldID,
 				},
 			},
@@ -1038,7 +1038,7 @@ func (ciuo *CoinInfoUpdateOne) sqlSave(ctx context.Context) (_node *CoinInfo, er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: walletnode.FieldID,
 				},
 			},
@@ -1054,7 +1054,7 @@ func (ciuo *CoinInfoUpdateOne) sqlSave(ctx context.Context) (_node *CoinInfo, er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: walletnode.FieldID,
 				},
 			},
@@ -1073,7 +1073,7 @@ func (ciuo *CoinInfoUpdateOne) sqlSave(ctx context.Context) (_node *CoinInfo, er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: walletnode.FieldID,
 				},
 			},

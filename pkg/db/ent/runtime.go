@@ -17,7 +17,7 @@ func init() {
 	coininfoFields := schema.CoinInfo{}.Fields()
 	_ = coininfoFields
 	// coininfoDescName is the schema descriptor for name field.
-	coininfoDescName := coininfoFields[0].Descriptor()
+	coininfoDescName := coininfoFields[1].Descriptor()
 	// coininfo.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	coininfo.NameValidator = func() func(string) error {
 		validators := coininfoDescName.Validators
@@ -35,7 +35,7 @@ func init() {
 		}
 	}()
 	// coininfoDescUnit is the schema descriptor for unit field.
-	coininfoDescUnit := coininfoFields[1].Descriptor()
+	coininfoDescUnit := coininfoFields[2].Descriptor()
 	// coininfo.UnitValidator is a validator for the "unit" field. It is called by the builders before save.
 	coininfo.UnitValidator = func() func(string) error {
 		validators := coininfoDescUnit.Validators
@@ -53,13 +53,13 @@ func init() {
 		}
 	}()
 	// coininfoDescNeedSigninfo is the schema descriptor for need_signinfo field.
-	coininfoDescNeedSigninfo := coininfoFields[2].Descriptor()
+	coininfoDescNeedSigninfo := coininfoFields[3].Descriptor()
 	// coininfo.DefaultNeedSigninfo holds the default value on creation for the need_signinfo field.
 	coininfo.DefaultNeedSigninfo = coininfoDescNeedSigninfo.Default.(bool)
 	keystoreFields := schema.KeyStore{}.Fields()
 	_ = keystoreFields
 	// keystoreDescAddress is the schema descriptor for address field.
-	keystoreDescAddress := keystoreFields[0].Descriptor()
+	keystoreDescAddress := keystoreFields[1].Descriptor()
 	// keystore.AddressValidator is a validator for the "address" field. It is called by the builders before save.
 	keystore.AddressValidator = func() func(string) error {
 		validators := keystoreDescAddress.Validators
@@ -77,7 +77,7 @@ func init() {
 		}
 	}()
 	// keystoreDescPrivateKey is the schema descriptor for private_key field.
-	keystoreDescPrivateKey := keystoreFields[1].Descriptor()
+	keystoreDescPrivateKey := keystoreFields[2].Descriptor()
 	// keystore.PrivateKeyValidator is a validator for the "private_key" field. It is called by the builders before save.
 	keystore.PrivateKeyValidator = func() func(string) error {
 		validators := keystoreDescPrivateKey.Validators
@@ -97,27 +97,27 @@ func init() {
 	reviewFields := schema.Review{}.Fields()
 	_ = reviewFields
 	// reviewDescIsApproved is the schema descriptor for is_approved field.
-	reviewDescIsApproved := reviewFields[0].Descriptor()
+	reviewDescIsApproved := reviewFields[1].Descriptor()
 	// review.DefaultIsApproved holds the default value on creation for the is_approved field.
 	review.DefaultIsApproved = reviewDescIsApproved.Default.(bool)
 	// reviewDescOperatorNote is the schema descriptor for operator_note field.
-	reviewDescOperatorNote := reviewFields[1].Descriptor()
+	reviewDescOperatorNote := reviewFields[2].Descriptor()
 	// review.OperatorNoteValidator is a validator for the "operator_note" field. It is called by the builders before save.
 	review.OperatorNoteValidator = reviewDescOperatorNote.Validators[0].(func(string) error)
 	transactionFields := schema.Transaction{}.Fields()
 	_ = transactionFields
 	// transactionDescAmountInt is the schema descriptor for amount_int field.
-	transactionDescAmountInt := transactionFields[0].Descriptor()
+	transactionDescAmountInt := transactionFields[1].Descriptor()
 	// transaction.AmountIntValidator is a validator for the "amount_int" field. It is called by the builders before save.
 	transaction.AmountIntValidator = transactionDescAmountInt.Validators[0].(func(int) error)
 	// transactionDescAmountDigits is the schema descriptor for amount_digits field.
-	transactionDescAmountDigits := transactionFields[1].Descriptor()
+	transactionDescAmountDigits := transactionFields[2].Descriptor()
 	// transaction.DefaultAmountDigits holds the default value on creation for the amount_digits field.
 	transaction.DefaultAmountDigits = transactionDescAmountDigits.Default.(int)
 	// transaction.AmountDigitsValidator is a validator for the "amount_digits" field. It is called by the builders before save.
 	transaction.AmountDigitsValidator = transactionDescAmountDigits.Validators[0].(func(int) error)
 	// transactionDescAddressFrom is the schema descriptor for address_from field.
-	transactionDescAddressFrom := transactionFields[2].Descriptor()
+	transactionDescAddressFrom := transactionFields[3].Descriptor()
 	// transaction.AddressFromValidator is a validator for the "address_from" field. It is called by the builders before save.
 	transaction.AddressFromValidator = func() func(string) error {
 		validators := transactionDescAddressFrom.Validators
@@ -135,7 +135,7 @@ func init() {
 		}
 	}()
 	// transactionDescAddressTo is the schema descriptor for address_to field.
-	transactionDescAddressTo := transactionFields[3].Descriptor()
+	transactionDescAddressTo := transactionFields[4].Descriptor()
 	// transaction.AddressToValidator is a validator for the "address_to" field. It is called by the builders before save.
 	transaction.AddressToValidator = func() func(string) error {
 		validators := transactionDescAddressTo.Validators
@@ -153,19 +153,19 @@ func init() {
 		}
 	}()
 	// transactionDescNeedManualReview is the schema descriptor for need_manual_review field.
-	transactionDescNeedManualReview := transactionFields[4].Descriptor()
+	transactionDescNeedManualReview := transactionFields[5].Descriptor()
 	// transaction.DefaultNeedManualReview holds the default value on creation for the need_manual_review field.
 	transaction.DefaultNeedManualReview = transactionDescNeedManualReview.Default.(bool)
 	// transactionDescTransactionIDInsite is the schema descriptor for transaction_id_insite field.
-	transactionDescTransactionIDInsite := transactionFields[6].Descriptor()
+	transactionDescTransactionIDInsite := transactionFields[7].Descriptor()
 	// transaction.TransactionIDInsiteValidator is a validator for the "transaction_id_insite" field. It is called by the builders before save.
 	transaction.TransactionIDInsiteValidator = transactionDescTransactionIDInsite.Validators[0].(func(string) error)
 	// transactionDescTransactionIDChain is the schema descriptor for transaction_id_chain field.
-	transactionDescTransactionIDChain := transactionFields[7].Descriptor()
+	transactionDescTransactionIDChain := transactionFields[8].Descriptor()
 	// transaction.TransactionIDChainValidator is a validator for the "transaction_id_chain" field. It is called by the builders before save.
 	transaction.TransactionIDChainValidator = transactionDescTransactionIDChain.Validators[0].(func(string) error)
 	// transactionDescMutex is the schema descriptor for mutex field.
-	transactionDescMutex := transactionFields[9].Descriptor()
+	transactionDescMutex := transactionFields[10].Descriptor()
 	// transaction.DefaultMutex holds the default value on creation for the mutex field.
 	transaction.DefaultMutex = transactionDescMutex.Default.(bool)
 }

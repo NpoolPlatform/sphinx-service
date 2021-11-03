@@ -76,7 +76,7 @@ func (ru *ReviewUpdate) AddUpdatetimeUtc(i int) *ReviewUpdate {
 }
 
 // SetTransactionID sets the "transaction" edge to the Transaction entity by ID.
-func (ru *ReviewUpdate) SetTransactionID(id int) *ReviewUpdate {
+func (ru *ReviewUpdate) SetTransactionID(id int32) *ReviewUpdate {
 	ru.mutation.SetTransactionID(id)
 	return ru
 }
@@ -87,7 +87,7 @@ func (ru *ReviewUpdate) SetTransaction(t *Transaction) *ReviewUpdate {
 }
 
 // SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (ru *ReviewUpdate) SetCoinID(id int) *ReviewUpdate {
+func (ru *ReviewUpdate) SetCoinID(id int32) *ReviewUpdate {
 	ru.mutation.SetCoinID(id)
 	return ru
 }
@@ -196,7 +196,7 @@ func (ru *ReviewUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   review.Table,
 			Columns: review.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeInt32,
 				Column: review.FieldID,
 			},
 		},
@@ -259,7 +259,7 @@ func (ru *ReviewUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: transaction.FieldID,
 				},
 			},
@@ -275,7 +275,7 @@ func (ru *ReviewUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: transaction.FieldID,
 				},
 			},
@@ -294,7 +294,7 @@ func (ru *ReviewUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: coininfo.FieldID,
 				},
 			},
@@ -310,7 +310,7 @@ func (ru *ReviewUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: coininfo.FieldID,
 				},
 			},
@@ -386,7 +386,7 @@ func (ruo *ReviewUpdateOne) AddUpdatetimeUtc(i int) *ReviewUpdateOne {
 }
 
 // SetTransactionID sets the "transaction" edge to the Transaction entity by ID.
-func (ruo *ReviewUpdateOne) SetTransactionID(id int) *ReviewUpdateOne {
+func (ruo *ReviewUpdateOne) SetTransactionID(id int32) *ReviewUpdateOne {
 	ruo.mutation.SetTransactionID(id)
 	return ruo
 }
@@ -397,7 +397,7 @@ func (ruo *ReviewUpdateOne) SetTransaction(t *Transaction) *ReviewUpdateOne {
 }
 
 // SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (ruo *ReviewUpdateOne) SetCoinID(id int) *ReviewUpdateOne {
+func (ruo *ReviewUpdateOne) SetCoinID(id int32) *ReviewUpdateOne {
 	ruo.mutation.SetCoinID(id)
 	return ruo
 }
@@ -513,7 +513,7 @@ func (ruo *ReviewUpdateOne) sqlSave(ctx context.Context) (_node *Review, err err
 			Table:   review.Table,
 			Columns: review.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeInt32,
 				Column: review.FieldID,
 			},
 		},
@@ -593,7 +593,7 @@ func (ruo *ReviewUpdateOne) sqlSave(ctx context.Context) (_node *Review, err err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: transaction.FieldID,
 				},
 			},
@@ -609,7 +609,7 @@ func (ruo *ReviewUpdateOne) sqlSave(ctx context.Context) (_node *Review, err err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: transaction.FieldID,
 				},
 			},
@@ -628,7 +628,7 @@ func (ruo *ReviewUpdateOne) sqlSave(ctx context.Context) (_node *Review, err err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: coininfo.FieldID,
 				},
 			},
@@ -644,7 +644,7 @@ func (ruo *ReviewUpdateOne) sqlSave(ctx context.Context) (_node *Review, err err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: coininfo.FieldID,
 				},
 			},

@@ -53,8 +53,14 @@ func (rc *ReviewCreate) SetUpdatetimeUtc(i int) *ReviewCreate {
 	return rc
 }
 
+// SetID sets the "id" field.
+func (rc *ReviewCreate) SetID(i int32) *ReviewCreate {
+	rc.mutation.SetID(i)
+	return rc
+}
+
 // SetTransactionID sets the "transaction" edge to the Transaction entity by ID.
-func (rc *ReviewCreate) SetTransactionID(id int) *ReviewCreate {
+func (rc *ReviewCreate) SetTransactionID(id int32) *ReviewCreate {
 	rc.mutation.SetTransactionID(id)
 	return rc
 }
@@ -65,7 +71,7 @@ func (rc *ReviewCreate) SetTransaction(t *Transaction) *ReviewCreate {
 }
 
 // SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (rc *ReviewCreate) SetCoinID(id int) *ReviewCreate {
+func (rc *ReviewCreate) SetCoinID(id int32) *ReviewCreate {
 	rc.mutation.SetCoinID(id)
 	return rc
 }
@@ -188,8 +194,10 @@ func (rc *ReviewCreate) sqlSave(ctx context.Context) (*Review, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int32(id)
+	}
 	return _node, nil
 }
 
@@ -199,11 +207,15 @@ func (rc *ReviewCreate) createSpec() (*Review, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: review.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeInt32,
 				Column: review.FieldID,
 			},
 		}
 	)
+	if id, ok := rc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := rc.mutation.IsApproved(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeBool,
@@ -245,7 +257,7 @@ func (rc *ReviewCreate) createSpec() (*Review, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: transaction.FieldID,
 				},
 			},
@@ -265,7 +277,7 @@ func (rc *ReviewCreate) createSpec() (*Review, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: coininfo.FieldID,
 				},
 			},
@@ -321,9 +333,9 @@ func (rcb *ReviewCreateBulk) Save(ctx context.Context) ([]*Review, error) {
 				}
 				mutation.id = &nodes[i].ID
 				mutation.done = true
-				if specs[i].ID.Value != nil {
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = int32(id)
 				}
 				return nodes[i], nil
 			})

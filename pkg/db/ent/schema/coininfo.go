@@ -13,6 +13,7 @@ type CoinInfo struct {
 
 func (CoinInfo) Fields() []ent.Field {
 	return []ent.Field{
+		field.Int32("id"),
 		field.String("name").NotEmpty().MaxLen(16).Unique(),
 		field.String("unit").NotEmpty().MaxLen(4),
 		field.Bool("need_signinfo").Default(false),

@@ -32,8 +32,14 @@ func (ksc *KeyStoreCreate) SetPrivateKey(s string) *KeyStoreCreate {
 	return ksc
 }
 
+// SetID sets the "id" field.
+func (ksc *KeyStoreCreate) SetID(i int32) *KeyStoreCreate {
+	ksc.mutation.SetID(i)
+	return ksc
+}
+
 // SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (ksc *KeyStoreCreate) SetCoinID(id int) *KeyStoreCreate {
+func (ksc *KeyStoreCreate) SetCoinID(id int32) *KeyStoreCreate {
 	ksc.mutation.SetCoinID(id)
 	return ksc
 }
@@ -143,8 +149,10 @@ func (ksc *KeyStoreCreate) sqlSave(ctx context.Context) (*KeyStore, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int32(id)
+	}
 	return _node, nil
 }
 
@@ -154,11 +162,15 @@ func (ksc *KeyStoreCreate) createSpec() (*KeyStore, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: keystore.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeInt32,
 				Column: keystore.FieldID,
 			},
 		}
 	)
+	if id, ok := ksc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := ksc.mutation.Address(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -184,7 +196,7 @@ func (ksc *KeyStoreCreate) createSpec() (*KeyStore, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: coininfo.FieldID,
 				},
 			},
@@ -239,9 +251,9 @@ func (kscb *KeyStoreCreateBulk) Save(ctx context.Context) ([]*KeyStore, error) {
 				}
 				mutation.id = &nodes[i].ID
 				mutation.done = true
-				if specs[i].ID.Value != nil {
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = int32(id)
 				}
 				return nodes[i], nil
 			})

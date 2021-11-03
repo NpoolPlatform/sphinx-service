@@ -72,7 +72,7 @@ func (ksd *KeyStoreDelete) sqlExec(ctx context.Context) (int, error) {
 		Node: &sqlgraph.NodeSpec{
 			Table: keystore.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeInt32,
 				Column: keystore.FieldID,
 			},
 		},

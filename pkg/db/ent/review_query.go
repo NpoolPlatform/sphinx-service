@@ -134,8 +134,8 @@ func (rq *ReviewQuery) FirstX(ctx context.Context) *Review {
 
 // FirstID returns the first Review ID from the query.
 // Returns a *NotFoundError when no Review ID was found.
-func (rq *ReviewQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (rq *ReviewQuery) FirstID(ctx context.Context) (id int32, err error) {
+	var ids []int32
 	if ids, err = rq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -147,7 +147,7 @@ func (rq *ReviewQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (rq *ReviewQuery) FirstIDX(ctx context.Context) int {
+func (rq *ReviewQuery) FirstIDX(ctx context.Context) int32 {
 	id, err := rq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -185,8 +185,8 @@ func (rq *ReviewQuery) OnlyX(ctx context.Context) *Review {
 // OnlyID is like Only, but returns the only Review ID in the query.
 // Returns a *NotSingularError when exactly one Review ID is not found.
 // Returns a *NotFoundError when no entities are found.
-func (rq *ReviewQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (rq *ReviewQuery) OnlyID(ctx context.Context) (id int32, err error) {
+	var ids []int32
 	if ids, err = rq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -202,7 +202,7 @@ func (rq *ReviewQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (rq *ReviewQuery) OnlyIDX(ctx context.Context) int {
+func (rq *ReviewQuery) OnlyIDX(ctx context.Context) int32 {
 	id, err := rq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -228,8 +228,8 @@ func (rq *ReviewQuery) AllX(ctx context.Context) []*Review {
 }
 
 // IDs executes the query and returns a list of Review IDs.
-func (rq *ReviewQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (rq *ReviewQuery) IDs(ctx context.Context) ([]int32, error) {
+	var ids []int32
 	if err := rq.Select(review.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -237,7 +237,7 @@ func (rq *ReviewQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (rq *ReviewQuery) IDsX(ctx context.Context) []int {
+func (rq *ReviewQuery) IDsX(ctx context.Context) []int32 {
 	ids, err := rq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -419,8 +419,8 @@ func (rq *ReviewQuery) sqlAll(ctx context.Context) ([]*Review, error) {
 	}
 
 	if query := rq.withTransaction; query != nil {
-		ids := make([]int, 0, len(nodes))
-		nodeids := make(map[int][]*Review)
+		ids := make([]int32, 0, len(nodes))
+		nodeids := make(map[int32][]*Review)
 		for i := range nodes {
 			if nodes[i].transaction_review == nil {
 				continue
@@ -448,8 +448,8 @@ func (rq *ReviewQuery) sqlAll(ctx context.Context) ([]*Review, error) {
 	}
 
 	if query := rq.withCoin; query != nil {
-		ids := make([]int, 0, len(nodes))
-		nodeids := make(map[int][]*Review)
+		ids := make([]int32, 0, len(nodes))
+		nodeids := make(map[int32][]*Review)
 		for i := range nodes {
 			if nodes[i].coin_info_reviews == nil {
 				continue
@@ -498,7 +498,7 @@ func (rq *ReviewQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   review.Table,
 			Columns: review.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeInt32,
 				Column: review.FieldID,
 			},
 		},

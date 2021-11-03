@@ -110,8 +110,8 @@ func (ksq *KeyStoreQuery) FirstX(ctx context.Context) *KeyStore {
 
 // FirstID returns the first KeyStore ID from the query.
 // Returns a *NotFoundError when no KeyStore ID was found.
-func (ksq *KeyStoreQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (ksq *KeyStoreQuery) FirstID(ctx context.Context) (id int32, err error) {
+	var ids []int32
 	if ids, err = ksq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -123,7 +123,7 @@ func (ksq *KeyStoreQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (ksq *KeyStoreQuery) FirstIDX(ctx context.Context) int {
+func (ksq *KeyStoreQuery) FirstIDX(ctx context.Context) int32 {
 	id, err := ksq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -161,8 +161,8 @@ func (ksq *KeyStoreQuery) OnlyX(ctx context.Context) *KeyStore {
 // OnlyID is like Only, but returns the only KeyStore ID in the query.
 // Returns a *NotSingularError when exactly one KeyStore ID is not found.
 // Returns a *NotFoundError when no entities are found.
-func (ksq *KeyStoreQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (ksq *KeyStoreQuery) OnlyID(ctx context.Context) (id int32, err error) {
+	var ids []int32
 	if ids, err = ksq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -178,7 +178,7 @@ func (ksq *KeyStoreQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (ksq *KeyStoreQuery) OnlyIDX(ctx context.Context) int {
+func (ksq *KeyStoreQuery) OnlyIDX(ctx context.Context) int32 {
 	id, err := ksq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -204,8 +204,8 @@ func (ksq *KeyStoreQuery) AllX(ctx context.Context) []*KeyStore {
 }
 
 // IDs executes the query and returns a list of KeyStore IDs.
-func (ksq *KeyStoreQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (ksq *KeyStoreQuery) IDs(ctx context.Context) ([]int32, error) {
+	var ids []int32
 	if err := ksq.Select(keystore.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -213,7 +213,7 @@ func (ksq *KeyStoreQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (ksq *KeyStoreQuery) IDsX(ctx context.Context) []int {
+func (ksq *KeyStoreQuery) IDsX(ctx context.Context) []int32 {
 	ids, err := ksq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -382,8 +382,8 @@ func (ksq *KeyStoreQuery) sqlAll(ctx context.Context) ([]*KeyStore, error) {
 	}
 
 	if query := ksq.withCoin; query != nil {
-		ids := make([]int, 0, len(nodes))
-		nodeids := make(map[int][]*KeyStore)
+		ids := make([]int32, 0, len(nodes))
+		nodeids := make(map[int32][]*KeyStore)
 		for i := range nodes {
 			if nodes[i].coin_info_keys == nil {
 				continue
@@ -432,7 +432,7 @@ func (ksq *KeyStoreQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   keystore.Table,
 			Columns: keystore.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeInt32,
 				Column: keystore.FieldID,
 			},
 		},

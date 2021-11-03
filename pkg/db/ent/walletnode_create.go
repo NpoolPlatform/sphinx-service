@@ -62,8 +62,14 @@ func (wnc *WalletNodeCreate) SetLastOnlineTimeUtc(i int) *WalletNodeCreate {
 	return wnc
 }
 
+// SetID sets the "id" field.
+func (wnc *WalletNodeCreate) SetID(i int32) *WalletNodeCreate {
+	wnc.mutation.SetID(i)
+	return wnc
+}
+
 // SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (wnc *WalletNodeCreate) SetCoinID(id int) *WalletNodeCreate {
+func (wnc *WalletNodeCreate) SetCoinID(id int32) *WalletNodeCreate {
 	wnc.mutation.SetCoinID(id)
 	return wnc
 }
@@ -178,8 +184,10 @@ func (wnc *WalletNodeCreate) sqlSave(ctx context.Context) (*WalletNode, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int32(id)
+	}
 	return _node, nil
 }
 
@@ -189,11 +197,15 @@ func (wnc *WalletNodeCreate) createSpec() (*WalletNode, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: walletnode.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeInt32,
 				Column: walletnode.FieldID,
 			},
 		}
 	)
+	if id, ok := wnc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := wnc.mutation.UUID(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -259,7 +271,7 @@ func (wnc *WalletNodeCreate) createSpec() (*WalletNode, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeInt32,
 					Column: coininfo.FieldID,
 				},
 			},
@@ -314,9 +326,9 @@ func (wncb *WalletNodeCreateBulk) Save(ctx context.Context) ([]*WalletNode, erro
 				}
 				mutation.id = &nodes[i].ID
 				mutation.done = true
-				if specs[i].ID.Value != nil {
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = int32(id)
 				}
 				return nodes[i], nil
 			})

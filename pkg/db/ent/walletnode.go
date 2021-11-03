@@ -15,7 +15,7 @@ import (
 type WalletNode struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID int32 `json:"id,omitempty"`
 	// UUID holds the value of the "uuid" field.
 	UUID string `json:"uuid,omitempty"`
 	// Location holds the value of the "location" field.
@@ -33,7 +33,7 @@ type WalletNode struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the WalletNodeQuery when eager-loading is set.
 	Edges                  WalletNodeEdges `json:"edges"`
-	coin_info_wallet_nodes *int
+	coin_info_wallet_nodes *int32
 }
 
 // WalletNodeEdges holds the relations/edges for other nodes in the graph.
@@ -90,7 +90,7 @@ func (wn *WalletNode) assignValues(columns []string, values []interface{}) error
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			wn.ID = int(value.Int64)
+			wn.ID = int32(value.Int64)
 		case walletnode.FieldUUID:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field uuid", values[i])
@@ -137,8 +137,8 @@ func (wn *WalletNode) assignValues(columns []string, values []interface{}) error
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field coin_info_wallet_nodes", value)
 			} else if value.Valid {
-				wn.coin_info_wallet_nodes = new(int)
-				*wn.coin_info_wallet_nodes = int(value.Int64)
+				wn.coin_info_wallet_nodes = new(int32)
+				*wn.coin_info_wallet_nodes = int32(value.Int64)
 			}
 		}
 	}
