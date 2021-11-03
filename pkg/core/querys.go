@@ -11,10 +11,6 @@ import (
 
 var client *ent.Client
 
-type Server struct {
-	npool.UnimplementedTradingServer
-}
-
 func init() {
 	client = db.Client()
 }
