@@ -173,8 +173,8 @@ GetTxJSONRequest 参数
 | ----- | ---- | ----- | ----------- |
 | coin_id | [int32](#int32) |  | 继承钱包节点基础功能，预留 |
 | address | [string](#string) |  | 要查询的钱包地址 |
-| timefrom_utc | [uint64](#uint64) |  | 开始时间 |
-| timetill_utc | [uint64](#uint64) |  | 结束时间 |
+| timefrom_utc | [int64](#int64) |  | 开始时间 |
+| timetill_utc | [int64](#int64) |  | 结束时间 |
 | limit_n | [int32](#int32) |  | 服务端限制返回条数 |
 
 
