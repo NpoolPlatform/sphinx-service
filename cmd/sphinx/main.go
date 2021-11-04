@@ -57,7 +57,7 @@ import (
 )
 
 const (
-	serviceName = "sphinx"
+	serviceName = "sphinx.npool.top"
 	description = "Trading service and Wallet agent."
 	usageText   = ""
 )

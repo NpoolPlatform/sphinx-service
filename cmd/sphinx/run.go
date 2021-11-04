@@ -7,6 +7,7 @@ import (
 	grpc2 "github.com/NpoolPlatform/go-service-framework/pkg/grpc"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db"
 
 	cli "github.com/urfave/cli/v2"
 )
@@ -16,6 +17,9 @@ var runCmd = &cli.Command{
 	Aliases: []string{"s"},
 	Usage:   "Run the daemon",
 	Action: func(c *cli.Context) error {
+		if err := db.Init(); err != nil {
+			return err
+		}
 		go func() {
 			err := grpc2.RunGRPC(rpcRegister)
 			if err != nil {
