@@ -1,6 +1,6 @@
 FROM scratch
 
 COPY ServiceSample.viper.yaml /etc/ServiceSample/ServiceSample.viper.yaml
-COPY service-sample /usr/local/bin/service-sample
+COPY sphinx-service /usr/local/bin/sphinx-service
 
-CMD ["service-sample", "run"]
+CMD ["sphinx-service", "run"]

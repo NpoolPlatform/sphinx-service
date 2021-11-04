@@ -46,8 +46,8 @@
 * make verify-build ```编译目标```
 * make test ```单元测试```
 * make generate-docker-images ```生成docker镜像```
-* make service-sample ```单独编译服务```
-* make service-sample-image ```单独生成服务镜像```
+* make sphinx-service ```单独编译服务```
+* make sphinx-service-image ```单独生成服务镜像```
 * make deploy-to-k8s-cluster ```部署到k8s集群```
 
 ###  Models
