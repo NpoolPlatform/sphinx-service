@@ -36,4 +36,3 @@ func (KeyStore) Indexes() []ent.Index {
 			Unique(),
 	}
 }
-

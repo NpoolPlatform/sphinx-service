@@ -3,11 +3,11 @@ package main
 import (
 	"google.golang.org/grpc"
 
-	"github.com/NpoolPlatform/sphinx-service/api"
 	grpc2 "github.com/NpoolPlatform/go-service-framework/pkg/grpc"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/NpoolPlatform/sphinx-service/api"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 
 	cli "github.com/urfave/cli/v2"
 )

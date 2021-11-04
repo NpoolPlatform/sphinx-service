@@ -21,4 +21,3 @@ func RegisterAccount(ctx context.Context, in *npool.RegisterAccountRequest) (obj
 	}
 	return
 }
-
