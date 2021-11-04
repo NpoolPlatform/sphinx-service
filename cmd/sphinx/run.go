@@ -3,7 +3,7 @@ package main
 import (
 	"google.golang.org/grpc"
 
-	"github.com/NpoolPlatform/go-service-app-template/api"
+	"github.com/NpoolPlatform/sphinx-service/api"
 	grpc2 "github.com/NpoolPlatform/go-service-framework/pkg/grpc"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"

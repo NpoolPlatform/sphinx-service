@@ -4,12 +4,10 @@ go 1.17
 
 require (
 	entgo.io/ent v0.9.1
-	github.com/NpoolPlatform/go-service-app-template v0.0.0-20211102054345-802dd4ee1f81
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20211102122901-b687a4bf9b14
 	github.com/golang/protobuf v1.5.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
-	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.6.0
 	github.com/prometheus/client_golang v1.11.0
 	github.com/urfave/cli/v2 v2.3.0
@@ -73,6 +71,7 @@ require (
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/ratelimit v0.1.0 // indirect
 	go.uber.org/zap v1.19.1 // indirect
+	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
 	golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f // indirect
 	golang.org/x/sys v0.0.0-20211015200801-69063c4bb744 // indirect
 	golang.org/x/text v0.3.7 // indirect
