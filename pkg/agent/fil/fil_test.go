@@ -2,6 +2,8 @@ package fil
 
 import (
 	"fmt"
+	"os"
+	"strconv"
 	"testing"
 )
 
@@ -12,6 +14,10 @@ var (
 )
 
 func TestGetBalance(t *testing.T) {
+	runByGithubAction, err := strconv.ParseBool(os.Getenv("RUN_BY_GITHUB_ACTION"))
+	if runByGithubAction && err == nil {
+		return
+	}
 	SetHostWithToken(TestHost, TestToken)
 	balance, err := GetBalance(TestAddr)
 	if err != nil {
