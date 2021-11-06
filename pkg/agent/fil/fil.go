@@ -10,18 +10,20 @@ import (
 
 var Client *filecoin.Client
 
-func lotusRpcUrl(host string) string {
+func lotusUrl(host string) string {
 	return fmt.Sprintf("http://%v:1234/rpc/v0", host)
 }
 
-func SetHostWithToken(str string, token string) {
-	Client = filecoin.NewClient(lotusRpcUrl(str), token)
+func SetHostWithToken(str, token string) {
+	Client = filecoin.NewClient(lotusUrl(str), token)
 }
 
-func GetSignInfo(address string) (json string, err error) { return }
+func GetSignInfo(addr string) (json string, err error) { return }
 
-func GetBalance(addr string) (string, error) {
-	addrStd, _ := address.NewFromString(addr)
+func GetBalance(addr string) (str string, err error) {
+	addrStd, err := address.NewFromString(addr)
+	if err != nil { return }
 	bal, err := Client.WalletBalance(context.Background(), addrStd)
-	return bal.String(), err
+	str = bal.String()
+	return str, err
 }
