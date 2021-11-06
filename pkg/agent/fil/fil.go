@@ -30,6 +30,6 @@ func GetBalance(addr string) (str string, err error) {
 	return
 }
 
-func BroadcastScript(transactionScript string) (transactionIdChain string, err error) {
+func BroadcastScript(transactionScript string) (transactionIDChain string, err error) {
 	return
 }
