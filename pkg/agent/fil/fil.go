@@ -10,20 +10,26 @@ import (
 
 var Client *filecoin.Client
 
-func lotusUrl(host string) string {
+func lotusURL(host string) string {
 	return fmt.Sprintf("http://%v:1234/rpc/v0", host)
 }
 
 func SetHostWithToken(str, token string) {
-	Client = filecoin.NewClient(lotusUrl(str), token)
+	Client = filecoin.NewClient(lotusURL(str), token)
 }
 
 func GetSignInfo(addr string) (json string, err error) { return }
 
 func GetBalance(addr string) (str string, err error) {
 	addrStd, err := address.NewFromString(addr)
-	if err != nil { return }
+	if err != nil {
+		return
+	}
 	bal, err := Client.WalletBalance(context.Background(), addrStd)
 	str = bal.String()
-	return str, err
+	return
+}
+
+func BroadcastScript(transaction_script string) (transaction_id_chain string, err error) {
+	return
 }
