@@ -17,7 +17,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func init() {
+func test_init() {
 	address.CurrentNetwork = address.Mainnet
 	SetHostWithToken("172.16.30.117", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBbGxvdyI6WyJyZWFkIiwid3JpdGUiLCJzaWduIiwiYWRtaW4iXX0.ppK_nggwygh6kCPDlktdBtkGaqQXxoXM99iNx3-tZ9E")
 }
@@ -42,6 +42,7 @@ func OfflineSign(ki *types.KeyInfo, msg *types.Message) (s *types.SignedMessage,
 }
 
 func TestBroadcastScript(t *testing.T) {
+	test_init()
 	var err error
 	// 静态设置
 	toAddr, err := address.NewFromString("t1gvkap5jmv5k7gwpa42zj43i2oaai5zg74n66xra")
@@ -105,6 +106,7 @@ func TestBroadcastScript(t *testing.T) {
 }
 
 func TestGetBalance(t *testing.T) {
+	test_init()
 	str, err := GetBalance("t1gvkap5jmv5k7gwpa42zj43i2oaai5zg74n66xra")
 	fmt.Println("Balance: ", str)
 	assert.Nil(t, err)
