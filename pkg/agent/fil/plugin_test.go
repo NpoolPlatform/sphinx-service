@@ -107,6 +107,7 @@ func TestBroadcastScript(t *testing.T) {
 }
 
 func TestGetBalance(t *testing.T) {
-	_, err := GetBalance("t1gvkap5jmv5k7gwpa42zj43i2oaai5zg74n66xra")
+	str, err := GetBalance("t1gvkap5jmv5k7gwpa42zj43i2oaai5zg74n66xra")
+	fmt.Println("Balance: ", str)
 	assert.Nil(t, err)
 }
