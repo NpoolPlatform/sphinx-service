@@ -2,25 +2,18 @@ package fil
 
 import (
 	"context"
-	"encoding/base64"
-	"encoding/hex"
 	"fmt"
 
-	"github.com/cyvadra/filecoin-client"
-	"github.com/cyvadra/filecoin-client/local"
 	"github.com/cyvadra/filecoin-client/types"
 	"github.com/filecoin-project/go-address"
-	"github.com/filecoin-project/go-state-types/abi"
-	"github.com/filecoin-project/go-state-types/crypto"
-	"github.com/shopspring/decimal"
 )
 
 // todo
-func GetSignInfoRaw(addr string) (json string, err error) { return }
-func GetTxStatus(CID string) (json string, err error)     { return }
-func GetTxJSON(addr string) (json string, err error)      { return }
+func GetSignInfo(addr string) (json string, err error) { return }
+func GetTxStatus(CID string) (json string, err error)  { return }
+func GetTxJSON(addr string) (json string, err error)   { return }
 
-func GetBalanceRaw(addr string) (str string, err error) {
+func GetBalance(addr string) (str string, err error) {
 	addrStd, err := address.NewFromString(addr)
 	if err != nil {
 		return
@@ -30,7 +23,7 @@ func GetBalanceRaw(addr string) (str string, err error) {
 	return
 }
 
-func BroadcastScriptRaw(s *types.SignedMessage) (err error) {
+func BroadcastScript(s *types.SignedMessage) (err error) {
 	// 消息广播
 	mid, err := Client.MpoolPush(context.Background(), s)
 	if err != nil {
