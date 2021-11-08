@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/NpoolPlatform/sphinx-service/message/agents"
+	"github.com/cyvadra/filecoin-client/types"
 )
 
 type Server agents.UnimplementedPluginServer
@@ -35,6 +36,19 @@ func (Server) GetBalance(ctx context.Context, in *agents.GetBalanceRequest) (acb
 		AmountInt:    amountInt,
 		AmountDigits: amountDigits,
 		AmountString: amountString,
+	}
+	return
+}
+
+func (Server) BroadcastScript(ctx context.Context, in *agents.BroadcastScriptRequest) (resp *agents.BroadcastScriptResponse, err error) {
+	msg := &types.SignedMessage{}
+	err = json.Unmarshal([]byte(in.TransactionScript), msg)
+	if err != nil {
+		return
+	}
+	cid, err := BroadcastScript(msg)
+	resp = &agents.BroadcastScriptResponse{
+		TransactionIdChain: cid,
 	}
 	return
 }

@@ -49,15 +49,16 @@ func GetBalance(addr string) (str string, err error) {
 	return
 }
 
-func BroadcastScript(s *types.SignedMessage) (err error) {
+func BroadcastScript(s *types.SignedMessage) (cid string, err error) {
 	// 消息广播
 	mid, err := Client.MpoolPush(context.Background(), s)
+	cid = mid.String()
 	if err != nil {
 		fmt.Println("消息广播失败")
 		fmt.Println(err)
 	} else {
 		fmt.Println("消息发送成功，message id:")
-		fmt.Println(mid.String())
+		fmt.Println(cid)
 	}
 	return
 }

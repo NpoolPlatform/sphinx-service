@@ -99,7 +99,7 @@ func TestBroadcastScript(t *testing.T) {
 		fmt.Println("签名失败", err)
 		assert.Nil(t, err)
 	}
-	err = BroadcastScript(signedMsg)
+	_, err = BroadcastScript(signedMsg)
 	if err != nil {
 		fmt.Println("广播失败，请检查主机配置", err)
 	}
