@@ -5,7 +5,7 @@ go 1.16
 require (
 	entgo.io/ent v0.9.1
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20211104061935-a1f3ca021a26
-	github.com/cyvadra/filecoin-client v0.3.4
+	github.com/cyvadra/filecoin-client v0.3.5
 	github.com/filecoin-project/go-address v0.0.6
 	github.com/filecoin-project/go-state-types v0.1.1
 	github.com/go-resty/resty/v2 v2.7.0
