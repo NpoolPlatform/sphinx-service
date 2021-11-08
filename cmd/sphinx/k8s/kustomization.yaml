@@ -1,0 +1,6 @@
+commonLabels:
+  # app: sphinx-service
+
+resources:
+- 01-sphinx-service.yaml
+- 02-ingress.yaml
