@@ -9,7 +9,6 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.6.0
-	github.com/myxtype/filecoin-client v0.3.2
 	github.com/prometheus/client_golang v1.11.0
 	github.com/urfave/cli/v2 v2.3.0
 	google.golang.org/genproto v0.0.0-20211102202547-e9cf271f7f2c
@@ -19,6 +18,10 @@ require (
 )
 
 require (
+	github.com/cyvadra/filecoin-client v0.3.3
+	github.com/filecoin-project/go-state-types v0.1.1
+	github.com/shopspring/decimal v1.3.1
+	github.com/stretchr/testify v1.7.0
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
 	golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f // indirect
 	golang.org/x/sys v0.0.0-20211015200801-69063c4bb744 // indirect
