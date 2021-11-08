@@ -20,6 +20,7 @@ require (
 require (
 	github.com/cyvadra/filecoin-client v0.3.3
 	github.com/filecoin-project/go-state-types v0.1.1
+	github.com/ipfs/go-cid v0.1.0
 	github.com/shopspring/decimal v1.3.1
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect

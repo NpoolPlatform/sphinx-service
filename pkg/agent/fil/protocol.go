@@ -52,3 +52,26 @@ func (Server) BroadcastScript(ctx context.Context, in *agents.BroadcastScriptReq
 	}
 	return
 }
+
+// default true
+func (Server) GetTxStatus(ctx context.Context, in *agents.GetTxStatusRequest) (resp *agents.GetTxStatusResponse, err error) {
+	msg, err := GetTxStatus(in.TransactionIdChain)
+	if err != nil {
+		return
+	}
+	amountInt, amountDigits, amountString := DecomposeStringInt(msg.Value.String())
+	resp = &agents.GetTxStatusResponse{
+		AmountInt:          amountInt,
+		AmountDigits:       amountDigits,
+		AmountString:       amountString,
+		AddressFrom:        msg.From.String(),
+		AddressTo:          msg.To.String(),
+		TransactionIdChain: in.TransactionIdChain,
+		CreatetimeUtc:      0,
+		UpdatetimeUtc:      0,
+		IsSuccess:          true,
+		IsFailed:           false,
+		NumBlocksConfirmed: -1,
+	}
+	return
+}

@@ -6,6 +6,7 @@ import (
 
 	"github.com/cyvadra/filecoin-client/types"
 	"github.com/filecoin-project/go-address"
+	"github.com/ipfs/go-cid"
 )
 
 var (
@@ -18,8 +19,7 @@ var (
 )
 
 // todo
-func GetTxStatus(CID string) (json string, err error) { return }
-func GetTxJSON(addr string) (json string, err error)  { return }
+func GetTxJSON(addr string) (json string, err error) { return }
 
 func GetSignInfo(addr string) (signInfo *SignInfoFIL, err error) {
 	addrStd, err := address.NewFromString(addr)
@@ -60,5 +60,14 @@ func BroadcastScript(s *types.SignedMessage) (cid string, err error) {
 		fmt.Println("消息发送成功，message id:")
 		fmt.Println(cid)
 	}
+	return
+}
+
+func GetTxStatus(CID string) (msg *types.Message, err error) {
+	_, CTID, err := cid.CidFromBytes([]byte(CID))
+	if err != nil {
+		return
+	}
+	msg, err = Client.ChainGetMessage(context.Background(), CTID)
 	return
 }
