@@ -44,16 +44,19 @@ func OfflineSign(ki *types.KeyInfo, msg *types.Message) (s *types.SignedMessage,
 
 func TestBroadcastScript(t *testing.T) {
 	var err error
-	var toAddr address.Address
-	var fromAddr *address.Address
-	toAddrStr := "t1gvkap5jmv5k7gwpa42zj43i2oaai5zg74n66xra"
-	pkStr := "c3pS5JcZEM1C5Yukor63mQ8DvADh1qQN"
 	// 静态设置
-	toAddr, err = address.NewFromString(toAddrStr)
-	panic("test key error")
-	pk, err := base64.StdEncoding.DecodeString(pkStr)
+	toAddr, err := address.NewFromString("t1gvkap5jmv5k7gwpa42zj43i2oaai5zg74n66xra")
+	pkStr := "c3pS5JcZEM1C5Yukor63mQ8DvADh1qQN/GrUsRA20XE="
 	if err != nil {
-		panic("pk解码失败")
+		fmt.Println("收款地址错误", err)
+		return
+	}
+	var fromAddr *address.Address
+	var pk []byte
+	pk, err = base64.StdEncoding.DecodeString(pkStr)
+	if err != nil {
+		fmt.Println("pk解码失败", err)
+		return
 	}
 	// 设置key
 	ki := &types.KeyInfo{
@@ -66,14 +69,17 @@ func TestBroadcastScript(t *testing.T) {
 		fmt.Println("生成地址失败", err)
 		return
 	}
-	// 在此编辑message
-	// 需要获取Nonce
+	// 获取Nonce
+	nonce, err := Client.MpoolGetNonce(context.Background(), *fromAddr)
+	if err != nil {
+		fmt.Println("获取Nonce失败，请检查主机配置")
+	}
 	msg := &types.Message{
 		Version:    0,
 		To:         toAddr,
 		From:       *fromAddr,
-		Nonce:      14,
-		Value:      filecoin.FromFil(decimal.NewFromFloat(123.456)),
+		Nonce:      nonce,
+		Value:      filecoin.FromFil(decimal.NewFromFloat(1.0001)),
 		GasLimit:   0,
 		GasFeeCap:  abi.NewTokenAmount(100),
 		GasPremium: abi.NewTokenAmount(100),
@@ -95,8 +101,7 @@ func TestBroadcastScript(t *testing.T) {
 	}
 	err = BroadcastScript(signedMsg)
 	if err != nil {
-		fmt.Println("广播失败", err)
-		assert.Nil(t, err)
+		fmt.Println("广播失败，请检查主机配置", err)
 	}
 	return
 }
