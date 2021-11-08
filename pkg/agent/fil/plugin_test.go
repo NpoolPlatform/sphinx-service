@@ -30,11 +30,10 @@ func OfflineSign(ki *types.KeyInfo, msg *types.Message) (s *types.SignedMessage,
 		fmt.Println(s)
 		fmt.Println(err)
 		return
-	} else {
-		fmt.Println("signed message: ")
-		fmt.Println(s)
 	}
-	println(hex.EncodeToString(s.Signature.Data))
+	fmt.Println("signed message: ")
+	fmt.Println(s)
+	fmt.Println(hex.EncodeToString(s.Signature.Data))
 	// 验证签名
 	if err = local.WalletVerifyMessage(s); err != nil {
 		fmt.Println("验证签名失败", err)
@@ -103,7 +102,6 @@ func TestBroadcastScript(t *testing.T) {
 	if err != nil {
 		fmt.Println("广播失败，请检查主机配置", err)
 	}
-	return
 }
 
 func TestGetBalance(t *testing.T) {

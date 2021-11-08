@@ -28,14 +28,13 @@ func TestSignScript(t *testing.T) {
 		Params:     []byte{},
 	}
 	s, err := SignScript(ki, msg)
+	assert.Nil(t, err)
 	err = local.WalletVerifyMessage(s)
 	assert.Nil(t, err)
-	return
 }
 
 func TestCreateAccount(t *testing.T) {
 	// (ki *types.KeyInfo, addr *address.Address, err error)
 	_, _, err := local.WalletNew(types.KTBLS)
 	assert.Nil(t, err)
-	return
 }

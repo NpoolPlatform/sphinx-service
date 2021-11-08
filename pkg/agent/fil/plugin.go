@@ -10,12 +10,12 @@ import (
 )
 
 var (
-	MessageMethod  uint64  = 0
-	MessageVersion uint64  = 0
-	GasLimit       int64   = 0
-	GasFeeCap      int64   = 10000
-	GasPremium     int64   = 10000
-	MaxFeeFloat    float64 = 0.001
+	MessageMethod  uint64
+	MessageVersion uint64
+	GasLimit       int64
+	GasFeeCap      int64 = 10000
+	GasPremium     int64 = 10000
+	MaxFeeFloat          = 0.001
 )
 
 // todo
@@ -49,22 +49,22 @@ func GetBalance(addr string) (str string, err error) {
 	return
 }
 
-func BroadcastScript(s *types.SignedMessage) (cid string, err error) {
+func BroadcastScript(s *types.SignedMessage) (cID string, err error) {
 	// 消息广播
 	mid, err := Client.MpoolPush(context.Background(), s)
-	cid = mid.String()
+	cID = mid.String()
 	if err != nil {
 		fmt.Println("消息广播失败")
 		fmt.Println(err)
 	} else {
 		fmt.Println("消息发送成功，message id:")
-		fmt.Println(cid)
+		fmt.Println(cID)
 	}
 	return
 }
 
-func GetTxStatus(CID string) (msg *types.Message, err error) {
-	_, CTID, err := cid.CidFromBytes([]byte(CID))
+func GetTxStatus(cID string) (msg *types.Message, err error) {
+	_, CTID, err := cid.CidFromBytes([]byte(cID))
 	if err != nil {
 		return
 	}
