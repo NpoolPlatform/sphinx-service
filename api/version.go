@@ -1,3 +1,4 @@
+//go:build !codeanalysis
 // +build !codeanalysis
 
 package api
@@ -5,9 +6,9 @@ package api
 import (
 	"context"
 
-	"github.com/NpoolPlatform/go-service-app-template/message/npool"
-	"github.com/NpoolPlatform/go-service-app-template/pkg/version"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
+	"github.com/NpoolPlatform/sphinx-service/message/npool"
+	"github.com/NpoolPlatform/sphinx-service/pkg/version"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
