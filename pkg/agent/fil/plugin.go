@@ -2,8 +2,8 @@ package fil
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	"github.com/cyvadra/filecoin-client/types"
 	"github.com/filecoin-project/go-address"
 	"github.com/ipfs/go-cid"
@@ -54,17 +54,15 @@ func BroadcastScript(s *types.SignedMessage) (cID string, err error) {
 	mid, err := Client.MpoolPush(context.Background(), s)
 	cID = mid.String()
 	if err != nil {
-		fmt.Println("消息广播失败")
-		fmt.Println(err)
+		logger.Sugar().Errorf("消息广播失败, %s", err)
 	} else {
-		fmt.Println("消息发送成功，message id:")
-		fmt.Println(cID)
+		logger.Sugar().Infof("消息发送成功，message id: %s", cID)
 	}
 	return
 }
 
 func GetTxStatus(cID string) (msg *types.Message, err error) {
-	_, CTID, err := cid.CidFromBytes([]byte(cID))
+	CTID, err := cid.Decode(cID)
 	if err != nil {
 		return
 	}

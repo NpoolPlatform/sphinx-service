@@ -5,6 +5,8 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
+	"os"
+	"strconv"
 	"testing"
 
 	"github.com/cyvadra/filecoin-client"
@@ -17,7 +19,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func testInit() {
+func init() {
 	address.CurrentNetwork = address.Mainnet
 	SetHostWithToken("172.16.30.117", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBbGxvdyI6WyJyZWFkIiwid3JpdGUiLCJzaWduIiwiYWRtaW4iXX0.ppK_nggwygh6kCPDlktdBtkGaqQXxoXM99iNx3-tZ9E")
 }
@@ -42,7 +44,6 @@ func OfflineSign(ki *types.KeyInfo, msg *types.Message) (s *types.SignedMessage,
 }
 
 func TestBroadcastScript(t *testing.T) {
-	testInit()
 	var err error
 	// 静态设置
 	toAddr, err := address.NewFromString("t1gvkap5jmv5k7gwpa42zj43i2oaai5zg74n66xra")
@@ -99,15 +100,43 @@ func TestBroadcastScript(t *testing.T) {
 		fmt.Println("签名失败", err)
 		assert.Nil(t, err)
 	}
-	_, err = BroadcastScript(signedMsg)
-	if err != nil {
-		fmt.Println("广播失败，请检查主机配置", err)
+	if runByGithubAction, err := strconv.ParseBool(os.Getenv("RUN_BY_GITHUB_ACTION")); err == nil && runByGithubAction {
+		return
 	}
+	s, err := BroadcastScript(signedMsg)
+	assert.Nil(t, err)
+	assert.NotEmpty(t, s)
 }
 
 func TestGetBalance(t *testing.T) {
-	testInit()
 	str, err := GetBalance("t1gvkap5jmv5k7gwpa42zj43i2oaai5zg74n66xra")
-	fmt.Println("Balance: ", str)
 	assert.Nil(t, err)
+	assert.NotEmpty(t, str)
+	str, err = GetBalance("asdfasdfasdf")
+	assert.NotNil(t, err)
+	assert.Empty(t, str)
+}
+
+func TestGetTxStatus(t *testing.T) {
+	msg, err := GetTxStatus("asdf")
+	assert.NotNil(t, err)
+	assert.Nil(t, msg)
+	msg, err = GetTxStatus("bafy2bzacebcgpnxout6iu442fcybhli35wd4jh6uxdrqq4ajczgxgnzwe6vhi")
+	assert.Nil(t, err)
+	assert.NotNil(t, msg)
+}
+
+func TestGetSignInfo(t *testing.T) {
+	signInfo, err := GetSignInfo("t3rhsc4yhuysbtl63kybatw7rmnii5lcn7w3rsitjnjbzezbvkk3cjnsabppog44u3acmv2rc3hfgvo7ubv6qq")
+	assert.Nil(t, err)
+	assert.NotNil(t, signInfo)
+	signInfo, err = GetSignInfo("000000000000000000")
+	assert.NotNil(t, err)
+	assert.Nil(t, signInfo)
+}
+
+func TestGetTxJSON(t *testing.T) {
+	json, err := GetTxJSON("to be implemented")
+	assert.Nil(t, err)
+	assert.Empty(t, json)
 }
