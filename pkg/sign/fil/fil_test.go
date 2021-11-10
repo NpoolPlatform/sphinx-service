@@ -13,7 +13,7 @@ import (
 
 func TestSignScript(t *testing.T) {
 	// (s *types.SignedMessage, err error)
-	ki, addr, err := local.WalletNew(types.KTBLS)
+	_, addr, err := CreateAccount()
 	assert.Nil(t, err)
 	msg := &types.Message{
 		Version:    0,
@@ -27,7 +27,7 @@ func TestSignScript(t *testing.T) {
 		Method:     0,
 		Params:     []byte{},
 	}
-	s, err := SignScript(ki, msg)
+	s, err := SignScript(msg)
 	assert.Nil(t, err)
 	err = local.WalletVerifyMessage(s)
 	assert.Nil(t, err)
