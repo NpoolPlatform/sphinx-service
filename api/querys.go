@@ -32,16 +32,6 @@ func (s *Server) ApplyTransaction(ctx context.Context, in *npool.ApplyTransactio
 	return
 }
 
-// 签名服务接入点
-func (s *Server) PortalSign(ctx context.Context, in *npool.PortalSignInit) (ret *npool.IdentityProof, err error) {
-	return nil, nil
-}
-
-// 代理服务接入点
-func (s *Server) PortalWallet(ctx context.Context, in *npool.PortalWalletInit) (ret *npool.IdentityProof, err error) {
-	return nil, nil
-}
-
 // 账户交易查询
 func (s *Server) GetTxJSON(ctx context.Context, in *npool.GetTxJSONRequest) (ret *npool.AccountTxJSON, err error) {
 	return nil, nil

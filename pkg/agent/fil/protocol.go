@@ -28,14 +28,14 @@ func (Server) GetBalance(ctx context.Context, in *agents.GetBalanceRequest) (acb
 	if err != nil {
 		return
 	}
-	amountInt, amountDigits, amountString := DecomposeStringInt(acbStr)
+	amountFloat64 := DecomposeStringFloat64(acbStr)
+	amountUInt64 := VisualPriceToDBPrice(amountFloat64)
 	acb = &agents.AccountBalance{
-		CoinId:       0,
-		Address:      in.Address,
-		TimestampUtc: time.Now().UnixNano(),
-		AmountInt:    amountInt,
-		AmountDigits: amountDigits,
-		AmountString: amountString,
+		CoinId:        0,
+		Address:       in.Address,
+		TimestampUtc:  time.Now().UnixNano(),
+		AmountFloat64: amountFloat64,
+		AmountUint64:  amountUInt64,
 	}
 	return
 }
@@ -59,11 +59,11 @@ func (Server) GetTxStatus(ctx context.Context, in *agents.GetTxStatusRequest) (r
 	if err != nil {
 		return
 	}
-	amountInt, amountDigits, amountString := DecomposeStringInt(msg.Value.String())
+	amountFloat64 := DecomposeStringFloat64(msg.Value.String())
+	amountUInt64 := VisualPriceToDBPrice(amountFloat64)
 	resp = &agents.GetTxStatusResponse{
-		AmountInt:          amountInt,
-		AmountDigits:       amountDigits,
-		AmountString:       amountString,
+		AmountFloat64:      amountFloat64,
+		AmountUint64:       amountUInt64,
 		AddressFrom:        msg.From.String(),
 		AddressTo:          msg.To.String(),
 		TransactionIdChain: in.TransactionIdChain,

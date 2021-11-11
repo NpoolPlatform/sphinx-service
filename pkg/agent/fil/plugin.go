@@ -52,11 +52,10 @@ func GetBalance(addr string) (str string, err error) {
 func BroadcastScript(s *types.SignedMessage) (cID string, err error) {
 	// 消息广播
 	mid, err := Client.MpoolPush(context.Background(), s)
-	cID = mid.String()
 	if err != nil {
 		logger.Sugar().Errorf("消息广播失败, %s", err)
 	} else {
-		logger.Sugar().Infof("消息发送成功，message id: %s", cID)
+		cID = mid.String()
 	}
 	return
 }

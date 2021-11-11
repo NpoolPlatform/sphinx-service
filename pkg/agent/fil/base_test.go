@@ -1,6 +1,7 @@
 package fil
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"testing"
@@ -20,4 +21,9 @@ func TestSetHostWithToken(t *testing.T) {
 		return
 	}
 	SetHostWithToken("172.16.30.117", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBbGxvdyI6WyJyZWFkIiwid3JpdGUiLCJzaWduIiwiYWRtaW4iXX0.ppK_nggwygh6kCPDlktdBtkGaqQXxoXM99iNx3-tZ9E")
+}
+
+func TestDecomposeStringFloat64(t *testing.T) {
+	amountFloat64 := DecomposeStringFloat64("11364195385307179586438")
+	assert.Equal(t, "11364.195385307179586438"[0:12], fmt.Sprintf("%v", amountFloat64)[0:12])
 }

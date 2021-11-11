@@ -74,6 +74,8 @@ func TestBroadcastScript(t *testing.T) {
 	nonce, err := Client.MpoolGetNonce(context.Background(), *fromAddr)
 	if err != nil {
 		fmt.Println("获取Nonce失败，请检查主机配置")
+		fmt.Println(err)
+		return
 	}
 	msg := &types.Message{
 		Version:    0,
