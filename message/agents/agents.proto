@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package sphinx.v1;
 
-option go_package = "github.com/NpoolPlatform/sphinx-service/message/agents";
+option go_package = "github.com/NpoolPlatform/sphinx-sign/message/agents";
 
 // 离线签名服务
 service Sign {
@@ -43,6 +43,7 @@ message SignScriptRequest {
   string amount_string = 7; // 字符串格式数据，便于确认
   string uuid_signature = 8; // 2FA签名
   int64 createtime_utc = 9; // 用户发起提现的时间，与2FA绑定
+  string sign_info_json = 10; // 签名所需参数，打包成json自取
 }
 
 // SignScript 返回
@@ -143,6 +144,15 @@ message AccountTxJSON {
   string json = 1;
 }
 
+// FIL 预签名参数
+message SignInfoFIL {
+  uint64 nonce = 1; // 避免重复交易
+  uint64 version = 2; // Message版本，默认为0
+  int64 gas_limit = 3; // 填0自动
+  int64 gas_fee_cap = 4; // big.Int{}
+  int64 gas_premium = 5; // big.Int{}
+  uint64 method = 6; // 0
+}
 
 
 

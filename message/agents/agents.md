@@ -16,6 +16,7 @@
     - [GetTxStatusRequest](#sphinx.v1.GetTxStatusRequest)
     - [GetTxStatusResponse](#sphinx.v1.GetTxStatusResponse)
     - [SignInfo](#sphinx.v1.SignInfo)
+    - [SignInfoFIL](#sphinx.v1.SignInfoFIL)
     - [SignScriptRequest](#sphinx.v1.SignScriptRequest)
     - [SignScriptResponse](#sphinx.v1.SignScriptResponse)
   
@@ -237,6 +238,26 @@ GetSignInfo 返回
 
 
 
+<a name="sphinx.v1.SignInfoFIL"></a>
+
+### SignInfoFIL
+FIL 预签名参数
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| nonce | [uint64](#uint64) |  | 避免重复交易 |
+| version | [uint64](#uint64) |  | Message版本，默认为0 |
+| gas_limit | [int64](#int64) |  | 填0自动 |
+| gas_fee_cap | [int64](#int64) |  | big.Int{} |
+| gas_premium | [int64](#int64) |  | big.Int{} |
+| method | [uint64](#uint64) |  | 0 |
+
+
+
+
+
+
 <a name="sphinx.v1.SignScriptRequest"></a>
 
 ### SignScriptRequest
@@ -254,6 +275,7 @@ SignScript 参数
 | amount_string | [string](#string) |  | 字符串格式数据，便于确认 |
 | uuid_signature | [string](#string) |  | 2FA签名 |
 | createtime_utc | [int64](#int64) |  | 用户发起提现的时间，与2FA绑定 |
+| sign_info_json | [string](#string) |  | 签名所需参数，打包成json自取 |
 
 
 
