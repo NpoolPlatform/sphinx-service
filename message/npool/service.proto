@@ -36,10 +36,10 @@ service Trading {
 			post: "/v1/account/transaction"
 			body: "*"
 		};}
-	// 签名服务接入点
-	rpc PortalSign (PortalSignInit) returns (IdentityProof) {}
-	// 代理服务接入点
-	rpc PortalWallet (PortalWalletInit) returns (IdentityProof) {}
+	// // 签名服务接入点
+	// rpc PortalSign (PortalSignInit) returns (IdentityProof) {}
+	// // 代理服务接入点
+	// rpc PortalWallet (PortalWalletInit) returns (IdentityProof) {}
 	// 账户交易查询
 	rpc GetTxJSON (GetTxJSONRequest) returns (AccountTxJSON) {
 		option (google.api.http) = {
@@ -50,6 +50,23 @@ service Trading {
 		option (google.api.http) = {
 			get: "/v1/account/transaction"
 		};}
+}
+
+// 钱包代理服务
+service WalletProxy {
+	/* 
+		从RabbitMQ获取消息通知
+		从MySQL拉取交易，以及交易的详细信息
+		根据不同交易状态进行不同操作
+		每步操作完成后同步更新数据库状态
+		审核通过交易，调用离线签名
+		离线签名后，交由钱包节点进行广播
+		广播成功后获取到CID，更新数据库标记为完成
+	*/
+  // 交易状态查询
+  rpc GetTxStatus (GetTxStatusRequest) returns (GetTxStatusResponse) {}
+  // 余额查询
+  rpc GetBalance (GetBalanceRequest) returns (AccountBalance) {}
 }
 
 // GetCoinInfo 参数
@@ -95,9 +112,8 @@ message AccountBalance {
 	int32 coin_id = 1;
 	string address = 2; // 查询的钱包地址
 	int64 timestamp_utc = 3; // 长整型时间戳
-	int64 amount_int = 4; // 金额整数
-	int32 amount_digits = 5; // 金额*了10的^n，默认为9
-	string amount_string = 6; // 金额字符串，"123.45678901"
+	double amount_float64 = 4; // 不入库的参考金额
+	uint64 amount_uint64 = 5; // 内部交互标准金额格式
 }
 
 // GetTxJSONRequest 参数
@@ -122,20 +138,19 @@ message GetInsiteTxStatusRequest {
 // GetInsiteTxStatus 返回
 message GetInsiteTxStatusResponse {
 	int32 coin_id = 1;
-	int64 amount_int = 2; // 放大后的金额整数
-	int32 amount_digits = 3; // amount_int == amount*10^n
+	double amount_float64 = 2; // 不入库的参考金额
+	uint64 amount_uint64 = 3; // 内部交互标准金额格式
 	string address_from = 4; // 发送方
 	string address_to = 5; // 接收方
-	string amount_string = 6; // 便于验证，数据库里不存
-	string insite_tx_type = 7; // recharge, payment, withdraw, unknown
-	string transaction_id_insite = 8; // 站内交易ID
-	string transaction_id_chain = 9; // 公链交易ID（如有）
-	string status = 10; // 为done则成功；全部状态："pending_review", "pending_process", "pending_signinfo", "pending_signaction", "pending_broadcast", "pending_confirm", "done", "rejected", "error", "error_expected"
-	bool is_processing = 11; // 对应数据库中mutex
-	int64 createtime_utc = 12; // 创建时间
-	int64 updatetime_utc = 13; // 上次更新时间
-	bool is_success = 14; // 便于调用方判断
-	bool is_failed = 15; // 不success不fail就是pending了
+	string insite_tx_type = 6; // recharge, payment, withdraw, unknown
+	string transaction_id_insite = 7; // 站内交易ID
+	string transaction_id_chain = 8; // 公链交易ID（如有）
+	string status = 9; // 为done则成功；全部状态："pending_review", "pending_process", "pending_signinfo", "pending_signaction", "pending_broadcast", "pending_confirm", "done", "rejected", "error", "error_expected"
+	bool is_processing = 10; // 对应数据库中mutex
+	int64 createtime_utc = 11; // 创建时间
+	int64 updatetime_utc = 12; // 上次更新时间
+	bool is_success = 13; // 便于调用方判断
+	bool is_failed = 14; // 不success不fail就是pending了
 }
 
 // ApplyTransaction 参数
@@ -144,37 +159,47 @@ message ApplyTransactionRequest {
 	string transaction_id_insite = 2; // 站内交易ID
 	string address_from = 3; // 发送方
 	string address_to = 4; // 接收方
-	int64 amount_int = 5; // 放大后的金额整数
-	int32 amount_digits = 6; // 放大倍数，默认为9
-	string amount_string = 7; // str格式金额，便于确认，如：0.000500021，则amount_int为500021, amount_digits为9；如80231310000.0000，可选amount_int为8023131，amount_digits为-4；注意amount_int为int64类型，可存储18位有效数字
-	string uuid_signature = 8; // 2FA的时效性验证码，前期可以留空
-	int64 createtime_utc = 9; // 用户提交请求时的时间戳，与2FA绑定
+	double amount_float64 = 5; // 不入库的参考金额
+	uint64 amount_uint64 = 6; // 内部交互标准金额格式
+	string uuid_signature = 7; // 2FA的时效性验证码，前期可以留空
+	int64 createtime_utc = 8; // 用户提交请求时的时间戳，与2FA绑定
 }
 
-// PortalSignInit 参数
-message PortalSignInit {
-	int32 coin_id = 1;
-	string uuid = 2; // 机器标识符
+// // PortalSignInit 参数
+// message PortalSignInit {
+// 	int32 coin_id = 1;
+// 	string uuid = 2; // 机器标识符
+// }
+
+// // PortalWalletInit 参数
+// message PortalWalletInit {
+// 	int32 coin_id = 1;
+// 	string uuid = 2; // 机器标识符
+// 	string location = 3; // 硬件所在地点（看板用到的节点信息，下同）
+// 	string host_vendor = 4; // 硬件供应商
+// 	string mac_address = 5; // MAC地址
+// 	string public_ip = 6; // 公网ip，也可能没有
+// 	string local_ip = 7; // 内网ip
+// 	int64 timestamp_utc = 8; // 汇报时间
+// }
+
+// GetTxStatus 参数
+message GetTxStatusRequest {
+  string transaction_id_chain = 1;
 }
 
-// PortalWalletInit 参数
-message PortalWalletInit {
-	int32 coin_id = 1;
-	string uuid = 2; // 机器标识符
-	string location = 3; // 硬件所在地点（看板用到的节点信息，下同）
-	string host_vendor = 4; // 硬件供应商
-	string mac_address = 5; // MAC地址
-	string public_ip = 6; // 公网ip，也可能没有
-	string local_ip = 7; // 内网ip
-	int64 timestamp_utc = 8; // 汇报时间
-}
-
-// 返回给节点的身份认证
-message IdentityProof {
-	int64 timestamp_utc = 1; // 时间戳，用于加盐
-	string prikey_version = 2; // 私钥版本；节点hardcode钱包代理的公钥，以便认证
-	string hostname = 3; // k8s集群中的身份标识符，如有需要，节点可通过该项，确认是否已连接全部钱包代理服务
-	string signature = 4; // 参数加签，前期可选
+// GetTxStatus 返回
+message GetTxStatusResponse {
+  double amount_float64 = 1; // 不入库的参考金额
+  uint64 amount_uint64 = 2; // 内部交互标准金额格式
+  string address_from = 3; // 发送方
+  string address_to = 4; // 接收方
+  string transaction_id_chain = 5; // 公链交易ID
+  int64 createtime_utc = 6; // 创建时间
+  int64 updatetime_utc = 7; // 上次更新时间
+  bool is_success = 8; // 便于调用方判断
+  bool is_failed = 9; // 不success不fail就是pending了
+  int32 num_blocks_confirmed = 10; // 已确认区块数
 }
 
 service ServiceExample {

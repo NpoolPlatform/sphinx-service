@@ -38,12 +38,11 @@ message SignScriptRequest {
   string transaction_id_insite = 2; // 站内交易ID，缓存去重
   string address_from = 3; // 发送方
   string address_to = 4; // 接收方
-  int64 amount_int = 5; // 金额整数
-  int32 amount_digits = 6; // 默认为9
-  string amount_string = 7; // 字符串格式数据，便于确认
-  string uuid_signature = 8; // 2FA签名
-  int64 createtime_utc = 9; // 用户发起提现的时间，与2FA绑定
-  string sign_info_json = 10; // 签名所需参数，打包成json自取
+  double amount_float64 = 5; // 不入库的参考金额
+  uint64 amount_uint64 = 6; // 内部交互标准金额格式
+  string uuid_signature = 7; // 2FA签名
+  int64 createtime_utc = 8; // 用户发起提现的时间，与2FA绑定
+  string sign_info_json = 9; // 签名所需参数，打包成json自取
 }
 
 // SignScript 返回
@@ -52,10 +51,9 @@ message SignScriptResponse {
   string transaction_id_insite = 2; // 站内交易ID，缓存去重
   string address_from = 3; // 发送方
   string address_to = 4; // 接收方
-  int64 amount_int = 5; // 金额整数
-  int32 amount_digits = 6; // 默认为9
-  string amount_string = 7; // 字符串格式数据，便于确认
-  string script_json = 8; // 可用于广播的交易script对象
+  double amount_float64 = 5; // 不入库的参考金额
+  uint64 amount_uint64 = 6; // 内部交互标准金额格式
+  string script_json = 7; // 可用于广播的交易script对象
 }
 
 
@@ -95,9 +93,8 @@ message AccountBalance {
   int32 coin_id = 1;
   string address = 2; // 查询的钱包地址
   int64 timestamp_utc = 3; // 长整型时间戳
-  int64 amount_int = 4; // 金额整数
-  int32 amount_digits = 5; // 金额*了10的^n，默认为9
-  string amount_string = 6; // 金额字符串，"123.45678901"
+  double amount_float64 = 4; // 不入库的参考金额
+  uint64 amount_uint64 = 5; // 内部交互标准金额格式
 }
 
 // BroadcastScript 参数
@@ -117,17 +114,16 @@ message GetTxStatusRequest {
 
 // GetTxStatus 返回
 message GetTxStatusResponse {
-  int64 amount_int = 1; // 放大后的金额整数
-  int32 amount_digits = 2; // amount_int == amount*10^n
-  string amount_string = 3; // 便于验证，数据库里不存
-  string address_from = 4; // 发送方
-  string address_to = 5; // 接收方
-  string transaction_id_chain = 6; // 公链交易ID
-  int64 createtime_utc = 11; // 创建时间
-  int64 updatetime_utc = 12; // 上次更新时间
-  bool is_success = 13; // 便于调用方判断
-  bool is_failed = 14; // 不success不fail就是pending了
-  int32 num_blocks_confirmed = 15; // 已确认区块数
+  double amount_float64 = 1; // 不入库的参考金额
+  uint64 amount_uint64 = 2; // 内部交互标准金额格式
+  string address_from = 3; // 发送方
+  string address_to = 4; // 接收方
+  string transaction_id_chain = 5; // 公链交易ID
+  int64 createtime_utc = 6; // 创建时间
+  int64 updatetime_utc = 7; // 上次更新时间
+  bool is_success = 8; // 便于调用方判断
+  bool is_failed = 9; // 不success不fail就是pending了
+  int32 num_blocks_confirmed = 10; // 已确认区块数
 }
 
 // GetTxJSONRequest 参数

@@ -45,9 +45,8 @@ GetBalance 返回
 | coin_id | [int32](#int32) |  |  |
 | address | [string](#string) |  | 查询的钱包地址 |
 | timestamp_utc | [int64](#int64) |  | 长整型时间戳 |
-| amount_int | [int64](#int64) |  | 金额整数 |
-| amount_digits | [int32](#int32) |  | 金额*了10的^n，默认为9 |
-| amount_string | [string](#string) |  | 金额字符串，&#34;123.45678901&#34; |
+| amount_float64 | [double](#double) |  | 不入库的参考金额 |
+| amount_uint64 | [uint64](#uint64) |  | 内部交互标准金额格式 |
 
 
 
@@ -206,9 +205,8 @@ GetTxStatus 返回
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| amount_int | [int64](#int64) |  | 放大后的金额整数 |
-| amount_digits | [int32](#int32) |  | amount_int == amount*10^n |
-| amount_string | [string](#string) |  | 便于验证，数据库里不存 |
+| amount_float64 | [double](#double) |  | 不入库的参考金额 |
+| amount_uint64 | [uint64](#uint64) |  | 内部交互标准金额格式 |
 | address_from | [string](#string) |  | 发送方 |
 | address_to | [string](#string) |  | 接收方 |
 | transaction_id_chain | [string](#string) |  | 公链交易ID |
@@ -270,9 +268,8 @@ SignScript 参数
 | transaction_id_insite | [string](#string) |  | 站内交易ID，缓存去重 |
 | address_from | [string](#string) |  | 发送方 |
 | address_to | [string](#string) |  | 接收方 |
-| amount_int | [int64](#int64) |  | 金额整数 |
-| amount_digits | [int32](#int32) |  | 默认为9 |
-| amount_string | [string](#string) |  | 字符串格式数据，便于确认 |
+| amount_float64 | [double](#double) |  | 不入库的参考金额 |
+| amount_uint64 | [uint64](#uint64) |  | 内部交互标准金额格式 |
 | uuid_signature | [string](#string) |  | 2FA签名 |
 | createtime_utc | [int64](#int64) |  | 用户发起提现的时间，与2FA绑定 |
 | sign_info_json | [string](#string) |  | 签名所需参数，打包成json自取 |
@@ -294,9 +291,8 @@ SignScript 返回
 | transaction_id_insite | [string](#string) |  | 站内交易ID，缓存去重 |
 | address_from | [string](#string) |  | 发送方 |
 | address_to | [string](#string) |  | 接收方 |
-| amount_int | [int64](#int64) |  | 金额整数 |
-| amount_digits | [int32](#int32) |  | 默认为9 |
-| amount_string | [string](#string) |  | 字符串格式数据，便于确认 |
+| amount_float64 | [double](#double) |  | 不入库的参考金额 |
+| amount_uint64 | [uint64](#uint64) |  | 内部交互标准金额格式 |
 | script_json | [string](#string) |  | 可用于广播的交易script对象 |
 
 

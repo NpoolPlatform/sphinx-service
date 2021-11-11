@@ -16,14 +16,14 @@
     - [GetInsiteTxStatusRequest](#sphinx.v1.GetInsiteTxStatusRequest)
     - [GetInsiteTxStatusResponse](#sphinx.v1.GetInsiteTxStatusResponse)
     - [GetTxJSONRequest](#sphinx.v1.GetTxJSONRequest)
-    - [IdentityProof](#sphinx.v1.IdentityProof)
-    - [PortalSignInit](#sphinx.v1.PortalSignInit)
-    - [PortalWalletInit](#sphinx.v1.PortalWalletInit)
+    - [GetTxStatusRequest](#sphinx.v1.GetTxStatusRequest)
+    - [GetTxStatusResponse](#sphinx.v1.GetTxStatusResponse)
     - [RegisterAccountRequest](#sphinx.v1.RegisterAccountRequest)
     - [VersionResponse](#sphinx.v1.VersionResponse)
   
     - [ServiceExample](#sphinx.v1.ServiceExample)
     - [Trading](#sphinx.v1.Trading)
+    - [WalletProxy](#sphinx.v1.WalletProxy)
   
 - [Scalar Value Types](#scalar-value-types)
 
@@ -64,9 +64,8 @@ GetBalance 返回
 | coin_id | [int32](#int32) |  |  |
 | address | [string](#string) |  | 查询的钱包地址 |
 | timestamp_utc | [int64](#int64) |  | 长整型时间戳 |
-| amount_int | [int64](#int64) |  | 金额整数 |
-| amount_digits | [int32](#int32) |  | 金额*了10的^n，默认为9 |
-| amount_string | [string](#string) |  | 金额字符串，&#34;123.45678901&#34; |
+| amount_float64 | [double](#double) |  | 不入库的参考金额 |
+| amount_uint64 | [uint64](#uint64) |  | 内部交互标准金额格式 |
 
 
 
@@ -100,9 +99,8 @@ ApplyTransaction 参数
 | transaction_id_insite | [string](#string) |  | 站内交易ID |
 | address_from | [string](#string) |  | 发送方 |
 | address_to | [string](#string) |  | 接收方 |
-| amount_int | [int64](#int64) |  | 放大后的金额整数 |
-| amount_digits | [int32](#int32) |  | 放大倍数，默认为9 |
-| amount_string | [string](#string) |  | str格式金额，便于确认，如：0.000500021，则amount_int为500021, amount_digits为9；如80231310000.0000，可选amount_int为8023131，amount_digits为-4；注意amount_int为int64类型，可存储18位有效数字 |
+| amount_float64 | [double](#double) |  | 不入库的参考金额 |
+| amount_uint64 | [uint64](#uint64) |  | 内部交互标准金额格式 |
 | uuid_signature | [string](#string) |  | 2FA的时效性验证码，前期可以留空 |
 | createtime_utc | [int64](#int64) |  | 用户提交请求时的时间戳，与2FA绑定 |
 
@@ -215,11 +213,10 @@ GetInsiteTxStatus 返回
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | coin_id | [int32](#int32) |  |  |
-| amount_int | [int64](#int64) |  | 放大后的金额整数 |
-| amount_digits | [int32](#int32) |  | amount_int == amount*10^n |
+| amount_float64 | [double](#double) |  | 不入库的参考金额 |
+| amount_uint64 | [uint64](#uint64) |  | 内部交互标准金额格式 |
 | address_from | [string](#string) |  | 发送方 |
 | address_to | [string](#string) |  | 接收方 |
-| amount_string | [string](#string) |  | 便于验证，数据库里不存 |
 | insite_tx_type | [string](#string) |  | recharge, payment, withdraw, unknown |
 | transaction_id_insite | [string](#string) |  | 站内交易ID |
 | transaction_id_chain | [string](#string) |  | 公链交易ID（如有） |
@@ -254,56 +251,39 @@ GetTxJSONRequest 参数
 
 
 
-<a name="sphinx.v1.IdentityProof"></a>
+<a name="sphinx.v1.GetTxStatusRequest"></a>
 
-### IdentityProof
-返回给节点的身份认证
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| timestamp_utc | [int64](#int64) |  | 时间戳，用于加盐 |
-| prikey_version | [string](#string) |  | 私钥版本；节点hardcode钱包代理的公钥，以便认证 |
-| hostname | [string](#string) |  | k8s集群中的身份标识符，如有需要，节点可通过该项，确认是否已连接全部钱包代理服务 |
-| signature | [string](#string) |  | 参数加签，前期可选 |
-
-
-
-
-
-
-<a name="sphinx.v1.PortalSignInit"></a>
-
-### PortalSignInit
-PortalSignInit 参数
+### GetTxStatusRequest
+GetTxStatus 参数
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| coin_id | [int32](#int32) |  |  |
-| uuid | [string](#string) |  | 机器标识符 |
+| transaction_id_chain | [string](#string) |  |  |
 
 
 
 
 
 
-<a name="sphinx.v1.PortalWalletInit"></a>
+<a name="sphinx.v1.GetTxStatusResponse"></a>
 
-### PortalWalletInit
-PortalWalletInit 参数
+### GetTxStatusResponse
+GetTxStatus 返回
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| coin_id | [int32](#int32) |  |  |
-| uuid | [string](#string) |  | 机器标识符 |
-| location | [string](#string) |  | 硬件所在地点（看板用到的节点信息，下同） |
-| host_vendor | [string](#string) |  | 硬件供应商 |
-| mac_address | [string](#string) |  | MAC地址 |
-| public_ip | [string](#string) |  | 公网ip，也可能没有 |
-| local_ip | [string](#string) |  | 内网ip |
-| timestamp_utc | [int64](#int64) |  | 汇报时间 |
+| amount_float64 | [double](#double) |  | 不入库的参考金额 |
+| amount_uint64 | [uint64](#uint64) |  | 内部交互标准金额格式 |
+| address_from | [string](#string) |  | 发送方 |
+| address_to | [string](#string) |  | 接收方 |
+| transaction_id_chain | [string](#string) |  | 公链交易ID |
+| createtime_utc | [int64](#int64) |  | 创建时间 |
+| updatetime_utc | [int64](#int64) |  | 上次更新时间 |
+| is_success | [bool](#bool) |  | 便于调用方判断 |
+| is_failed | [bool](#bool) |  | 不success不fail就是pending了 |
+| num_blocks_confirmed | [int32](#int32) |  | 已确认区块数 |
 
 
 
@@ -369,10 +349,27 @@ request body and response
 | RegisterAccount | [RegisterAccountRequest](#sphinx.v1.RegisterAccountRequest) | [AccountAddress](#sphinx.v1.AccountAddress) | 创建账户 |
 | GetBalance | [GetBalanceRequest](#sphinx.v1.GetBalanceRequest) | [AccountBalance](#sphinx.v1.AccountBalance) | 余额查询 |
 | ApplyTransaction | [ApplyTransactionRequest](#sphinx.v1.ApplyTransactionRequest) | [.google.protobuf.Empty](#google.protobuf.Empty) | 转账 / 提现 |
-| PortalSign | [PortalSignInit](#sphinx.v1.PortalSignInit) | [IdentityProof](#sphinx.v1.IdentityProof) | 签名服务接入点 |
-| PortalWallet | [PortalWalletInit](#sphinx.v1.PortalWalletInit) | [IdentityProof](#sphinx.v1.IdentityProof) | 代理服务接入点 |
-| GetTxJSON | [GetTxJSONRequest](#sphinx.v1.GetTxJSONRequest) | [AccountTxJSON](#sphinx.v1.AccountTxJSON) | 账户交易查询 |
+| GetTxJSON | [GetTxJSONRequest](#sphinx.v1.GetTxJSONRequest) | [AccountTxJSON](#sphinx.v1.AccountTxJSON) | 签名服务接入点 rpc PortalSign (PortalSignInit) returns (IdentityProof) {} // 代理服务接入点 rpc PortalWallet (PortalWalletInit) returns (IdentityProof) {} 账户交易查询 |
 | GetInsiteTxStatus | [GetInsiteTxStatusRequest](#sphinx.v1.GetInsiteTxStatusRequest) | [GetInsiteTxStatusResponse](#sphinx.v1.GetInsiteTxStatusResponse) | 交易状态查询 |
+
+
+<a name="sphinx.v1.WalletProxy"></a>
+
+### WalletProxy
+钱包代理服务
+
+从RabbitMQ获取消息通知
+从MySQL拉取交易，以及交易的详细信息
+根据不同交易状态进行不同操作
+每步操作完成后同步更新数据库状态
+审核通过交易，调用离线签名
+离线签名后，交由钱包节点进行广播
+广播成功后获取到CID，更新数据库标记为完成
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| GetTxStatus | [GetTxStatusRequest](#sphinx.v1.GetTxStatusRequest) | [GetTxStatusResponse](#sphinx.v1.GetTxStatusResponse) | 交易状态查询 |
+| GetBalance | [GetBalanceRequest](#sphinx.v1.GetBalanceRequest) | [AccountBalance](#sphinx.v1.AccountBalance) | 余额查询 |
 
  
 

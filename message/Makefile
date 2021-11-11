@@ -1,8 +1,8 @@
 PROTOC=$(shell which protoc)
 PROTOC-GEN-GRPC-GATEWAY=$(shell which protoc-gen-grpc-gateway)
 
-PROTO_FILE = $(shell find npool -name "*.proto")
-PROTO_GW_FILE = $(shell grep -l 'google.api.http' -r npool)
+PROTO_FILE = $(shell find agents -name "*.proto")
+PROTO_GW_FILE = $(shell grep -l 'google.api.http' -r agents)
 PROTO_GO_FILE = $(patsubst %.proto,%.pb.go,$(PROTO_FILE))
 PROTO_GO_GW_FILE = $(patsubst %.proto,%.pb.gw.go,$(PROTO_GW_FILE))
 PROTO_SWAGGER_FILE = $(patsubst %.proto,%.swagger.json,$(PROTO_FILE))
