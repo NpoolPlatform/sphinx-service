@@ -19,21 +19,13 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TradingClient interface {
-	// 查询单个币种
-	GetCoinInfo(ctx context.Context, in *GetCoinInfoRequest, opts ...grpc.CallOption) (*CoinInfoRow, error)
-	// 查询全部币种
-	GetCoinInfos(ctx context.Context, in *GetCoinInfosRequest, opts ...grpc.CallOption) (*CoinInfoList, error)
 	// 创建账户
 	RegisterAccount(ctx context.Context, in *RegisterAccountRequest, opts ...grpc.CallOption) (*AccountAddress, error)
 	// 余额查询
 	GetBalance(ctx context.Context, in *GetBalanceRequest, opts ...grpc.CallOption) (*AccountBalance, error)
 	// 转账 / 提现
 	ApplyTransaction(ctx context.Context, in *ApplyTransactionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// // 签名服务接入点
-	// rpc PortalSign (PortalSignInit) returns (IdentityProof) {}
-	// // 代理服务接入点
-	// rpc PortalWallet (PortalWalletInit) returns (IdentityProof) {}
-	// 账户交易查询
+	// TODO: 账户交易查询
 	GetTxJSON(ctx context.Context, in *GetTxJSONRequest, opts ...grpc.CallOption) (*AccountTxJSON, error)
 	// 交易状态查询
 	GetInsiteTxStatus(ctx context.Context, in *GetInsiteTxStatusRequest, opts ...grpc.CallOption) (*GetInsiteTxStatusResponse, error)
@@ -45,24 +37,6 @@ type tradingClient struct {
 
 func NewTradingClient(cc grpc.ClientConnInterface) TradingClient {
 	return &tradingClient{cc}
-}
-
-func (c *tradingClient) GetCoinInfo(ctx context.Context, in *GetCoinInfoRequest, opts ...grpc.CallOption) (*CoinInfoRow, error) {
-	out := new(CoinInfoRow)
-	err := c.cc.Invoke(ctx, "/sphinx.v1.Trading/GetCoinInfo", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *tradingClient) GetCoinInfos(ctx context.Context, in *GetCoinInfosRequest, opts ...grpc.CallOption) (*CoinInfoList, error) {
-	out := new(CoinInfoList)
-	err := c.cc.Invoke(ctx, "/sphinx.v1.Trading/GetCoinInfos", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *tradingClient) RegisterAccount(ctx context.Context, in *RegisterAccountRequest, opts ...grpc.CallOption) (*AccountAddress, error) {
@@ -114,21 +88,13 @@ func (c *tradingClient) GetInsiteTxStatus(ctx context.Context, in *GetInsiteTxSt
 // All implementations must embed UnimplementedTradingServer
 // for forward compatibility
 type TradingServer interface {
-	// 查询单个币种
-	GetCoinInfo(context.Context, *GetCoinInfoRequest) (*CoinInfoRow, error)
-	// 查询全部币种
-	GetCoinInfos(context.Context, *GetCoinInfosRequest) (*CoinInfoList, error)
 	// 创建账户
 	RegisterAccount(context.Context, *RegisterAccountRequest) (*AccountAddress, error)
 	// 余额查询
 	GetBalance(context.Context, *GetBalanceRequest) (*AccountBalance, error)
 	// 转账 / 提现
 	ApplyTransaction(context.Context, *ApplyTransactionRequest) (*emptypb.Empty, error)
-	// // 签名服务接入点
-	// rpc PortalSign (PortalSignInit) returns (IdentityProof) {}
-	// // 代理服务接入点
-	// rpc PortalWallet (PortalWalletInit) returns (IdentityProof) {}
-	// 账户交易查询
+	// TODO: 账户交易查询
 	GetTxJSON(context.Context, *GetTxJSONRequest) (*AccountTxJSON, error)
 	// 交易状态查询
 	GetInsiteTxStatus(context.Context, *GetInsiteTxStatusRequest) (*GetInsiteTxStatusResponse, error)
@@ -139,12 +105,6 @@ type TradingServer interface {
 type UnimplementedTradingServer struct {
 }
 
-func (UnimplementedTradingServer) GetCoinInfo(context.Context, *GetCoinInfoRequest) (*CoinInfoRow, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetCoinInfo not implemented")
-}
-func (UnimplementedTradingServer) GetCoinInfos(context.Context, *GetCoinInfosRequest) (*CoinInfoList, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetCoinInfos not implemented")
-}
 func (UnimplementedTradingServer) RegisterAccount(context.Context, *RegisterAccountRequest) (*AccountAddress, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterAccount not implemented")
 }
@@ -171,42 +131,6 @@ type UnsafeTradingServer interface {
 
 func RegisterTradingServer(s grpc.ServiceRegistrar, srv TradingServer) {
 	s.RegisterService(&Trading_ServiceDesc, srv)
-}
-
-func _Trading_GetCoinInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetCoinInfoRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(TradingServer).GetCoinInfo(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/sphinx.v1.Trading/GetCoinInfo",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TradingServer).GetCoinInfo(ctx, req.(*GetCoinInfoRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Trading_GetCoinInfos_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetCoinInfosRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(TradingServer).GetCoinInfos(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/sphinx.v1.Trading/GetCoinInfos",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TradingServer).GetCoinInfos(ctx, req.(*GetCoinInfosRequest))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _Trading_RegisterAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -307,14 +231,6 @@ var Trading_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*TradingServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetCoinInfo",
-			Handler:    _Trading_GetCoinInfo_Handler,
-		},
-		{
-			MethodName: "GetCoinInfos",
-			Handler:    _Trading_GetCoinInfos_Handler,
-		},
-		{
 			MethodName: "RegisterAccount",
 			Handler:    _Trading_RegisterAccount_Handler,
 		},
@@ -333,132 +249,6 @@ var Trading_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetInsiteTxStatus",
 			Handler:    _Trading_GetInsiteTxStatus_Handler,
-		},
-	},
-	Streams:  []grpc.StreamDesc{},
-	Metadata: "npool/service.proto",
-}
-
-// WalletProxyClient is the client API for WalletProxy service.
-//
-// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type WalletProxyClient interface {
-	// 交易状态查询
-	GetTxStatus(ctx context.Context, in *GetTxStatusRequest, opts ...grpc.CallOption) (*GetTxStatusResponse, error)
-	// 余额查询
-	GetBalance(ctx context.Context, in *GetBalanceRequest, opts ...grpc.CallOption) (*AccountBalance, error)
-}
-
-type walletProxyClient struct {
-	cc grpc.ClientConnInterface
-}
-
-func NewWalletProxyClient(cc grpc.ClientConnInterface) WalletProxyClient {
-	return &walletProxyClient{cc}
-}
-
-func (c *walletProxyClient) GetTxStatus(ctx context.Context, in *GetTxStatusRequest, opts ...grpc.CallOption) (*GetTxStatusResponse, error) {
-	out := new(GetTxStatusResponse)
-	err := c.cc.Invoke(ctx, "/sphinx.v1.WalletProxy/GetTxStatus", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *walletProxyClient) GetBalance(ctx context.Context, in *GetBalanceRequest, opts ...grpc.CallOption) (*AccountBalance, error) {
-	out := new(AccountBalance)
-	err := c.cc.Invoke(ctx, "/sphinx.v1.WalletProxy/GetBalance", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// WalletProxyServer is the server API for WalletProxy service.
-// All implementations must embed UnimplementedWalletProxyServer
-// for forward compatibility
-type WalletProxyServer interface {
-	// 交易状态查询
-	GetTxStatus(context.Context, *GetTxStatusRequest) (*GetTxStatusResponse, error)
-	// 余额查询
-	GetBalance(context.Context, *GetBalanceRequest) (*AccountBalance, error)
-	mustEmbedUnimplementedWalletProxyServer()
-}
-
-// UnimplementedWalletProxyServer must be embedded to have forward compatible implementations.
-type UnimplementedWalletProxyServer struct {
-}
-
-func (UnimplementedWalletProxyServer) GetTxStatus(context.Context, *GetTxStatusRequest) (*GetTxStatusResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetTxStatus not implemented")
-}
-func (UnimplementedWalletProxyServer) GetBalance(context.Context, *GetBalanceRequest) (*AccountBalance, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetBalance not implemented")
-}
-func (UnimplementedWalletProxyServer) mustEmbedUnimplementedWalletProxyServer() {}
-
-// UnsafeWalletProxyServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to WalletProxyServer will
-// result in compilation errors.
-type UnsafeWalletProxyServer interface {
-	mustEmbedUnimplementedWalletProxyServer()
-}
-
-func RegisterWalletProxyServer(s grpc.ServiceRegistrar, srv WalletProxyServer) {
-	s.RegisterService(&WalletProxy_ServiceDesc, srv)
-}
-
-func _WalletProxy_GetTxStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetTxStatusRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(WalletProxyServer).GetTxStatus(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/sphinx.v1.WalletProxy/GetTxStatus",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(WalletProxyServer).GetTxStatus(ctx, req.(*GetTxStatusRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _WalletProxy_GetBalance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetBalanceRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(WalletProxyServer).GetBalance(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/sphinx.v1.WalletProxy/GetBalance",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(WalletProxyServer).GetBalance(ctx, req.(*GetBalanceRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-// WalletProxy_ServiceDesc is the grpc.ServiceDesc for WalletProxy service.
-// It's only intended for direct use with grpc.RegisterService,
-// and not to be introspected or modified (even as a copy)
-var WalletProxy_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "sphinx.v1.WalletProxy",
-	HandlerType: (*WalletProxyServer)(nil),
-	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "GetTxStatus",
-			Handler:    _WalletProxy_GetTxStatus_Handler,
-		},
-		{
-			MethodName: "GetBalance",
-			Handler:    _WalletProxy_GetBalance_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

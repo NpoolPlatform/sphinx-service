@@ -8,22 +8,15 @@
     - [AccountBalance](#sphinx.v1.AccountBalance)
     - [AccountTxJSON](#sphinx.v1.AccountTxJSON)
     - [ApplyTransactionRequest](#sphinx.v1.ApplyTransactionRequest)
-    - [CoinInfoList](#sphinx.v1.CoinInfoList)
-    - [CoinInfoRow](#sphinx.v1.CoinInfoRow)
     - [GetBalanceRequest](#sphinx.v1.GetBalanceRequest)
-    - [GetCoinInfoRequest](#sphinx.v1.GetCoinInfoRequest)
-    - [GetCoinInfosRequest](#sphinx.v1.GetCoinInfosRequest)
     - [GetInsiteTxStatusRequest](#sphinx.v1.GetInsiteTxStatusRequest)
     - [GetInsiteTxStatusResponse](#sphinx.v1.GetInsiteTxStatusResponse)
     - [GetTxJSONRequest](#sphinx.v1.GetTxJSONRequest)
-    - [GetTxStatusRequest](#sphinx.v1.GetTxStatusRequest)
-    - [GetTxStatusResponse](#sphinx.v1.GetTxStatusResponse)
     - [RegisterAccountRequest](#sphinx.v1.RegisterAccountRequest)
     - [VersionResponse](#sphinx.v1.VersionResponse)
   
     - [ServiceExample](#sphinx.v1.ServiceExample)
     - [Trading](#sphinx.v1.Trading)
-    - [WalletProxy](#sphinx.v1.WalletProxy)
   
 - [Scalar Value Types](#scalar-value-types)
 
@@ -109,39 +102,6 @@ ApplyTransaction 参数
 
 
 
-<a name="sphinx.v1.CoinInfoList"></a>
-
-### CoinInfoList
-GetCoinInfos 返回
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| list | [CoinInfoRow](#sphinx.v1.CoinInfoRow) | repeated | 返回对象，取list字段 |
-
-
-
-
-
-
-<a name="sphinx.v1.CoinInfoRow"></a>
-
-### CoinInfoRow
-GetCoinInfo 返回
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| id | [int32](#int32) |  |  |
-| need_signinfo | [bool](#bool) |  | 是否需要预签名信息 |
-| name | [string](#string) |  | 币种名称：Filecoin |
-| unit | [string](#string) |  | 单位：FIL |
-
-
-
-
-
-
 <a name="sphinx.v1.GetBalanceRequest"></a>
 
 ### GetBalanceRequest
@@ -153,36 +113,6 @@ GetBalance 参数
 | coin_id | [int32](#int32) |  |  |
 | address | [string](#string) |  | 查询的钱包地址 |
 | timestamp_utc | [int64](#int64) |  | 长整型时间戳 |
-
-
-
-
-
-
-<a name="sphinx.v1.GetCoinInfoRequest"></a>
-
-### GetCoinInfoRequest
-GetCoinInfo 参数
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| coin_id | [int32](#int32) |  |  |
-
-
-
-
-
-
-<a name="sphinx.v1.GetCoinInfosRequest"></a>
-
-### GetCoinInfosRequest
-GetCoinInfos 参数
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| coin_ids | [int32](#int32) | repeated |  |
 
 
 
@@ -251,45 +181,6 @@ GetTxJSONRequest 参数
 
 
 
-<a name="sphinx.v1.GetTxStatusRequest"></a>
-
-### GetTxStatusRequest
-GetTxStatus 参数
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| transaction_id_chain | [string](#string) |  |  |
-
-
-
-
-
-
-<a name="sphinx.v1.GetTxStatusResponse"></a>
-
-### GetTxStatusResponse
-GetTxStatus 返回
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| amount_float64 | [double](#double) |  | 不入库的参考金额 |
-| amount_uint64 | [uint64](#uint64) |  | 内部交互标准金额格式 |
-| address_from | [string](#string) |  | 发送方 |
-| address_to | [string](#string) |  | 接收方 |
-| transaction_id_chain | [string](#string) |  | 公链交易ID |
-| createtime_utc | [int64](#int64) |  | 创建时间 |
-| updatetime_utc | [int64](#int64) |  | 上次更新时间 |
-| is_success | [bool](#bool) |  | 便于调用方判断 |
-| is_failed | [bool](#bool) |  | 不success不fail就是pending了 |
-| num_blocks_confirmed | [int32](#int32) |  | 已确认区块数 |
-
-
-
-
-
-
 <a name="sphinx.v1.RegisterAccountRequest"></a>
 
 ### RegisterAccountRequest
@@ -344,32 +235,11 @@ request body and response
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| GetCoinInfo | [GetCoinInfoRequest](#sphinx.v1.GetCoinInfoRequest) | [CoinInfoRow](#sphinx.v1.CoinInfoRow) | 查询单个币种 |
-| GetCoinInfos | [GetCoinInfosRequest](#sphinx.v1.GetCoinInfosRequest) | [CoinInfoList](#sphinx.v1.CoinInfoList) | 查询全部币种 |
 | RegisterAccount | [RegisterAccountRequest](#sphinx.v1.RegisterAccountRequest) | [AccountAddress](#sphinx.v1.AccountAddress) | 创建账户 |
 | GetBalance | [GetBalanceRequest](#sphinx.v1.GetBalanceRequest) | [AccountBalance](#sphinx.v1.AccountBalance) | 余额查询 |
 | ApplyTransaction | [ApplyTransactionRequest](#sphinx.v1.ApplyTransactionRequest) | [.google.protobuf.Empty](#google.protobuf.Empty) | 转账 / 提现 |
-| GetTxJSON | [GetTxJSONRequest](#sphinx.v1.GetTxJSONRequest) | [AccountTxJSON](#sphinx.v1.AccountTxJSON) | 签名服务接入点 rpc PortalSign (PortalSignInit) returns (IdentityProof) {} // 代理服务接入点 rpc PortalWallet (PortalWalletInit) returns (IdentityProof) {} 账户交易查询 |
+| GetTxJSON | [GetTxJSONRequest](#sphinx.v1.GetTxJSONRequest) | [AccountTxJSON](#sphinx.v1.AccountTxJSON) | TODO: 账户交易查询 |
 | GetInsiteTxStatus | [GetInsiteTxStatusRequest](#sphinx.v1.GetInsiteTxStatusRequest) | [GetInsiteTxStatusResponse](#sphinx.v1.GetInsiteTxStatusResponse) | 交易状态查询 |
-
-
-<a name="sphinx.v1.WalletProxy"></a>
-
-### WalletProxy
-钱包代理服务
-
-从RabbitMQ获取消息通知
-从MySQL拉取交易，以及交易的详细信息
-根据不同交易状态进行不同操作
-每步操作完成后同步更新数据库状态
-审核通过交易，调用离线签名
-离线签名后，交由钱包节点进行广播
-广播成功后获取到CID，更新数据库标记为完成
-
-| Method Name | Request Type | Response Type | Description |
-| ----------- | ------------ | ------------- | ------------|
-| GetTxStatus | [GetTxStatusRequest](#sphinx.v1.GetTxStatusRequest) | [GetTxStatusResponse](#sphinx.v1.GetTxStatusResponse) | 交易状态查询 |
-| GetBalance | [GetBalanceRequest](#sphinx.v1.GetBalanceRequest) | [AccountBalance](#sphinx.v1.AccountBalance) | 余额查询 |
 
  
 

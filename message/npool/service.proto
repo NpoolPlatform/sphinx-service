@@ -9,16 +9,6 @@ import "google/protobuf/Empty.proto";
 
 // 交易服务
 service Trading {
-	// 查询单个币种
-	rpc GetCoinInfo (GetCoinInfoRequest) returns (CoinInfoRow) {
-		option (google.api.http) = {
-			get: "/v1/coin/single"
-		};}
-	// 查询全部币种
-	rpc GetCoinInfos (GetCoinInfosRequest) returns (CoinInfoList) {
-		option (google.api.http) = {
-			get: "/v1/coin/list"
-		};}
 	// 创建账户
 	rpc RegisterAccount (RegisterAccountRequest) returns (AccountAddress) {
 		option (google.api.http) = {
@@ -36,57 +26,13 @@ service Trading {
 			post: "/v1/account/transaction"
 			body: "*"
 		};}
-	// // 签名服务接入点
-	// rpc PortalSign (PortalSignInit) returns (IdentityProof) {}
-	// // 代理服务接入点
-	// rpc PortalWallet (PortalWalletInit) returns (IdentityProof) {}
-	// 账户交易查询
-	rpc GetTxJSON (GetTxJSONRequest) returns (AccountTxJSON) {
-		option (google.api.http) = {
-			get: "/v1/account/txjson"
-		};}
+	// TODO: 账户交易查询
+	rpc GetTxJSON (GetTxJSONRequest) returns (AccountTxJSON) {} // reserved function
 	// 交易状态查询
 	rpc GetInsiteTxStatus (GetInsiteTxStatusRequest) returns (GetInsiteTxStatusResponse) {
 		option (google.api.http) = {
 			get: "/v1/account/transaction"
 		};}
-}
-
-// 钱包代理服务
-service WalletProxy {
-	/* 
-		从RabbitMQ获取消息通知
-		从MySQL拉取交易，以及交易的详细信息
-		根据不同交易状态进行不同操作
-		每步操作完成后同步更新数据库状态
-		审核通过交易，调用离线签名
-		离线签名后，交由钱包节点进行广播
-		广播成功后获取到CID，更新数据库标记为完成
-	*/
-  // 交易状态查询
-  rpc GetTxStatus (GetTxStatusRequest) returns (GetTxStatusResponse) {}
-  // 余额查询
-  rpc GetBalance (GetBalanceRequest) returns (AccountBalance) {}
-}
-
-// GetCoinInfo 参数
-message GetCoinInfoRequest {
-	int32 coin_id = 1;
-}
-// GetCoinInfos 参数
-message GetCoinInfosRequest {
-	repeated int32 coin_ids = 1;
-}
-// GetCoinInfo 返回
-message CoinInfoRow {
-	int32 id = 1;
-	bool need_signinfo = 2; // 是否需要预签名信息
-	string name = 3; // 币种名称：Filecoin
-	string unit = 4; // 单位：FIL
-}
-// GetCoinInfos 返回
-message CoinInfoList {
-	repeated CoinInfoRow list = 1; // 返回对象，取list字段
 }
 
 // RegisterAccount 参数
@@ -182,25 +128,6 @@ message ApplyTransactionRequest {
 // 	string local_ip = 7; // 内网ip
 // 	int64 timestamp_utc = 8; // 汇报时间
 // }
-
-// GetTxStatus 参数
-message GetTxStatusRequest {
-  string transaction_id_chain = 1;
-}
-
-// GetTxStatus 返回
-message GetTxStatusResponse {
-  double amount_float64 = 1; // 不入库的参考金额
-  uint64 amount_uint64 = 2; // 内部交互标准金额格式
-  string address_from = 3; // 发送方
-  string address_to = 4; // 接收方
-  string transaction_id_chain = 5; // 公链交易ID
-  int64 createtime_utc = 6; // 创建时间
-  int64 updatetime_utc = 7; // 上次更新时间
-  bool is_success = 8; // 便于调用方判断
-  bool is_failed = 9; // 不success不fail就是pending了
-  int32 num_blocks_confirmed = 10; // 已确认区块数
-}
 
 service ServiceExample {
 	// Method Version
