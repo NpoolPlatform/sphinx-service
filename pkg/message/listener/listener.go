@@ -24,3 +24,18 @@ func listenTemplateExample() {
 func Listen() {
 	go listenTemplateExample()
 }
+
+func listenTransactionSucceeded() {
+	for {
+		logger.Sugar().Infof("listening for transaction success")
+		err := msgcli.ComsumerOfAgent(func(notification *msg.NotificationTransaction) error {
+			logger.Sugar().Infof("good news everyone: %+w", notification)
+			// Call event handler in api module
+			return nil
+		})
+		if err != nil {
+			logger.Sugar().Errorf("fail to consume example: %v", err)
+			return
+		}
+	}
+}
