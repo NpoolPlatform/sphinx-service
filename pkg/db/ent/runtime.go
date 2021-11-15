@@ -106,16 +106,6 @@ func init() {
 	review.OperatorNoteValidator = reviewDescOperatorNote.Validators[0].(func(string) error)
 	transactionFields := schema.Transaction{}.Fields()
 	_ = transactionFields
-	// transactionDescAmountInt is the schema descriptor for amount_int field.
-	transactionDescAmountInt := transactionFields[1].Descriptor()
-	// transaction.AmountIntValidator is a validator for the "amount_int" field. It is called by the builders before save.
-	transaction.AmountIntValidator = transactionDescAmountInt.Validators[0].(func(int) error)
-	// transactionDescAmountDigits is the schema descriptor for amount_digits field.
-	transactionDescAmountDigits := transactionFields[2].Descriptor()
-	// transaction.DefaultAmountDigits holds the default value on creation for the amount_digits field.
-	transaction.DefaultAmountDigits = transactionDescAmountDigits.Default.(int)
-	// transaction.AmountDigitsValidator is a validator for the "amount_digits" field. It is called by the builders before save.
-	transaction.AmountDigitsValidator = transactionDescAmountDigits.Validators[0].(func(int) error)
 	// transactionDescAddressFrom is the schema descriptor for address_from field.
 	transactionDescAddressFrom := transactionFields[3].Descriptor()
 	// transaction.AddressFromValidator is a validator for the "address_from" field. It is called by the builders before save.

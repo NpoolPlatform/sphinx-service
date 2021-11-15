@@ -21,23 +21,15 @@ type TransactionCreate struct {
 	hooks    []Hook
 }
 
-// SetAmountInt sets the "amount_int" field.
-func (tc *TransactionCreate) SetAmountInt(i int) *TransactionCreate {
-	tc.mutation.SetAmountInt(i)
+// SetAmountUint64 sets the "amount_uint64" field.
+func (tc *TransactionCreate) SetAmountUint64(u uint64) *TransactionCreate {
+	tc.mutation.SetAmountUint64(u)
 	return tc
 }
 
-// SetAmountDigits sets the "amount_digits" field.
-func (tc *TransactionCreate) SetAmountDigits(i int) *TransactionCreate {
-	tc.mutation.SetAmountDigits(i)
-	return tc
-}
-
-// SetNillableAmountDigits sets the "amount_digits" field if the given value is not nil.
-func (tc *TransactionCreate) SetNillableAmountDigits(i *int) *TransactionCreate {
-	if i != nil {
-		tc.SetAmountDigits(*i)
-	}
+// SetAmountFloat64 sets the "amount_float64" field.
+func (tc *TransactionCreate) SetAmountFloat64(f float64) *TransactionCreate {
+	tc.mutation.SetAmountFloat64(f)
 	return tc
 }
 
@@ -220,10 +212,6 @@ func (tc *TransactionCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (tc *TransactionCreate) defaults() {
-	if _, ok := tc.mutation.AmountDigits(); !ok {
-		v := transaction.DefaultAmountDigits
-		tc.mutation.SetAmountDigits(v)
-	}
 	if _, ok := tc.mutation.NeedManualReview(); !ok {
 		v := transaction.DefaultNeedManualReview
 		tc.mutation.SetNeedManualReview(v)
@@ -236,21 +224,11 @@ func (tc *TransactionCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (tc *TransactionCreate) check() error {
-	if _, ok := tc.mutation.AmountInt(); !ok {
-		return &ValidationError{Name: "amount_int", err: errors.New(`ent: missing required field "amount_int"`)}
+	if _, ok := tc.mutation.AmountUint64(); !ok {
+		return &ValidationError{Name: "amount_uint64", err: errors.New(`ent: missing required field "amount_uint64"`)}
 	}
-	if v, ok := tc.mutation.AmountInt(); ok {
-		if err := transaction.AmountIntValidator(v); err != nil {
-			return &ValidationError{Name: "amount_int", err: fmt.Errorf(`ent: validator failed for field "amount_int": %w`, err)}
-		}
-	}
-	if _, ok := tc.mutation.AmountDigits(); !ok {
-		return &ValidationError{Name: "amount_digits", err: errors.New(`ent: missing required field "amount_digits"`)}
-	}
-	if v, ok := tc.mutation.AmountDigits(); ok {
-		if err := transaction.AmountDigitsValidator(v); err != nil {
-			return &ValidationError{Name: "amount_digits", err: fmt.Errorf(`ent: validator failed for field "amount_digits": %w`, err)}
-		}
+	if _, ok := tc.mutation.AmountFloat64(); !ok {
+		return &ValidationError{Name: "amount_float64", err: errors.New(`ent: missing required field "amount_float64"`)}
 	}
 	if _, ok := tc.mutation.AddressFrom(); !ok {
 		return &ValidationError{Name: "address_from", err: errors.New(`ent: missing required field "address_from"`)}
@@ -348,21 +326,21 @@ func (tc *TransactionCreate) createSpec() (*Transaction, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := tc.mutation.AmountInt(); ok {
+	if value, ok := tc.mutation.AmountUint64(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeUint64,
 			Value:  value,
-			Column: transaction.FieldAmountInt,
+			Column: transaction.FieldAmountUint64,
 		})
-		_node.AmountInt = value
+		_node.AmountUint64 = value
 	}
-	if value, ok := tc.mutation.AmountDigits(); ok {
+	if value, ok := tc.mutation.AmountFloat64(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeFloat64,
 			Value:  value,
-			Column: transaction.FieldAmountDigits,
+			Column: transaction.FieldAmountFloat64,
 		})
-		_node.AmountDigits = value
+		_node.AmountFloat64 = value
 	}
 	if value, ok := tc.mutation.AddressFrom(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

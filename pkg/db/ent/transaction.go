@@ -16,10 +16,10 @@ type Transaction struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int32 `json:"id,omitempty"`
-	// AmountInt holds the value of the "amount_int" field.
-	AmountInt int `json:"amount_int,omitempty"`
-	// AmountDigits holds the value of the "amount_digits" field.
-	AmountDigits int `json:"amount_digits,omitempty"`
+	// AmountUint64 holds the value of the "amount_uint64" field.
+	AmountUint64 uint64 `json:"amount_uint64,omitempty"`
+	// AmountFloat64 holds the value of the "amount_float64" field.
+	AmountFloat64 float64 `json:"amount_float64,omitempty"`
 	// AddressFrom holds the value of the "address_from" field.
 	AddressFrom string `json:"address_from,omitempty"`
 	// AddressTo holds the value of the "address_to" field.
@@ -87,7 +87,9 @@ func (*Transaction) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case transaction.FieldNeedManualReview, transaction.FieldMutex:
 			values[i] = new(sql.NullBool)
-		case transaction.FieldID, transaction.FieldAmountInt, transaction.FieldAmountDigits, transaction.FieldCreatetimeUtc, transaction.FieldUpdatetimeUtc:
+		case transaction.FieldAmountFloat64:
+			values[i] = new(sql.NullFloat64)
+		case transaction.FieldID, transaction.FieldAmountUint64, transaction.FieldCreatetimeUtc, transaction.FieldUpdatetimeUtc:
 			values[i] = new(sql.NullInt64)
 		case transaction.FieldAddressFrom, transaction.FieldAddressTo, transaction.FieldType, transaction.FieldTransactionIDInsite, transaction.FieldTransactionIDChain, transaction.FieldStatus:
 			values[i] = new(sql.NullString)
@@ -114,17 +116,17 @@ func (t *Transaction) assignValues(columns []string, values []interface{}) error
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			t.ID = int32(value.Int64)
-		case transaction.FieldAmountInt:
+		case transaction.FieldAmountUint64:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field amount_int", values[i])
+				return fmt.Errorf("unexpected type %T for field amount_uint64", values[i])
 			} else if value.Valid {
-				t.AmountInt = int(value.Int64)
+				t.AmountUint64 = uint64(value.Int64)
 			}
-		case transaction.FieldAmountDigits:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field amount_digits", values[i])
+		case transaction.FieldAmountFloat64:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field amount_float64", values[i])
 			} else if value.Valid {
-				t.AmountDigits = int(value.Int64)
+				t.AmountFloat64 = value.Float64
 			}
 		case transaction.FieldAddressFrom:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -231,10 +233,10 @@ func (t *Transaction) String() string {
 	var builder strings.Builder
 	builder.WriteString("Transaction(")
 	builder.WriteString(fmt.Sprintf("id=%v", t.ID))
-	builder.WriteString(", amount_int=")
-	builder.WriteString(fmt.Sprintf("%v", t.AmountInt))
-	builder.WriteString(", amount_digits=")
-	builder.WriteString(fmt.Sprintf("%v", t.AmountDigits))
+	builder.WriteString(", amount_uint64=")
+	builder.WriteString(fmt.Sprintf("%v", t.AmountUint64))
+	builder.WriteString(", amount_float64=")
+	builder.WriteString(fmt.Sprintf("%v", t.AmountFloat64))
 	builder.WriteString(", address_from=")
 	builder.WriteString(t.AddressFrom)
 	builder.WriteString(", address_to=")

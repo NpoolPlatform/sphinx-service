@@ -11,10 +11,10 @@ const (
 	Label = "transaction"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldAmountInt holds the string denoting the amount_int field in the database.
-	FieldAmountInt = "amount_int"
-	// FieldAmountDigits holds the string denoting the amount_digits field in the database.
-	FieldAmountDigits = "amount_digits"
+	// FieldAmountUint64 holds the string denoting the amount_uint64 field in the database.
+	FieldAmountUint64 = "amount_uint64"
+	// FieldAmountFloat64 holds the string denoting the amount_float64 field in the database.
+	FieldAmountFloat64 = "amount_float64"
 	// FieldAddressFrom holds the string denoting the address_from field in the database.
 	FieldAddressFrom = "address_from"
 	// FieldAddressTo holds the string denoting the address_to field in the database.
@@ -60,8 +60,8 @@ const (
 // Columns holds all SQL columns for transaction fields.
 var Columns = []string{
 	FieldID,
-	FieldAmountInt,
-	FieldAmountDigits,
+	FieldAmountUint64,
+	FieldAmountFloat64,
 	FieldAddressFrom,
 	FieldAddressTo,
 	FieldNeedManualReview,
@@ -96,12 +96,6 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// AmountIntValidator is a validator for the "amount_int" field. It is called by the builders before save.
-	AmountIntValidator func(int) error
-	// DefaultAmountDigits holds the default value on creation for the "amount_digits" field.
-	DefaultAmountDigits int
-	// AmountDigitsValidator is a validator for the "amount_digits" field. It is called by the builders before save.
-	AmountDigitsValidator func(int) error
 	// AddressFromValidator is a validator for the "address_from" field. It is called by the builders before save.
 	AddressFromValidator func(string) error
 	// AddressToValidator is a validator for the "address_to" field. It is called by the builders before save.

@@ -328,12 +328,12 @@ func (tq *TransactionQuery) WithReview(opts ...func(*ReviewQuery)) *TransactionQ
 // Example:
 //
 //	var v []struct {
-//		AmountInt int `json:"amount_int,omitempty"`
+//		AmountUint64 uint64 `json:"amount_uint64,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Transaction.Query().
-//		GroupBy(transaction.FieldAmountInt).
+//		GroupBy(transaction.FieldAmountUint64).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -355,11 +355,11 @@ func (tq *TransactionQuery) GroupBy(field string, fields ...string) *Transaction
 // Example:
 //
 //	var v []struct {
-//		AmountInt int `json:"amount_int,omitempty"`
+//		AmountUint64 uint64 `json:"amount_uint64,omitempty"`
 //	}
 //
 //	client.Transaction.Query().
-//		Select(transaction.FieldAmountInt).
+//		Select(transaction.FieldAmountUint64).
 //		Scan(ctx, &v)
 //
 func (tq *TransactionQuery) Select(fields ...string) *TransactionSelect {

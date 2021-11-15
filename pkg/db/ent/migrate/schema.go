@@ -116,8 +116,8 @@ var (
 	// TransactionsColumns holds the columns for the "transactions" table.
 	TransactionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt32, Increment: true},
-		{Name: "amount_int", Type: field.TypeInt},
-		{Name: "amount_digits", Type: field.TypeInt, Default: 9},
+		{Name: "amount_uint64", Type: field.TypeUint64},
+		{Name: "amount_float64", Type: field.TypeFloat64},
 		{Name: "address_from", Type: field.TypeString, Size: 64},
 		{Name: "address_to", Type: field.TypeString, Size: 64},
 		{Name: "need_manual_review", Type: field.TypeBool, Default: true},

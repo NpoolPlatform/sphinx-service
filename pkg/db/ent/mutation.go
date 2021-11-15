@@ -2096,10 +2096,10 @@ type TransactionMutation struct {
 	op                    Op
 	typ                   string
 	id                    *int32
-	amount_int            *int
-	addamount_int         *int
-	amount_digits         *int
-	addamount_digits      *int
+	amount_uint64         *uint64
+	addamount_uint64      *uint64
+	amount_float64        *float64
+	addamount_float64     *float64
 	address_from          *string
 	address_to            *string
 	need_manual_review    *bool
@@ -2208,116 +2208,116 @@ func (m *TransactionMutation) ID() (id int32, exists bool) {
 	return *m.id, true
 }
 
-// SetAmountInt sets the "amount_int" field.
-func (m *TransactionMutation) SetAmountInt(i int) {
-	m.amount_int = &i
-	m.addamount_int = nil
+// SetAmountUint64 sets the "amount_uint64" field.
+func (m *TransactionMutation) SetAmountUint64(u uint64) {
+	m.amount_uint64 = &u
+	m.addamount_uint64 = nil
 }
 
-// AmountInt returns the value of the "amount_int" field in the mutation.
-func (m *TransactionMutation) AmountInt() (r int, exists bool) {
-	v := m.amount_int
+// AmountUint64 returns the value of the "amount_uint64" field in the mutation.
+func (m *TransactionMutation) AmountUint64() (r uint64, exists bool) {
+	v := m.amount_uint64
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldAmountInt returns the old "amount_int" field's value of the Transaction entity.
+// OldAmountUint64 returns the old "amount_uint64" field's value of the Transaction entity.
 // If the Transaction object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TransactionMutation) OldAmountInt(ctx context.Context) (v int, err error) {
+func (m *TransactionMutation) OldAmountUint64(ctx context.Context) (v uint64, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldAmountInt is only allowed on UpdateOne operations")
+		return v, fmt.Errorf("OldAmountUint64 is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldAmountInt requires an ID field in the mutation")
+		return v, fmt.Errorf("OldAmountUint64 requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldAmountInt: %w", err)
+		return v, fmt.Errorf("querying old value for OldAmountUint64: %w", err)
 	}
-	return oldValue.AmountInt, nil
+	return oldValue.AmountUint64, nil
 }
 
-// AddAmountInt adds i to the "amount_int" field.
-func (m *TransactionMutation) AddAmountInt(i int) {
-	if m.addamount_int != nil {
-		*m.addamount_int += i
+// AddAmountUint64 adds u to the "amount_uint64" field.
+func (m *TransactionMutation) AddAmountUint64(u uint64) {
+	if m.addamount_uint64 != nil {
+		*m.addamount_uint64 += u
 	} else {
-		m.addamount_int = &i
+		m.addamount_uint64 = &u
 	}
 }
 
-// AddedAmountInt returns the value that was added to the "amount_int" field in this mutation.
-func (m *TransactionMutation) AddedAmountInt() (r int, exists bool) {
-	v := m.addamount_int
+// AddedAmountUint64 returns the value that was added to the "amount_uint64" field in this mutation.
+func (m *TransactionMutation) AddedAmountUint64() (r uint64, exists bool) {
+	v := m.addamount_uint64
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetAmountInt resets all changes to the "amount_int" field.
-func (m *TransactionMutation) ResetAmountInt() {
-	m.amount_int = nil
-	m.addamount_int = nil
+// ResetAmountUint64 resets all changes to the "amount_uint64" field.
+func (m *TransactionMutation) ResetAmountUint64() {
+	m.amount_uint64 = nil
+	m.addamount_uint64 = nil
 }
 
-// SetAmountDigits sets the "amount_digits" field.
-func (m *TransactionMutation) SetAmountDigits(i int) {
-	m.amount_digits = &i
-	m.addamount_digits = nil
+// SetAmountFloat64 sets the "amount_float64" field.
+func (m *TransactionMutation) SetAmountFloat64(f float64) {
+	m.amount_float64 = &f
+	m.addamount_float64 = nil
 }
 
-// AmountDigits returns the value of the "amount_digits" field in the mutation.
-func (m *TransactionMutation) AmountDigits() (r int, exists bool) {
-	v := m.amount_digits
+// AmountFloat64 returns the value of the "amount_float64" field in the mutation.
+func (m *TransactionMutation) AmountFloat64() (r float64, exists bool) {
+	v := m.amount_float64
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldAmountDigits returns the old "amount_digits" field's value of the Transaction entity.
+// OldAmountFloat64 returns the old "amount_float64" field's value of the Transaction entity.
 // If the Transaction object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TransactionMutation) OldAmountDigits(ctx context.Context) (v int, err error) {
+func (m *TransactionMutation) OldAmountFloat64(ctx context.Context) (v float64, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldAmountDigits is only allowed on UpdateOne operations")
+		return v, fmt.Errorf("OldAmountFloat64 is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldAmountDigits requires an ID field in the mutation")
+		return v, fmt.Errorf("OldAmountFloat64 requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldAmountDigits: %w", err)
+		return v, fmt.Errorf("querying old value for OldAmountFloat64: %w", err)
 	}
-	return oldValue.AmountDigits, nil
+	return oldValue.AmountFloat64, nil
 }
 
-// AddAmountDigits adds i to the "amount_digits" field.
-func (m *TransactionMutation) AddAmountDigits(i int) {
-	if m.addamount_digits != nil {
-		*m.addamount_digits += i
+// AddAmountFloat64 adds f to the "amount_float64" field.
+func (m *TransactionMutation) AddAmountFloat64(f float64) {
+	if m.addamount_float64 != nil {
+		*m.addamount_float64 += f
 	} else {
-		m.addamount_digits = &i
+		m.addamount_float64 = &f
 	}
 }
 
-// AddedAmountDigits returns the value that was added to the "amount_digits" field in this mutation.
-func (m *TransactionMutation) AddedAmountDigits() (r int, exists bool) {
-	v := m.addamount_digits
+// AddedAmountFloat64 returns the value that was added to the "amount_float64" field in this mutation.
+func (m *TransactionMutation) AddedAmountFloat64() (r float64, exists bool) {
+	v := m.addamount_float64
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetAmountDigits resets all changes to the "amount_digits" field.
-func (m *TransactionMutation) ResetAmountDigits() {
-	m.amount_digits = nil
-	m.addamount_digits = nil
+// ResetAmountFloat64 resets all changes to the "amount_float64" field.
+func (m *TransactionMutation) ResetAmountFloat64() {
+	m.amount_float64 = nil
+	m.addamount_float64 = nil
 }
 
 // SetAddressFrom sets the "address_from" field.
@@ -2833,11 +2833,11 @@ func (m *TransactionMutation) Type() string {
 // AddedFields().
 func (m *TransactionMutation) Fields() []string {
 	fields := make([]string, 0, 12)
-	if m.amount_int != nil {
-		fields = append(fields, transaction.FieldAmountInt)
+	if m.amount_uint64 != nil {
+		fields = append(fields, transaction.FieldAmountUint64)
 	}
-	if m.amount_digits != nil {
-		fields = append(fields, transaction.FieldAmountDigits)
+	if m.amount_float64 != nil {
+		fields = append(fields, transaction.FieldAmountFloat64)
 	}
 	if m.address_from != nil {
 		fields = append(fields, transaction.FieldAddressFrom)
@@ -2877,10 +2877,10 @@ func (m *TransactionMutation) Fields() []string {
 // schema.
 func (m *TransactionMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case transaction.FieldAmountInt:
-		return m.AmountInt()
-	case transaction.FieldAmountDigits:
-		return m.AmountDigits()
+	case transaction.FieldAmountUint64:
+		return m.AmountUint64()
+	case transaction.FieldAmountFloat64:
+		return m.AmountFloat64()
 	case transaction.FieldAddressFrom:
 		return m.AddressFrom()
 	case transaction.FieldAddressTo:
@@ -2910,10 +2910,10 @@ func (m *TransactionMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *TransactionMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case transaction.FieldAmountInt:
-		return m.OldAmountInt(ctx)
-	case transaction.FieldAmountDigits:
-		return m.OldAmountDigits(ctx)
+	case transaction.FieldAmountUint64:
+		return m.OldAmountUint64(ctx)
+	case transaction.FieldAmountFloat64:
+		return m.OldAmountFloat64(ctx)
 	case transaction.FieldAddressFrom:
 		return m.OldAddressFrom(ctx)
 	case transaction.FieldAddressTo:
@@ -2943,19 +2943,19 @@ func (m *TransactionMutation) OldField(ctx context.Context, name string) (ent.Va
 // type.
 func (m *TransactionMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case transaction.FieldAmountInt:
-		v, ok := value.(int)
+	case transaction.FieldAmountUint64:
+		v, ok := value.(uint64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetAmountInt(v)
+		m.SetAmountUint64(v)
 		return nil
-	case transaction.FieldAmountDigits:
-		v, ok := value.(int)
+	case transaction.FieldAmountFloat64:
+		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetAmountDigits(v)
+		m.SetAmountFloat64(v)
 		return nil
 	case transaction.FieldAddressFrom:
 		v, ok := value.(string)
@@ -3035,11 +3035,11 @@ func (m *TransactionMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *TransactionMutation) AddedFields() []string {
 	var fields []string
-	if m.addamount_int != nil {
-		fields = append(fields, transaction.FieldAmountInt)
+	if m.addamount_uint64 != nil {
+		fields = append(fields, transaction.FieldAmountUint64)
 	}
-	if m.addamount_digits != nil {
-		fields = append(fields, transaction.FieldAmountDigits)
+	if m.addamount_float64 != nil {
+		fields = append(fields, transaction.FieldAmountFloat64)
 	}
 	if m.addcreatetime_utc != nil {
 		fields = append(fields, transaction.FieldCreatetimeUtc)
@@ -3055,10 +3055,10 @@ func (m *TransactionMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *TransactionMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case transaction.FieldAmountInt:
-		return m.AddedAmountInt()
-	case transaction.FieldAmountDigits:
-		return m.AddedAmountDigits()
+	case transaction.FieldAmountUint64:
+		return m.AddedAmountUint64()
+	case transaction.FieldAmountFloat64:
+		return m.AddedAmountFloat64()
 	case transaction.FieldCreatetimeUtc:
 		return m.AddedCreatetimeUtc()
 	case transaction.FieldUpdatetimeUtc:
@@ -3072,19 +3072,19 @@ func (m *TransactionMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *TransactionMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case transaction.FieldAmountInt:
-		v, ok := value.(int)
+	case transaction.FieldAmountUint64:
+		v, ok := value.(uint64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddAmountInt(v)
+		m.AddAmountUint64(v)
 		return nil
-	case transaction.FieldAmountDigits:
-		v, ok := value.(int)
+	case transaction.FieldAmountFloat64:
+		v, ok := value.(float64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddAmountDigits(v)
+		m.AddAmountFloat64(v)
 		return nil
 	case transaction.FieldCreatetimeUtc:
 		v, ok := value.(int)
@@ -3127,11 +3127,11 @@ func (m *TransactionMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *TransactionMutation) ResetField(name string) error {
 	switch name {
-	case transaction.FieldAmountInt:
-		m.ResetAmountInt()
+	case transaction.FieldAmountUint64:
+		m.ResetAmountUint64()
 		return nil
-	case transaction.FieldAmountDigits:
-		m.ResetAmountDigits()
+	case transaction.FieldAmountFloat64:
+		m.ResetAmountFloat64()
 		return nil
 	case transaction.FieldAddressFrom:
 		m.ResetAddressFrom()

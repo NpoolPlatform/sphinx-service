@@ -14,8 +14,8 @@ type Transaction struct {
 func (Transaction) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int32("id"),
-		field.Int("amount_int").Positive(),
-		field.Int("amount_digits").NonNegative().Default(9),
+		field.Uint64("amount_uint64"),
+		field.Float("amount_float64"),
 		field.String("address_from").MaxLen(64).NotEmpty(),
 		field.String("address_to").MaxLen(64).NotEmpty(),
 		field.Bool("need_manual_review").Default(true),
