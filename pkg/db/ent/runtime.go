@@ -158,4 +158,12 @@ func init() {
 	transactionDescMutex := transactionFields[10].Descriptor()
 	// transaction.DefaultMutex holds the default value on creation for the mutex field.
 	transaction.DefaultMutex = transactionDescMutex.Default.(bool)
+	// transactionDescSignatureUser is the schema descriptor for signature_user field.
+	transactionDescSignatureUser := transactionFields[11].Descriptor()
+	// transaction.SignatureUserValidator is a validator for the "signature_user" field. It is called by the builders before save.
+	transaction.SignatureUserValidator = transactionDescSignatureUser.Validators[0].(func(string) error)
+	// transactionDescSignaturePlatform is the schema descriptor for signature_platform field.
+	transactionDescSignaturePlatform := transactionFields[12].Descriptor()
+	// transaction.SignaturePlatformValidator is a validator for the "signature_platform" field. It is called by the builders before save.
+	transaction.SignaturePlatformValidator = transactionDescSignaturePlatform.Validators[0].(func(string) error)
 }

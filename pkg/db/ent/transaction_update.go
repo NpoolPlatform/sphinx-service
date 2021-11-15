@@ -119,6 +119,18 @@ func (tu *TransactionUpdate) SetNillableMutex(b *bool) *TransactionUpdate {
 	return tu
 }
 
+// SetSignatureUser sets the "signature_user" field.
+func (tu *TransactionUpdate) SetSignatureUser(s string) *TransactionUpdate {
+	tu.mutation.SetSignatureUser(s)
+	return tu
+}
+
+// SetSignaturePlatform sets the "signature_platform" field.
+func (tu *TransactionUpdate) SetSignaturePlatform(s string) *TransactionUpdate {
+	tu.mutation.SetSignaturePlatform(s)
+	return tu
+}
+
 // SetCreatetimeUtc sets the "createtime_utc" field.
 func (tu *TransactionUpdate) SetCreatetimeUtc(i int) *TransactionUpdate {
 	tu.mutation.ResetCreatetimeUtc()
@@ -295,6 +307,16 @@ func (tu *TransactionUpdate) check() error {
 			return &ValidationError{Name: "status", err: fmt.Errorf("ent: validator failed for field \"status\": %w", err)}
 		}
 	}
+	if v, ok := tu.mutation.SignatureUser(); ok {
+		if err := transaction.SignatureUserValidator(v); err != nil {
+			return &ValidationError{Name: "signature_user", err: fmt.Errorf("ent: validator failed for field \"signature_user\": %w", err)}
+		}
+	}
+	if v, ok := tu.mutation.SignaturePlatform(); ok {
+		if err := transaction.SignaturePlatformValidator(v); err != nil {
+			return &ValidationError{Name: "signature_platform", err: fmt.Errorf("ent: validator failed for field \"signature_platform\": %w", err)}
+		}
+	}
 	if _, ok := tu.mutation.CoinID(); tu.mutation.CoinCleared() && !ok {
 		return errors.New("ent: clearing a required unique edge \"coin\"")
 	}
@@ -401,6 +423,20 @@ func (tu *TransactionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeBool,
 			Value:  value,
 			Column: transaction.FieldMutex,
+		})
+	}
+	if value, ok := tu.mutation.SignatureUser(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: transaction.FieldSignatureUser,
+		})
+	}
+	if value, ok := tu.mutation.SignaturePlatform(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: transaction.FieldSignaturePlatform,
 		})
 	}
 	if value, ok := tu.mutation.CreatetimeUtc(); ok {
@@ -629,6 +665,18 @@ func (tuo *TransactionUpdateOne) SetNillableMutex(b *bool) *TransactionUpdateOne
 	return tuo
 }
 
+// SetSignatureUser sets the "signature_user" field.
+func (tuo *TransactionUpdateOne) SetSignatureUser(s string) *TransactionUpdateOne {
+	tuo.mutation.SetSignatureUser(s)
+	return tuo
+}
+
+// SetSignaturePlatform sets the "signature_platform" field.
+func (tuo *TransactionUpdateOne) SetSignaturePlatform(s string) *TransactionUpdateOne {
+	tuo.mutation.SetSignaturePlatform(s)
+	return tuo
+}
+
 // SetCreatetimeUtc sets the "createtime_utc" field.
 func (tuo *TransactionUpdateOne) SetCreatetimeUtc(i int) *TransactionUpdateOne {
 	tuo.mutation.ResetCreatetimeUtc()
@@ -812,6 +860,16 @@ func (tuo *TransactionUpdateOne) check() error {
 			return &ValidationError{Name: "status", err: fmt.Errorf("ent: validator failed for field \"status\": %w", err)}
 		}
 	}
+	if v, ok := tuo.mutation.SignatureUser(); ok {
+		if err := transaction.SignatureUserValidator(v); err != nil {
+			return &ValidationError{Name: "signature_user", err: fmt.Errorf("ent: validator failed for field \"signature_user\": %w", err)}
+		}
+	}
+	if v, ok := tuo.mutation.SignaturePlatform(); ok {
+		if err := transaction.SignaturePlatformValidator(v); err != nil {
+			return &ValidationError{Name: "signature_platform", err: fmt.Errorf("ent: validator failed for field \"signature_platform\": %w", err)}
+		}
+	}
 	if _, ok := tuo.mutation.CoinID(); tuo.mutation.CoinCleared() && !ok {
 		return errors.New("ent: clearing a required unique edge \"coin\"")
 	}
@@ -935,6 +993,20 @@ func (tuo *TransactionUpdateOne) sqlSave(ctx context.Context) (_node *Transactio
 			Type:   field.TypeBool,
 			Value:  value,
 			Column: transaction.FieldMutex,
+		})
+	}
+	if value, ok := tuo.mutation.SignatureUser(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: transaction.FieldSignatureUser,
+		})
+	}
+	if value, ok := tuo.mutation.SignaturePlatform(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: transaction.FieldSignaturePlatform,
 		})
 	}
 	if value, ok := tuo.mutation.CreatetimeUtc(); ok {

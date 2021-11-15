@@ -97,6 +97,18 @@ func (tc *TransactionCreate) SetNillableMutex(b *bool) *TransactionCreate {
 	return tc
 }
 
+// SetSignatureUser sets the "signature_user" field.
+func (tc *TransactionCreate) SetSignatureUser(s string) *TransactionCreate {
+	tc.mutation.SetSignatureUser(s)
+	return tc
+}
+
+// SetSignaturePlatform sets the "signature_platform" field.
+func (tc *TransactionCreate) SetSignaturePlatform(s string) *TransactionCreate {
+	tc.mutation.SetSignaturePlatform(s)
+	return tc
+}
+
 // SetCreatetimeUtc sets the "createtime_utc" field.
 func (tc *TransactionCreate) SetCreatetimeUtc(i int) *TransactionCreate {
 	tc.mutation.SetCreatetimeUtc(i)
@@ -284,6 +296,22 @@ func (tc *TransactionCreate) check() error {
 	if _, ok := tc.mutation.Mutex(); !ok {
 		return &ValidationError{Name: "mutex", err: errors.New(`ent: missing required field "mutex"`)}
 	}
+	if _, ok := tc.mutation.SignatureUser(); !ok {
+		return &ValidationError{Name: "signature_user", err: errors.New(`ent: missing required field "signature_user"`)}
+	}
+	if v, ok := tc.mutation.SignatureUser(); ok {
+		if err := transaction.SignatureUserValidator(v); err != nil {
+			return &ValidationError{Name: "signature_user", err: fmt.Errorf(`ent: validator failed for field "signature_user": %w`, err)}
+		}
+	}
+	if _, ok := tc.mutation.SignaturePlatform(); !ok {
+		return &ValidationError{Name: "signature_platform", err: errors.New(`ent: missing required field "signature_platform"`)}
+	}
+	if v, ok := tc.mutation.SignaturePlatform(); ok {
+		if err := transaction.SignaturePlatformValidator(v); err != nil {
+			return &ValidationError{Name: "signature_platform", err: fmt.Errorf(`ent: validator failed for field "signature_platform": %w`, err)}
+		}
+	}
 	if _, ok := tc.mutation.CreatetimeUtc(); !ok {
 		return &ValidationError{Name: "createtime_utc", err: errors.New(`ent: missing required field "createtime_utc"`)}
 	}
@@ -405,6 +433,22 @@ func (tc *TransactionCreate) createSpec() (*Transaction, *sqlgraph.CreateSpec) {
 			Column: transaction.FieldMutex,
 		})
 		_node.Mutex = value
+	}
+	if value, ok := tc.mutation.SignatureUser(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: transaction.FieldSignatureUser,
+		})
+		_node.SignatureUser = value
+	}
+	if value, ok := tc.mutation.SignaturePlatform(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: transaction.FieldSignaturePlatform,
+		})
+		_node.SignaturePlatform = value
 	}
 	if value, ok := tc.mutation.CreatetimeUtc(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

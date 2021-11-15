@@ -95,6 +95,7 @@ ApplyTransaction 参数
 | address_to | [string](#string) |  | 接收方 |
 | amount_float64 | [double](#double) |  | 不入库的参考金额 |
 | amount_uint64 | [uint64](#uint64) |  | 内部交互标准金额格式 |
+| type | [string](#string) |  | recharge, payment, withdraw |
 | uuid_signature | [string](#string) |  | 2FA的时效性验证码，前期可以留空 |
 | createtime_utc | [int64](#int64) |  | 用户提交请求时的时间戳，与2FA绑定 |
 

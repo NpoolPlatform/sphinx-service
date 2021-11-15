@@ -31,6 +31,10 @@ const (
 	FieldStatus = "status"
 	// FieldMutex holds the string denoting the mutex field in the database.
 	FieldMutex = "mutex"
+	// FieldSignatureUser holds the string denoting the signature_user field in the database.
+	FieldSignatureUser = "signature_user"
+	// FieldSignaturePlatform holds the string denoting the signature_platform field in the database.
+	FieldSignaturePlatform = "signature_platform"
 	// FieldCreatetimeUtc holds the string denoting the createtime_utc field in the database.
 	FieldCreatetimeUtc = "createtime_utc"
 	// FieldUpdatetimeUtc holds the string denoting the updatetime_utc field in the database.
@@ -70,6 +74,8 @@ var Columns = []string{
 	FieldTransactionIDChain,
 	FieldStatus,
 	FieldMutex,
+	FieldSignatureUser,
+	FieldSignaturePlatform,
 	FieldCreatetimeUtc,
 	FieldUpdatetimeUtc,
 }
@@ -108,6 +114,10 @@ var (
 	TransactionIDChainValidator func(string) error
 	// DefaultMutex holds the default value on creation for the "mutex" field.
 	DefaultMutex bool
+	// SignatureUserValidator is a validator for the "signature_user" field. It is called by the builders before save.
+	SignatureUserValidator func(string) error
+	// SignaturePlatformValidator is a validator for the "signature_platform" field. It is called by the builders before save.
+	SignaturePlatformValidator func(string) error
 )
 
 // Type defines the type for the "type" enum field.

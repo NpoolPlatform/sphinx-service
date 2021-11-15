@@ -147,6 +147,20 @@ func Mutex(v bool) predicate.Transaction {
 	})
 }
 
+// SignatureUser applies equality check predicate on the "signature_user" field. It's identical to SignatureUserEQ.
+func SignatureUser(v string) predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldSignatureUser), v))
+	})
+}
+
+// SignaturePlatform applies equality check predicate on the "signature_platform" field. It's identical to SignaturePlatformEQ.
+func SignaturePlatform(v string) predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldSignaturePlatform), v))
+	})
+}
+
 // CreatetimeUtc applies equality check predicate on the "createtime_utc" field. It's identical to CreatetimeUtcEQ.
 func CreatetimeUtc(v int) predicate.Transaction {
 	return predicate.Transaction(func(s *sql.Selector) {
@@ -878,6 +892,228 @@ func MutexEQ(v bool) predicate.Transaction {
 func MutexNEQ(v bool) predicate.Transaction {
 	return predicate.Transaction(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldMutex), v))
+	})
+}
+
+// SignatureUserEQ applies the EQ predicate on the "signature_user" field.
+func SignatureUserEQ(v string) predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldSignatureUser), v))
+	})
+}
+
+// SignatureUserNEQ applies the NEQ predicate on the "signature_user" field.
+func SignatureUserNEQ(v string) predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldSignatureUser), v))
+	})
+}
+
+// SignatureUserIn applies the In predicate on the "signature_user" field.
+func SignatureUserIn(vs ...string) predicate.Transaction {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Transaction(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldSignatureUser), v...))
+	})
+}
+
+// SignatureUserNotIn applies the NotIn predicate on the "signature_user" field.
+func SignatureUserNotIn(vs ...string) predicate.Transaction {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Transaction(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldSignatureUser), v...))
+	})
+}
+
+// SignatureUserGT applies the GT predicate on the "signature_user" field.
+func SignatureUserGT(v string) predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldSignatureUser), v))
+	})
+}
+
+// SignatureUserGTE applies the GTE predicate on the "signature_user" field.
+func SignatureUserGTE(v string) predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldSignatureUser), v))
+	})
+}
+
+// SignatureUserLT applies the LT predicate on the "signature_user" field.
+func SignatureUserLT(v string) predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldSignatureUser), v))
+	})
+}
+
+// SignatureUserLTE applies the LTE predicate on the "signature_user" field.
+func SignatureUserLTE(v string) predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldSignatureUser), v))
+	})
+}
+
+// SignatureUserContains applies the Contains predicate on the "signature_user" field.
+func SignatureUserContains(v string) predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldSignatureUser), v))
+	})
+}
+
+// SignatureUserHasPrefix applies the HasPrefix predicate on the "signature_user" field.
+func SignatureUserHasPrefix(v string) predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldSignatureUser), v))
+	})
+}
+
+// SignatureUserHasSuffix applies the HasSuffix predicate on the "signature_user" field.
+func SignatureUserHasSuffix(v string) predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldSignatureUser), v))
+	})
+}
+
+// SignatureUserEqualFold applies the EqualFold predicate on the "signature_user" field.
+func SignatureUserEqualFold(v string) predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldSignatureUser), v))
+	})
+}
+
+// SignatureUserContainsFold applies the ContainsFold predicate on the "signature_user" field.
+func SignatureUserContainsFold(v string) predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldSignatureUser), v))
+	})
+}
+
+// SignaturePlatformEQ applies the EQ predicate on the "signature_platform" field.
+func SignaturePlatformEQ(v string) predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldSignaturePlatform), v))
+	})
+}
+
+// SignaturePlatformNEQ applies the NEQ predicate on the "signature_platform" field.
+func SignaturePlatformNEQ(v string) predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldSignaturePlatform), v))
+	})
+}
+
+// SignaturePlatformIn applies the In predicate on the "signature_platform" field.
+func SignaturePlatformIn(vs ...string) predicate.Transaction {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Transaction(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldSignaturePlatform), v...))
+	})
+}
+
+// SignaturePlatformNotIn applies the NotIn predicate on the "signature_platform" field.
+func SignaturePlatformNotIn(vs ...string) predicate.Transaction {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Transaction(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldSignaturePlatform), v...))
+	})
+}
+
+// SignaturePlatformGT applies the GT predicate on the "signature_platform" field.
+func SignaturePlatformGT(v string) predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldSignaturePlatform), v))
+	})
+}
+
+// SignaturePlatformGTE applies the GTE predicate on the "signature_platform" field.
+func SignaturePlatformGTE(v string) predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldSignaturePlatform), v))
+	})
+}
+
+// SignaturePlatformLT applies the LT predicate on the "signature_platform" field.
+func SignaturePlatformLT(v string) predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldSignaturePlatform), v))
+	})
+}
+
+// SignaturePlatformLTE applies the LTE predicate on the "signature_platform" field.
+func SignaturePlatformLTE(v string) predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldSignaturePlatform), v))
+	})
+}
+
+// SignaturePlatformContains applies the Contains predicate on the "signature_platform" field.
+func SignaturePlatformContains(v string) predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldSignaturePlatform), v))
+	})
+}
+
+// SignaturePlatformHasPrefix applies the HasPrefix predicate on the "signature_platform" field.
+func SignaturePlatformHasPrefix(v string) predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldSignaturePlatform), v))
+	})
+}
+
+// SignaturePlatformHasSuffix applies the HasSuffix predicate on the "signature_platform" field.
+func SignaturePlatformHasSuffix(v string) predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldSignaturePlatform), v))
+	})
+}
+
+// SignaturePlatformEqualFold applies the EqualFold predicate on the "signature_platform" field.
+func SignaturePlatformEqualFold(v string) predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldSignaturePlatform), v))
+	})
+}
+
+// SignaturePlatformContainsFold applies the ContainsFold predicate on the "signature_platform" field.
+func SignaturePlatformContainsFold(v string) predicate.Transaction {
+	return predicate.Transaction(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldSignaturePlatform), v))
 	})
 }
 

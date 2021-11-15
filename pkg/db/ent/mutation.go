@@ -2108,6 +2108,8 @@ type TransactionMutation struct {
 	transaction_id_chain  *string
 	status                *transaction.Status
 	mutex                 *bool
+	signature_user        *string
+	signature_platform    *string
 	createtime_utc        *int
 	addcreatetime_utc     *int
 	updatetime_utc        *int
@@ -2608,6 +2610,78 @@ func (m *TransactionMutation) ResetMutex() {
 	m.mutex = nil
 }
 
+// SetSignatureUser sets the "signature_user" field.
+func (m *TransactionMutation) SetSignatureUser(s string) {
+	m.signature_user = &s
+}
+
+// SignatureUser returns the value of the "signature_user" field in the mutation.
+func (m *TransactionMutation) SignatureUser() (r string, exists bool) {
+	v := m.signature_user
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSignatureUser returns the old "signature_user" field's value of the Transaction entity.
+// If the Transaction object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TransactionMutation) OldSignatureUser(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldSignatureUser is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldSignatureUser requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSignatureUser: %w", err)
+	}
+	return oldValue.SignatureUser, nil
+}
+
+// ResetSignatureUser resets all changes to the "signature_user" field.
+func (m *TransactionMutation) ResetSignatureUser() {
+	m.signature_user = nil
+}
+
+// SetSignaturePlatform sets the "signature_platform" field.
+func (m *TransactionMutation) SetSignaturePlatform(s string) {
+	m.signature_platform = &s
+}
+
+// SignaturePlatform returns the value of the "signature_platform" field in the mutation.
+func (m *TransactionMutation) SignaturePlatform() (r string, exists bool) {
+	v := m.signature_platform
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSignaturePlatform returns the old "signature_platform" field's value of the Transaction entity.
+// If the Transaction object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TransactionMutation) OldSignaturePlatform(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldSignaturePlatform is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldSignaturePlatform requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSignaturePlatform: %w", err)
+	}
+	return oldValue.SignaturePlatform, nil
+}
+
+// ResetSignaturePlatform resets all changes to the "signature_platform" field.
+func (m *TransactionMutation) ResetSignaturePlatform() {
+	m.signature_platform = nil
+}
+
 // SetCreatetimeUtc sets the "createtime_utc" field.
 func (m *TransactionMutation) SetCreatetimeUtc(i int) {
 	m.createtime_utc = &i
@@ -2832,7 +2906,7 @@ func (m *TransactionMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TransactionMutation) Fields() []string {
-	fields := make([]string, 0, 12)
+	fields := make([]string, 0, 14)
 	if m.amount_uint64 != nil {
 		fields = append(fields, transaction.FieldAmountUint64)
 	}
@@ -2862,6 +2936,12 @@ func (m *TransactionMutation) Fields() []string {
 	}
 	if m.mutex != nil {
 		fields = append(fields, transaction.FieldMutex)
+	}
+	if m.signature_user != nil {
+		fields = append(fields, transaction.FieldSignatureUser)
+	}
+	if m.signature_platform != nil {
+		fields = append(fields, transaction.FieldSignaturePlatform)
 	}
 	if m.createtime_utc != nil {
 		fields = append(fields, transaction.FieldCreatetimeUtc)
@@ -2897,6 +2977,10 @@ func (m *TransactionMutation) Field(name string) (ent.Value, bool) {
 		return m.Status()
 	case transaction.FieldMutex:
 		return m.Mutex()
+	case transaction.FieldSignatureUser:
+		return m.SignatureUser()
+	case transaction.FieldSignaturePlatform:
+		return m.SignaturePlatform()
 	case transaction.FieldCreatetimeUtc:
 		return m.CreatetimeUtc()
 	case transaction.FieldUpdatetimeUtc:
@@ -2930,6 +3014,10 @@ func (m *TransactionMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldStatus(ctx)
 	case transaction.FieldMutex:
 		return m.OldMutex(ctx)
+	case transaction.FieldSignatureUser:
+		return m.OldSignatureUser(ctx)
+	case transaction.FieldSignaturePlatform:
+		return m.OldSignaturePlatform(ctx)
 	case transaction.FieldCreatetimeUtc:
 		return m.OldCreatetimeUtc(ctx)
 	case transaction.FieldUpdatetimeUtc:
@@ -3012,6 +3100,20 @@ func (m *TransactionMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetMutex(v)
+		return nil
+	case transaction.FieldSignatureUser:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSignatureUser(v)
+		return nil
+	case transaction.FieldSignaturePlatform:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSignaturePlatform(v)
 		return nil
 	case transaction.FieldCreatetimeUtc:
 		v, ok := value.(int)
@@ -3156,6 +3258,12 @@ func (m *TransactionMutation) ResetField(name string) error {
 		return nil
 	case transaction.FieldMutex:
 		m.ResetMutex()
+		return nil
+	case transaction.FieldSignatureUser:
+		m.ResetSignatureUser()
+		return nil
+	case transaction.FieldSignaturePlatform:
+		m.ResetSignaturePlatform()
 		return nil
 	case transaction.FieldCreatetimeUtc:
 		m.ResetCreatetimeUtc()

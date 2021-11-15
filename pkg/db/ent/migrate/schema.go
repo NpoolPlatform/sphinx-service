@@ -126,6 +126,8 @@ var (
 		{Name: "transaction_id_chain", Type: field.TypeString, Size: 80},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"pending_review", "pending_process", "pending_signinfo", "pending_signaction", "pending_broadcast", "pending_confirm", "done", "rejected", "error", "error_expected"}},
 		{Name: "mutex", Type: field.TypeBool, Default: false},
+		{Name: "signature_user", Type: field.TypeString, Size: 16},
+		{Name: "signature_platform", Type: field.TypeString, Size: 64},
 		{Name: "createtime_utc", Type: field.TypeInt},
 		{Name: "updatetime_utc", Type: field.TypeInt},
 		{Name: "coin_info_transactions", Type: field.TypeInt32, Nullable: true},
@@ -138,7 +140,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "transactions_coin_infos_transactions",
-				Columns:    []*schema.Column{TransactionsColumns[13]},
+				Columns:    []*schema.Column{TransactionsColumns[15]},
 				RefColumns: []*schema.Column{CoinInfosColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -167,17 +169,17 @@ var (
 			{
 				Name:    "transaction_createtime_utc",
 				Unique:  false,
-				Columns: []*schema.Column{TransactionsColumns[11]},
+				Columns: []*schema.Column{TransactionsColumns[13]},
 			},
 			{
 				Name:    "transaction_transaction_id_insite_coin_info_transactions",
 				Unique:  true,
-				Columns: []*schema.Column{TransactionsColumns[7], TransactionsColumns[13]},
+				Columns: []*schema.Column{TransactionsColumns[7], TransactionsColumns[15]},
 			},
 			{
 				Name:    "transaction_transaction_id_chain_coin_info_transactions",
 				Unique:  true,
-				Columns: []*schema.Column{TransactionsColumns[8], TransactionsColumns[13]},
+				Columns: []*schema.Column{TransactionsColumns[8], TransactionsColumns[15]},
 			},
 		},
 	}

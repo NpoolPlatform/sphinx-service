@@ -36,6 +36,10 @@ type Transaction struct {
 	Status transaction.Status `json:"status,omitempty"`
 	// Mutex holds the value of the "mutex" field.
 	Mutex bool `json:"mutex,omitempty"`
+	// SignatureUser holds the value of the "signature_user" field.
+	SignatureUser string `json:"signature_user,omitempty"`
+	// SignaturePlatform holds the value of the "signature_platform" field.
+	SignaturePlatform string `json:"signature_platform,omitempty"`
 	// CreatetimeUtc holds the value of the "createtime_utc" field.
 	CreatetimeUtc int `json:"createtime_utc,omitempty"`
 	// UpdatetimeUtc holds the value of the "updatetime_utc" field.
@@ -91,7 +95,7 @@ func (*Transaction) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullFloat64)
 		case transaction.FieldID, transaction.FieldAmountUint64, transaction.FieldCreatetimeUtc, transaction.FieldUpdatetimeUtc:
 			values[i] = new(sql.NullInt64)
-		case transaction.FieldAddressFrom, transaction.FieldAddressTo, transaction.FieldType, transaction.FieldTransactionIDInsite, transaction.FieldTransactionIDChain, transaction.FieldStatus:
+		case transaction.FieldAddressFrom, transaction.FieldAddressTo, transaction.FieldType, transaction.FieldTransactionIDInsite, transaction.FieldTransactionIDChain, transaction.FieldStatus, transaction.FieldSignatureUser, transaction.FieldSignaturePlatform:
 			values[i] = new(sql.NullString)
 		case transaction.ForeignKeys[0]: // coin_info_transactions
 			values[i] = new(sql.NullInt64)
@@ -176,6 +180,18 @@ func (t *Transaction) assignValues(columns []string, values []interface{}) error
 			} else if value.Valid {
 				t.Mutex = value.Bool
 			}
+		case transaction.FieldSignatureUser:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field signature_user", values[i])
+			} else if value.Valid {
+				t.SignatureUser = value.String
+			}
+		case transaction.FieldSignaturePlatform:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field signature_platform", values[i])
+			} else if value.Valid {
+				t.SignaturePlatform = value.String
+			}
 		case transaction.FieldCreatetimeUtc:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field createtime_utc", values[i])
@@ -253,6 +269,10 @@ func (t *Transaction) String() string {
 	builder.WriteString(fmt.Sprintf("%v", t.Status))
 	builder.WriteString(", mutex=")
 	builder.WriteString(fmt.Sprintf("%v", t.Mutex))
+	builder.WriteString(", signature_user=")
+	builder.WriteString(t.SignatureUser)
+	builder.WriteString(", signature_platform=")
+	builder.WriteString(t.SignaturePlatform)
 	builder.WriteString(", createtime_utc=")
 	builder.WriteString(fmt.Sprintf("%v", t.CreatetimeUtc))
 	builder.WriteString(", updatetime_utc=")

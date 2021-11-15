@@ -107,8 +107,9 @@ message ApplyTransactionRequest {
 	string address_to = 4; // 接收方
 	double amount_float64 = 5; // 不入库的参考金额
 	uint64 amount_uint64 = 6; // 内部交互标准金额格式
-	string uuid_signature = 7; // 2FA的时效性验证码，前期可以留空
-	int64 createtime_utc = 8; // 用户提交请求时的时间戳，与2FA绑定
+	string type = 7; // recharge, payment, withdraw
+	string uuid_signature = 8; // 2FA的时效性验证码，前期可以留空
+	int64 createtime_utc = 9; // 用户提交请求时的时间戳，与2FA绑定
 }
 
 // // PortalSignInit 参数
