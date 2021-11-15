@@ -3,36 +3,79 @@ package api
 import (
 	"context"
 
+	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	"github.com/NpoolPlatform/sphinx-service/message/npool"
 	"github.com/NpoolPlatform/sphinx-service/pkg/app"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
-// 没写完的放下面
+var (
+	errInternal = status.Error(codes.Internal, "internal server error")
+	debugFlag   = false
+)
 
 // 余额查询
-func (s *Server) GetBalance(ctx context.Context, in *npool.GetBalanceRequest) (ret *npool.AccountBalance, err error) {
+func (s *Server) GetBalance(ctx context.Context, in *npool.GetBalanceRequest) (resp *npool.AccountBalance, err error) {
+	resp, err = app.GetBalance(ctx, in)
+	if err != nil {
+		logger.Sugar().Errorw("getbalance error: %w", err)
+		resp = &npool.AccountBalance{}
+		if debugFlag {
+			err = errInternal
+		}
+	}
 	return
 }
 
 // 转账 / 提现
-func (s *Server) ApplyTransaction(ctx context.Context, in *npool.ApplyTransactionRequest) (ret *npool.SuccessInfo, err error) {
-	ret, err = app.ApplyTransaction(ctx, in)
+func (s *Server) ApplyTransaction(ctx context.Context, in *npool.ApplyTransactionRequest) (resp *npool.SuccessInfo, err error) {
+	resp, err = app.ApplyTransaction(ctx, in)
+	if err != nil {
+		logger.Sugar().Errorw("applytransaction error: %w", err)
+		resp = &npool.SuccessInfo{}
+		if debugFlag {
+			err = errInternal
+		}
+	}
 	return
 }
 
 // TODO: 账户交易查询
-func (s *Server) GetTxJSON(ctx context.Context, in *npool.GetTxJSONRequest) (ret *npool.AccountTxJSON, err error) {
-	return nil, nil
+func (s *Server) GetTxJSON(ctx context.Context, in *npool.GetTxJSONRequest) (resp *npool.AccountTxJSON, err error) {
+	resp, err = app.GetTxJSON(ctx, in)
+	if err != nil {
+		logger.Sugar().Errorw("gettxjson error: %w", err)
+		resp = &npool.AccountTxJSON{}
+		if debugFlag {
+			err = errInternal
+		}
+	}
+	return
 }
 
 // 交易状态查询
-func (s *Server) GetInsiteTxStatus(ctx context.Context, in *npool.GetInsiteTxStatusRequest) (ret *npool.GetInsiteTxStatusResponse, err error) {
-	return nil, nil
+func (s *Server) GetInsiteTxStatus(ctx context.Context, in *npool.GetInsiteTxStatusRequest) (resp *npool.GetInsiteTxStatusResponse, err error) {
+	resp, err = app.GetInsiteTxStatus(ctx, in)
+	if err != nil {
+		logger.Sugar().Errorw("getinsitetxstatus error: %w", err)
+		resp = &npool.GetInsiteTxStatusResponse{}
+		if debugFlag {
+			err = errInternal
+		}
+	}
+	return
 }
 
-// 在写的放尾部
-
 // 创建账户
-func (s *Server) RegisterAccount(context.Context, *npool.RegisterAccountRequest) (*npool.AccountAddress, error) {
-	return nil, nil
+func (s *Server) RegisterAccount(ctx context.Context, in *npool.RegisterAccountRequest) (resp *npool.AccountAddress, err error) {
+	resp, err = app.RegisterAccount(ctx, in)
+	if err != nil {
+		logger.Sugar().Errorw("registeraccount error: %w", err)
+		resp = &npool.AccountAddress{}
+		if debugFlag {
+			err = errInternal
+		}
+	}
+	return
 }
