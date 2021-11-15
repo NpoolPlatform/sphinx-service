@@ -5,20 +5,8 @@ import (
 
 	"github.com/NpoolPlatform/sphinx-service/message/npool"
 
-	"github.com/NpoolPlatform/sphinx-service/pkg/core"
-
 	"google.golang.org/protobuf/types/known/emptypb"
 )
-
-func (s *Server) GetCoinInfos(ctx context.Context, req *npool.GetCoinInfosRequest) (cilist *npool.CoinInfoList, err error) {
-	cilist, err = core.GetCoinInfos(ctx, req)
-	return
-}
-
-func (s *Server) GetCoinInfo(ctx context.Context, req *npool.GetCoinInfoRequest) (cilist *npool.CoinInfoRow, err error) {
-	cilist, err = core.GetCoinInfo(ctx, req)
-	return
-}
 
 // 没写完的放下面
 

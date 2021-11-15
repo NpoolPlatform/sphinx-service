@@ -105,13 +105,13 @@ loop:
 			continue
 		}
 		client := npool.NewTradingClient(conn)
-		out, err := client.GetCoinInfo(ctx, &npool.GetCoinInfoRequest{})
+		out, err := client.GetBalance(ctx, &npool.GetBalanceRequest{})
 		if err != nil {
 			cancel()
 			continue
 		}
 		cancel()
-		fmt.Println("from grpc: ", out.Name)
+		fmt.Println("from grpc: ", out.AmountUint64)
 	}
 	log.Println("grpc done")
 }
