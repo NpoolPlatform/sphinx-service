@@ -4,8 +4,7 @@ import (
 	"context"
 
 	"github.com/NpoolPlatform/sphinx-service/message/npool"
-
-	"google.golang.org/protobuf/types/known/emptypb"
+	"github.com/NpoolPlatform/sphinx-service/pkg/app"
 )
 
 // 没写完的放下面
@@ -16,11 +15,12 @@ func (s *Server) GetBalance(ctx context.Context, in *npool.GetBalanceRequest) (r
 }
 
 // 转账 / 提现
-func (s *Server) ApplyTransaction(ctx context.Context, in *npool.ApplyTransactionRequest) (ret *emptypb.Empty, err error) {
+func (s *Server) ApplyTransaction(ctx context.Context, in *npool.ApplyTransactionRequest) (ret *npool.SuccessInfo, err error) {
+	ret, err = app.ApplyTransaction(ctx, in)
 	return
 }
 
-// 账户交易查询
+// TODO: 账户交易查询
 func (s *Server) GetTxJSON(ctx context.Context, in *npool.GetTxJSONRequest) (ret *npool.AccountTxJSON, err error) {
 	return nil, nil
 }

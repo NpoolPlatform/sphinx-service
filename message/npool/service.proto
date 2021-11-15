@@ -21,7 +21,7 @@ service Trading {
 			get: "/v1/account/balance"
 		};}
 	// 转账 / 提现
-	rpc ApplyTransaction (ApplyTransactionRequest) returns (google.protobuf.Empty) {
+	rpc ApplyTransaction (ApplyTransactionRequest) returns (SuccessInfo) {
 		option (google.api.http) = {
 			post: "/v1/account/transaction"
 			body: "*"
@@ -128,6 +128,10 @@ message ApplyTransactionRequest {
 // 	string local_ip = 7; // 内网ip
 // 	int64 timestamp_utc = 8; // 汇报时间
 // }
+
+message SuccessInfo {
+	string info = 1; // "success"
+}
 
 service ServiceExample {
 	// Method Version

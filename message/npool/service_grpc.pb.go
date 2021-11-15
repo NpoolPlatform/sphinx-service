@@ -24,7 +24,7 @@ type TradingClient interface {
 	// 余额查询
 	GetBalance(ctx context.Context, in *GetBalanceRequest, opts ...grpc.CallOption) (*AccountBalance, error)
 	// 转账 / 提现
-	ApplyTransaction(ctx context.Context, in *ApplyTransactionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	ApplyTransaction(ctx context.Context, in *ApplyTransactionRequest, opts ...grpc.CallOption) (*SuccessInfo, error)
 	// TODO: 账户交易查询
 	GetTxJSON(ctx context.Context, in *GetTxJSONRequest, opts ...grpc.CallOption) (*AccountTxJSON, error)
 	// 交易状态查询
@@ -57,8 +57,8 @@ func (c *tradingClient) GetBalance(ctx context.Context, in *GetBalanceRequest, o
 	return out, nil
 }
 
-func (c *tradingClient) ApplyTransaction(ctx context.Context, in *ApplyTransactionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
+func (c *tradingClient) ApplyTransaction(ctx context.Context, in *ApplyTransactionRequest, opts ...grpc.CallOption) (*SuccessInfo, error) {
+	out := new(SuccessInfo)
 	err := c.cc.Invoke(ctx, "/sphinx.v1.Trading/ApplyTransaction", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -93,7 +93,7 @@ type TradingServer interface {
 	// 余额查询
 	GetBalance(context.Context, *GetBalanceRequest) (*AccountBalance, error)
 	// 转账 / 提现
-	ApplyTransaction(context.Context, *ApplyTransactionRequest) (*emptypb.Empty, error)
+	ApplyTransaction(context.Context, *ApplyTransactionRequest) (*SuccessInfo, error)
 	// TODO: 账户交易查询
 	GetTxJSON(context.Context, *GetTxJSONRequest) (*AccountTxJSON, error)
 	// 交易状态查询
@@ -111,7 +111,7 @@ func (UnimplementedTradingServer) RegisterAccount(context.Context, *RegisterAcco
 func (UnimplementedTradingServer) GetBalance(context.Context, *GetBalanceRequest) (*AccountBalance, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBalance not implemented")
 }
-func (UnimplementedTradingServer) ApplyTransaction(context.Context, *ApplyTransactionRequest) (*emptypb.Empty, error) {
+func (UnimplementedTradingServer) ApplyTransaction(context.Context, *ApplyTransactionRequest) (*SuccessInfo, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ApplyTransaction not implemented")
 }
 func (UnimplementedTradingServer) GetTxJSON(context.Context, *GetTxJSONRequest) (*AccountTxJSON, error) {

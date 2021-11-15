@@ -13,6 +13,7 @@
     - [GetInsiteTxStatusResponse](#sphinx.v1.GetInsiteTxStatusResponse)
     - [GetTxJSONRequest](#sphinx.v1.GetTxJSONRequest)
     - [RegisterAccountRequest](#sphinx.v1.RegisterAccountRequest)
+    - [SuccessInfo](#sphinx.v1.SuccessInfo)
     - [VersionResponse](#sphinx.v1.VersionResponse)
   
     - [ServiceExample](#sphinx.v1.ServiceExample)
@@ -197,6 +198,21 @@ RegisterAccount 参数
 
 
 
+<a name="sphinx.v1.SuccessInfo"></a>
+
+### SuccessInfo
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| info | [string](#string) |  | &#34;success&#34; |
+
+
+
+
+
+
 <a name="sphinx.v1.VersionResponse"></a>
 
 ### VersionResponse
@@ -237,7 +253,7 @@ request body and response
 | ----------- | ------------ | ------------- | ------------|
 | RegisterAccount | [RegisterAccountRequest](#sphinx.v1.RegisterAccountRequest) | [AccountAddress](#sphinx.v1.AccountAddress) | 创建账户 |
 | GetBalance | [GetBalanceRequest](#sphinx.v1.GetBalanceRequest) | [AccountBalance](#sphinx.v1.AccountBalance) | 余额查询 |
-| ApplyTransaction | [ApplyTransactionRequest](#sphinx.v1.ApplyTransactionRequest) | [.google.protobuf.Empty](#google.protobuf.Empty) | 转账 / 提现 |
+| ApplyTransaction | [ApplyTransactionRequest](#sphinx.v1.ApplyTransactionRequest) | [SuccessInfo](#sphinx.v1.SuccessInfo) | 转账 / 提现 |
 | GetTxJSON | [GetTxJSONRequest](#sphinx.v1.GetTxJSONRequest) | [AccountTxJSON](#sphinx.v1.AccountTxJSON) | TODO: 账户交易查询 |
 | GetInsiteTxStatus | [GetInsiteTxStatusRequest](#sphinx.v1.GetInsiteTxStatusRequest) | [GetInsiteTxStatusResponse](#sphinx.v1.GetInsiteTxStatusResponse) | 交易状态查询 |
 
