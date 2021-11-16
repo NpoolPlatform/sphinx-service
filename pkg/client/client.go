@@ -6,16 +6,9 @@ import (
 	grpcBase "google.golang.org/grpc"
 )
 
-var (
-	serviceNamespace string
-	ClientApproval   *grpcBase.ClientConn
-)
+var ClientApproval *grpcBase.ClientConn
 
 // 审核服务 grpc远程调用
-
-func SetServiceName(str string) {
-	serviceNamespace = str
-}
 
 func GetApprovalClient() *grpcBase.ClientConn {
 	ClientApproval.Connect()
