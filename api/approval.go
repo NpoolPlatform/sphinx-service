@@ -17,4 +17,5 @@ func ApproveTransaction(transactionIDInsite string) (isApproved bool, err error)
 	return
 }
 
+// TODO
 func NotifyProcessTransaction(notification *message.NotificationTransaction) {}
