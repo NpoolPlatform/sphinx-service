@@ -12,3 +12,7 @@ func Init() error {
 func PublishExample(example *msg.Example) error {
 	return msgsrv.PublishToQueue(msg.QueueExample, example)
 }
+
+func PublishNotificationTransactionCreate(notification *msg.NotificationTransaction) error {
+	return msgsrv.PublishToQueue(msg.QueueAdminApprove, notification)
+}

@@ -39,3 +39,18 @@ func listenTransactionSucceeded() {
 		}
 	}
 }
+
+func listenTransactionApprove() {
+	for {
+		logger.Sugar().Infof("listening for transaction approvals")
+		err := msgcli.ComsumerOfAgent(func(notification *msg.NotificationTransaction) error {
+			logger.Sugar().Infof("gonna auto approve tx: %+w", notification)
+			// Call event handler in api module
+			return nil
+		})
+		if err != nil {
+			logger.Sugar().Errorf("fail to consume example: %v", err)
+			return
+		}
+	}
+}
