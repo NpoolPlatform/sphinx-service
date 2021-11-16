@@ -5,6 +5,7 @@ import (
 
 	trading "github.com/NpoolPlatform/message/npool/trading"
 	"github.com/NpoolPlatform/sphinx-service/pkg/client"
+	"github.com/NpoolPlatform/sphinx-service/pkg/crud"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
 	"github.com/gogo/status"
@@ -17,20 +18,11 @@ func ApplyTransaction(ctx context.Context, in *trading.ApplyTransactionRequest) 
 	resp = &trading.SuccessInfo{
 		Info: "aborted",
 	}
-	// check if transaction alreadey exists
-	info, err := db.Client().Transaction.Query().
-		Where(
-			transaction.And(
-				transaction.TransactionIDInsite(in.TransactionIdInsite),
-			),
-		).
-		First(ctx)
-	if info != nil {
-		if info.AddressFrom == in.AddressFrom && info.AddressTo == info.AddressFrom && info.AmountUint64 == in.AmountUint64 {
-			resp.Info = "success"
-		} else {
-			err = status.Error(codes.AlreadyExists, "transaction id insite already exists")
-		}
+	isExisted, err := crud.CheckRecordIfExistTransaction(in)
+	if err != nil {
+		return
+	} else if isExisted {
+		resp.Info = "success"
 		return
 	}
 	// check uuid signature
@@ -38,8 +30,9 @@ func ApplyTransaction(ctx context.Context, in *trading.ApplyTransactionRequest) 
 		err = status.Error(codes.Canceled, "user signature invalid")
 		return
 	}
-	// params check
+	// if amount > xxx, needManualReview => true, and etc.
 	needManualReview := true
+	// convert type
 	txType := transaction.TypeUnknown
 	if in.Type == "withdraw" {
 		txType = transaction.TypeWithdraw
@@ -49,19 +42,7 @@ func ApplyTransaction(ctx context.Context, in *trading.ApplyTransactionRequest) 
 		txType = transaction.TypePayment
 	}
 	// insert sql record
-	info, err = db.Client().Transaction.Create().
-		SetCoinID(in.CoinId).
-		SetMutex(false).
-		SetStatus(transaction.StatusPendingReview).
-		SetTransactionIDChain(in.TransactionIdInsite).
-		SetAmountUint64(in.AmountUint64).
-		SetAmountFloat64(in.AmountFloat64).
-		SetAddressFrom(in.AddressFrom).
-		SetAddressTo(in.AddressTo).
-		SetNeedManualReview(needManualReview).
-		SetSignatureUser(in.UuidSignature).
-		SetType(txType).
-		Save(ctx)
+	info, err := crud.CreateRecordTransaction(in, needManualReview, txType)
 	if err != nil {
 		err = status.Error(codes.Internal, "database error")
 		return
@@ -99,6 +80,7 @@ func ApplyTransaction(ctx context.Context, in *trading.ApplyTransactionRequest) 
 
 // 交易状态查询
 func GetInsiteTxStatus(ctx context.Context, in *trading.GetInsiteTxStatusRequest) (resp *trading.GetInsiteTxStatusResponse, err error) {
+	// MARK 交给钱包代理
 	return
 }
 
