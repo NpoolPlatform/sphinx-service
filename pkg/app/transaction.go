@@ -84,6 +84,7 @@ func ApplyTransaction(ctx context.Context, in *trading.ApplyTransactionRequest) 
 		err = status.Error(codes.Internal, "cannot notify transaction approval service")
 		return
 	}
+	// MARK: approve result override
 	_, err = db.Client().Transaction.Update().
 		SetStatus(transaction.StatusPendingReview).
 		SetMutex(false).
