@@ -10,10 +10,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-var (
-	errInternal = status.Error(codes.Internal, "internal server error")
-	debugFlag   = false
-)
+var errInternal = status.Error(codes.Internal, "internal server error")
 
 // 余额查询
 func (s *Server) GetBalance(ctx context.Context, in *npool.GetBalanceRequest) (resp *npool.AccountBalance, err error) {
@@ -21,7 +18,7 @@ func (s *Server) GetBalance(ctx context.Context, in *npool.GetBalanceRequest) (r
 	if err != nil {
 		logger.Sugar().Errorw("getbalance error: %w", err)
 		resp = &npool.AccountBalance{}
-		if debugFlag {
+		if DebugFlag {
 			err = errInternal
 		}
 	}
@@ -34,7 +31,7 @@ func (s *Server) ApplyTransaction(ctx context.Context, in *npool.ApplyTransactio
 	if err != nil {
 		logger.Sugar().Errorw("applytransaction error: %w", err)
 		resp = &npool.SuccessInfo{}
-		if debugFlag {
+		if DebugFlag {
 			err = errInternal
 		}
 	}
@@ -47,7 +44,7 @@ func (s *Server) GetTxJSON(ctx context.Context, in *npool.GetTxJSONRequest) (res
 	if err != nil {
 		logger.Sugar().Errorw("gettxjson error: %w", err)
 		resp = &npool.AccountTxJSON{}
-		if debugFlag {
+		if DebugFlag {
 			err = errInternal
 		}
 	}
@@ -60,7 +57,7 @@ func (s *Server) GetInsiteTxStatus(ctx context.Context, in *npool.GetInsiteTxSta
 	if err != nil {
 		logger.Sugar().Errorw("getinsitetxstatus error: %w", err)
 		resp = &npool.GetInsiteTxStatusResponse{}
-		if debugFlag {
+		if DebugFlag {
 			err = errInternal
 		}
 	}
@@ -73,7 +70,7 @@ func (s *Server) RegisterAccount(ctx context.Context, in *npool.RegisterAccountR
 	if err != nil {
 		logger.Sugar().Errorw("registeraccount error: %w", err)
 		resp = &npool.AccountAddress{}
-		if debugFlag {
+		if DebugFlag {
 			err = errInternal
 		}
 	}

@@ -93,3 +93,24 @@ func ComsumerOfAgent(h func(*msg.NotificationTransaction) error) error {
 
 	return xerrors.Errorf("WE SHOULD NOT BE HERE")
 }
+
+func ComsumerOfTradingForApproval(h func(*msg.NotificationTransaction) error) error {
+	successTxs, ok := myClients[constant.ServiceName].consumers[msg.QueueAdminApprove]
+	if !ok {
+		return xerrors.Errorf("consumer is not constructed")
+	}
+	for d := range successTxs {
+		tx := msg.NotificationTransaction{}
+		err := json.Unmarshal(d.Body, &tx)
+		if err != nil {
+			return xerrors.Errorf("parse message example error: %v", err)
+		}
+		if h != nil {
+			err = h(&tx)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return xerrors.Errorf("WE SHOULD NOT BE HERE")
+}

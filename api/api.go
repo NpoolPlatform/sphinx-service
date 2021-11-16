@@ -8,6 +8,8 @@ import (
 	"google.golang.org/grpc"
 )
 
+const DebugFlag = false
+
 type Server struct {
 	npool.UnimplementedTradingServer
 }

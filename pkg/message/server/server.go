@@ -16,3 +16,7 @@ func PublishExample(example *msg.Example) error {
 func PublishNotificationTransactionCreate(notification *msg.NotificationTransaction) error {
 	return msgsrv.PublishToQueue(msg.QueueAdminApprove, notification)
 }
+
+func PublishNotificationTransactionProcess(notification *msg.NotificationTransaction) error {
+	return msgsrv.PublishToQueue(msg.QueueAgent, notification)
+}

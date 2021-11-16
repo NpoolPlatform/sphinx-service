@@ -6,6 +6,8 @@ import (
 	"github.com/NpoolPlatform/sphinx-service/message/npool"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
+	"github.com/NpoolPlatform/sphinx-service/pkg/message/message"
+	"github.com/NpoolPlatform/sphinx-service/pkg/message/server"
 	"github.com/gogo/status"
 	"google.golang.org/grpc/codes"
 )
@@ -50,6 +52,8 @@ func ApplyTransaction(ctx context.Context, in *npool.ApplyTransactionRequest) (r
 	// insert sql record
 	info, err = db.Client().Transaction.Create().
 		SetCoinID(in.CoinId).
+		SetMutex(false).
+		SetStatus(transaction.StatusPendingReview).
 		SetTransactionIDChain(in.TransactionIdInsite).
 		SetAmountUint64(in.AmountUint64).
 		SetAmountFloat64(in.AmountFloat64).
@@ -64,8 +68,17 @@ func ApplyTransaction(ctx context.Context, in *npool.ApplyTransactionRequest) (r
 		return
 	}
 	// rabbitmq notify
-	// TODO
-	return
+	err = server.PublishNotificationTransactionCreate(&message.NotificationTransaction{
+		ID:                  info.ID,
+		TransactionIDInsite: info.TransactionIDInsite,
+	})
+	if err != nil {
+		err = status.Errorf(codes.Internal, "publishing notification error, check rabbitmq: %v", err)
+	} else {
+		resp.Info = "success"
+	}
+	// done
+	return resp, err
 }
 
 // 交易状态查询

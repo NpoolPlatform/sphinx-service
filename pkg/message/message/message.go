@@ -11,15 +11,20 @@ const (
 	QueueTrading      = "trading"
 )
 
-func InitQueues() error {
-	err := msgsrv.DeclareQueue(QueueExample)
-	if err != nil {
-		return err
+func InitQueues() (err error) {
+	if err = msgsrv.DeclareQueue(QueueExample); err != nil {
+		return
 	}
-	msgsrv.DeclareQueue(QueueAdminApprove)
-	msgsrv.DeclareQueue(QueueAgent)
-	msgsrv.DeclareQueue(QueueTrading)
-	return nil
+	if err = msgsrv.DeclareQueue(QueueAdminApprove); err != nil {
+		return
+	}
+	if err = msgsrv.DeclareQueue(QueueAgent); err != nil {
+		return
+	}
+	if err = msgsrv.DeclareQueue(QueueTrading); err != nil {
+		return
+	}
+	return
 }
 
 type Example struct {
