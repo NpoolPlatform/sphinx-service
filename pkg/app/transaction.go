@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 
+	"github.com/NpoolPlatform/message/npool/signproxy"
 	trading "github.com/NpoolPlatform/message/npool/trading"
 	"github.com/NpoolPlatform/sphinx-service/pkg/client"
 	"github.com/NpoolPlatform/sphinx-service/pkg/crud"
@@ -86,6 +87,10 @@ func GetInsiteTxStatus(ctx context.Context, in *trading.GetInsiteTxStatusRequest
 
 // 余额查询
 func GetBalance(ctx context.Context, in *trading.GetBalanceRequest) (resp *trading.AccountBalance, err error) {
+	client.ClientProxy.WalletBalance(ctx, &signproxy.WalletBalanceRequest{
+		CoinType: 0,
+		Address:  in.Address,
+	})
 	resp = &trading.AccountBalance{}
 	return
 }
