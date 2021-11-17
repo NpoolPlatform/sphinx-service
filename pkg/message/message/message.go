@@ -37,9 +37,17 @@ type Example struct {
 }
 
 type NotificationTransaction struct {
-	ID                  int32  `json:"id"`
-	TransactionIDInsite string `json:"transaction_id_insite"`
-	// TODO
+	TransactionIDInsite string `json:"transaction_id_insite"` // unique
+	AmountUint64        uint64 `json:"amount_uint64"`         // need to be converted through public repo
+	AddressFrom         string `json:"address_from"`
+	AddressTo           string `json:"address_to"`
+	TransactionIDChain  string `json:"transaction_id_chain"` // empty when created, return when finished
+	SignatureUser       string `json:"signature_user"`       // preserved for 2FA verification, implement this in v2
+	SignaturePlatform   string `json:"signature_platform"`   // preserved for signproxy to verify host, about v3
+	CreatetimeUtc       int    `json:"createtime_utc"`       // for 2FA
+	UpdatetimeUtc       int    `json:"updatetime_utc"`       // for return
+	IsSuccess           bool   `json:"is_success"`           // return true when completed
+	IsFailed            bool   `json:"is_failed"`            // return true when error occurred
 }
 
 func GetQueueName() string {
