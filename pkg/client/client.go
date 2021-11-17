@@ -14,26 +14,30 @@ var (
 	ClientCoinInfo coininfo.SphinxCoininfoClient
 )
 
-// 审核服务 grpc远程调用
+func Init() (err error) {
+	err = InitProxyClient()
+	if err != nil {
+		logger.Sugar().Errorf("init proxy client error, %w", err)
+	}
+	return
+}
 
+// 审核服务 init grpc
 func InitApprovalClient() (err error) {
 	_, err = grpc.GetGRPCConn("TO-BE-IMPLEMENTED")
 	if err != nil {
 		logger.Sugar().Errorf("get grpc connection failure, err: %v", err)
-		return
 	}
-	// MARK
 	return
 }
 
-// 钱包代理服务 grpc远程调用 其余在rabbitmq做消息通知
-
+// 钱包代理服务 init grpc
 func InitProxyClient() (err error) {
 	conn, err := grpc.GetGRPCConn("TO-BE-IMPLEMENTED")
 	if err != nil {
 		logger.Sugar().Errorf("get grpc connection failure, err: %v", err)
-		return
+	} else {
+		ClientProxy = signproxy.NewSignProxyClient(conn)
 	}
-	ClientProxy = signproxy.NewSignProxyClient(conn)
 	return
 }

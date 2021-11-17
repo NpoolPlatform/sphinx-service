@@ -2,16 +2,25 @@ package app
 
 import (
 	"context"
+	"fmt"
+	"math/big"
+	"time"
 
+	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
+	"github.com/NpoolPlatform/go-service-framework/pkg/price"
 	"github.com/NpoolPlatform/message/npool/signproxy"
-	trading "github.com/NpoolPlatform/message/npool/trading"
+	"github.com/NpoolPlatform/message/npool/trading"
 	"github.com/NpoolPlatform/sphinx-service/pkg/client"
 	"github.com/NpoolPlatform/sphinx-service/pkg/crud"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
+	"github.com/NpoolPlatform/sphinx-service/pkg/message/message"
 	"github.com/gogo/status"
 	"google.golang.org/grpc/codes"
 )
+
+const priceScale = 1000000000000
 
 // 转账 / 提现
 func ApplyTransaction(ctx context.Context, in *trading.ApplyTransactionRequest) (resp *trading.SuccessInfo, err error) {
@@ -61,9 +70,9 @@ func ApplyTransaction(ctx context.Context, in *trading.ApplyTransactionRequest) 
 		// }
 	*/
 	// grpc call approval service
-	err = client.LetApproveTransaction(info.TransactionIDInsite)
+	err = LetApproveTransaction(info)
 	if err != nil {
-		err = status.Error(codes.Internal, "cannot notify transaction approval service")
+		err = status.Errorf(codes.Internal, "cannot notify transaction approval service", err)
 		return
 	}
 	// MARK: approve result override
@@ -91,7 +100,42 @@ func GetBalance(ctx context.Context, in *trading.GetBalanceRequest) (resp *tradi
 		CoinType: 0,
 		Address:  in.Address,
 	})
-	resp = &trading.AccountBalance{}
+	respRPC, err := client.ClientProxy.WalletBalance(ctx, &signproxy.WalletBalanceRequest{
+		CoinType: signproxy.CoinType(in.CoinId),
+		Address:  in.Address,
+	})
+	if err != nil {
+		err = status.Errorf(codes.Internal, "get wallet balance failed, %w", err)
+		return
+	}
+	amountUint64, amountString, amountFloat64 := UntestedDecomposeStringAmount(respRPC.Info.Balance)
+	logger.Sugar().Infof("amount in: %v", respRPC.Info.Balance)
+	logger.Sugar().Infof("amount decomposed: %v", amountString)
+	resp = &trading.AccountBalance{
+		CoinId:        in.CoinId,
+		Address:       in.Address,
+		TimestampUtc:  time.Now().UTC().Unix(),
+		AmountFloat64: amountFloat64,
+		AmountUint64:  amountUint64,
+	}
+	return
+}
+
+// 金额转换函数
+func UntestedDecomposeStringAmount(str string) (amountUint64 uint64, amountString string, amountFloat64 float64) {
+	// get value
+	// for initial result: str == target_x_fil*10^18
+	bi, _ := new(big.Int).SetString(str, 10)
+	// prepare for division
+	filExp := new(big.Int)
+	filExp.Exp(big.NewInt(10), big.NewInt(9), nil)
+	// make a float copy
+	bf := new(big.Float).SetInt(bi)
+	// divide
+	bf.Quo(bf, new(big.Float).SetInt(filExp))
+	amountString = fmt.Sprintf("%f", bf)
+	amountFloat64, _ = bf.Float64()
+	amountUint64 = price.VisualPriceToDBPrice(amountFloat64)
 	return
 }
 
@@ -99,3 +143,33 @@ func GetBalance(ctx context.Context, in *trading.GetBalanceRequest) (resp *tradi
 func GetTxJSON(ctx context.Context, in *trading.GetTxJSONRequest) (resp *trading.AccountTxJSON, err error) {
 	return
 }
+
+// 审核服务 进行审核 overrided
+func LetApproveTransaction(tx *ent.Transaction) (err error) {
+	// MARK: currently overrided by pkg/app/transaction.go
+	return
+}
+
+// 钱包代理 查询交易状态
+func CheckIfTransactionComplete(tx *ent.Transaction) (err error) {
+	return
+}
+
+// 钱包代理 创建账号
+func RegisterAccount(coinTypeID int32, uuid string) (account *trading.AccountAddress, err error) {
+	coinType := signproxy.CoinType(coinTypeID)
+	notification := &message.NotificationTransaction{
+		TransactionType: signproxy.TransactionType_TransactionTypeCreateAccount,
+		CoinType:        coinType,
+		UUID:            uuid,
+		CreatetimeUtc:   time.Now().UTC().Unix(),
+		UpdatetimeUtc:   0,
+		IsSuccess:       false,
+		IsFailed:        false,
+	}
+	return
+}
+
+// 钱包代理 进行转账
+
+// 钱包代理 查询余额

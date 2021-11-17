@@ -1,3 +1,4 @@
+// deprecated
 package approval
 
 import (
@@ -11,7 +12,7 @@ import (
 	"google.golang.org/grpc/codes"
 )
 
-// 审核通过交易 deprecated
+// 审核通过交易
 func ApproveTransaction(transactionIDInsite string) (isApproved bool, err error) {
 	ctx := context.Background()
 	// 获取交易信息
