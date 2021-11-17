@@ -1,7 +1,11 @@
 package message
 
 import (
+	"fmt"
+	"reflect"
+
 	msgsrv "github.com/NpoolPlatform/go-service-framework/pkg/rabbitmq/server"
+	constant "github.com/NpoolPlatform/sphinx-service/pkg/message/const"
 )
 
 const (
@@ -35,4 +39,9 @@ type Example struct {
 type NotificationTransaction struct {
 	ID                  int32  `json:"id"`
 	TransactionIDInsite string `json:"transaction_id_insite"`
+	// TODO
+}
+
+func GetQueueName() string {
+	return fmt.Sprintf("%s::%s", constant.ServiceName, reflect.TypeOf(NotificationTransaction{}).String())
 }
