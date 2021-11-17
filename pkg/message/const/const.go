@@ -1,6 +1,9 @@
 package constant
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 const (
 	ServiceName   = "sphinx.npool.top"
@@ -9,3 +12,7 @@ const (
 	AdminDomain   = "sphinx.npool.top"
 	GrpcTimeout   = time.Second * 10
 )
+
+func GetMQChannel() string {
+	return fmt.Sprintf("%s::channel", ServiceName)
+}
