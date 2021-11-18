@@ -6,13 +6,13 @@ import (
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	"github.com/NpoolPlatform/message/npool/sphinxplugin"
+	"github.com/NpoolPlatform/message/npool/sphinxsign"
 	"github.com/NpoolPlatform/message/npool/trading"
 	"github.com/NpoolPlatform/sphinx-service/pkg/client"
 	"github.com/NpoolPlatform/sphinx-service/pkg/crud"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
 	"github.com/gogo/status"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // 创建账号
@@ -25,7 +25,9 @@ func RegisterAccount(ctx context.Context, coinTypeID int32, uuid string) (accoun
 	// })
 	// "github.com/NpoolPlatform/message/npool/signproxy"
 	// debug mode
-	resp, err := client.ClientProxy.WalletNew(ctx, &emptypb.Empty{})
+	resp, err := client.ClientProxy.WalletNew(ctx, &sphinxsign.WalletNewRequest{
+		CoinType: sphinxplugin.CoinType(coinTypeID),
+	})
 	if err != nil {
 		resp = nil
 		return
