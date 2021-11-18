@@ -46,7 +46,6 @@ func GetQueueName() string {
 
 type NotificationTransaction struct {
 	CoinType            sphinxplugin.CoinType `json:"coin_type"`             // when: always
-	UUID                string                `json:"uuid"`                  // when: create account; usage: for trading service to locate request when get return
 	TransactionIDInsite string                `json:"transaction_id_insite"` // when: Transaction; unique
 	AmountFloat64       float64               `json:"amount_float64"`        // when: Transaction
 	AddressFrom         string                `json:"address_from"`          // when: Transaction

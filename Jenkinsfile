@@ -19,6 +19,7 @@ pipeline {
         sh 'go get -u golang.org/x/lint/golint'
         sh 'go get github.com/tebeka/go2xunit'
         sh 'go get github.com/t-yuki/gocover-cobertura'
+        sh 'go get google.golang.org/grpc'
 
         // Get dependencies
         sh 'go get golang.org/x/image/tiff/lzw'
