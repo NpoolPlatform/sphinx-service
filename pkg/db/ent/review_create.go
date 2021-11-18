@@ -42,13 +42,13 @@ func (rc *ReviewCreate) SetOperatorNote(s string) *ReviewCreate {
 }
 
 // SetCreatetimeUtc sets the "createtime_utc" field.
-func (rc *ReviewCreate) SetCreatetimeUtc(i int) *ReviewCreate {
+func (rc *ReviewCreate) SetCreatetimeUtc(i int64) *ReviewCreate {
 	rc.mutation.SetCreatetimeUtc(i)
 	return rc
 }
 
 // SetUpdatetimeUtc sets the "updatetime_utc" field.
-func (rc *ReviewCreate) SetUpdatetimeUtc(i int) *ReviewCreate {
+func (rc *ReviewCreate) SetUpdatetimeUtc(i int64) *ReviewCreate {
 	rc.mutation.SetUpdatetimeUtc(i)
 	return rc
 }
@@ -234,7 +234,7 @@ func (rc *ReviewCreate) createSpec() (*Review, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := rc.mutation.CreatetimeUtc(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: review.FieldCreatetimeUtc,
 		})
@@ -242,7 +242,7 @@ func (rc *ReviewCreate) createSpec() (*Review, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := rc.mutation.UpdatetimeUtc(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: review.FieldUpdatetimeUtc,
 		})

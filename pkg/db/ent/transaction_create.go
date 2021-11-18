@@ -110,13 +110,13 @@ func (tc *TransactionCreate) SetSignaturePlatform(s string) *TransactionCreate {
 }
 
 // SetCreatetimeUtc sets the "createtime_utc" field.
-func (tc *TransactionCreate) SetCreatetimeUtc(i int) *TransactionCreate {
+func (tc *TransactionCreate) SetCreatetimeUtc(i int64) *TransactionCreate {
 	tc.mutation.SetCreatetimeUtc(i)
 	return tc
 }
 
 // SetUpdatetimeUtc sets the "updatetime_utc" field.
-func (tc *TransactionCreate) SetUpdatetimeUtc(i int) *TransactionCreate {
+func (tc *TransactionCreate) SetUpdatetimeUtc(i int64) *TransactionCreate {
 	tc.mutation.SetUpdatetimeUtc(i)
 	return tc
 }
@@ -452,7 +452,7 @@ func (tc *TransactionCreate) createSpec() (*Transaction, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := tc.mutation.CreatetimeUtc(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: transaction.FieldCreatetimeUtc,
 		})
@@ -460,7 +460,7 @@ func (tc *TransactionCreate) createSpec() (*Transaction, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := tc.mutation.UpdatetimeUtc(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: transaction.FieldUpdatetimeUtc,
 		})

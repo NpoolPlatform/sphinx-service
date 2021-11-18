@@ -19,8 +19,8 @@ func (WalletNode) Fields() []ent.Field {
 		field.String("host_vendor"),
 		field.String("public_ip"),
 		field.String("local_ip"),
-		field.Int("createtime_utc"),
-		field.Int("last_online_time_utc"),
+		field.Int64("createtime_utc"),
+		field.Int64("last_online_time_utc"),
 	}
 }
 

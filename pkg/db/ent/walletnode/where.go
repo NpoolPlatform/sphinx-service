@@ -127,14 +127,14 @@ func LocalIP(v string) predicate.WalletNode {
 }
 
 // CreatetimeUtc applies equality check predicate on the "createtime_utc" field. It's identical to CreatetimeUtcEQ.
-func CreatetimeUtc(v int) predicate.WalletNode {
+func CreatetimeUtc(v int64) predicate.WalletNode {
 	return predicate.WalletNode(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldCreatetimeUtc), v))
 	})
 }
 
 // LastOnlineTimeUtc applies equality check predicate on the "last_online_time_utc" field. It's identical to LastOnlineTimeUtcEQ.
-func LastOnlineTimeUtc(v int) predicate.WalletNode {
+func LastOnlineTimeUtc(v int64) predicate.WalletNode {
 	return predicate.WalletNode(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldLastOnlineTimeUtc), v))
 	})
@@ -696,21 +696,21 @@ func LocalIPContainsFold(v string) predicate.WalletNode {
 }
 
 // CreatetimeUtcEQ applies the EQ predicate on the "createtime_utc" field.
-func CreatetimeUtcEQ(v int) predicate.WalletNode {
+func CreatetimeUtcEQ(v int64) predicate.WalletNode {
 	return predicate.WalletNode(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldCreatetimeUtc), v))
 	})
 }
 
 // CreatetimeUtcNEQ applies the NEQ predicate on the "createtime_utc" field.
-func CreatetimeUtcNEQ(v int) predicate.WalletNode {
+func CreatetimeUtcNEQ(v int64) predicate.WalletNode {
 	return predicate.WalletNode(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldCreatetimeUtc), v))
 	})
 }
 
 // CreatetimeUtcIn applies the In predicate on the "createtime_utc" field.
-func CreatetimeUtcIn(vs ...int) predicate.WalletNode {
+func CreatetimeUtcIn(vs ...int64) predicate.WalletNode {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -727,7 +727,7 @@ func CreatetimeUtcIn(vs ...int) predicate.WalletNode {
 }
 
 // CreatetimeUtcNotIn applies the NotIn predicate on the "createtime_utc" field.
-func CreatetimeUtcNotIn(vs ...int) predicate.WalletNode {
+func CreatetimeUtcNotIn(vs ...int64) predicate.WalletNode {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -744,49 +744,49 @@ func CreatetimeUtcNotIn(vs ...int) predicate.WalletNode {
 }
 
 // CreatetimeUtcGT applies the GT predicate on the "createtime_utc" field.
-func CreatetimeUtcGT(v int) predicate.WalletNode {
+func CreatetimeUtcGT(v int64) predicate.WalletNode {
 	return predicate.WalletNode(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldCreatetimeUtc), v))
 	})
 }
 
 // CreatetimeUtcGTE applies the GTE predicate on the "createtime_utc" field.
-func CreatetimeUtcGTE(v int) predicate.WalletNode {
+func CreatetimeUtcGTE(v int64) predicate.WalletNode {
 	return predicate.WalletNode(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldCreatetimeUtc), v))
 	})
 }
 
 // CreatetimeUtcLT applies the LT predicate on the "createtime_utc" field.
-func CreatetimeUtcLT(v int) predicate.WalletNode {
+func CreatetimeUtcLT(v int64) predicate.WalletNode {
 	return predicate.WalletNode(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldCreatetimeUtc), v))
 	})
 }
 
 // CreatetimeUtcLTE applies the LTE predicate on the "createtime_utc" field.
-func CreatetimeUtcLTE(v int) predicate.WalletNode {
+func CreatetimeUtcLTE(v int64) predicate.WalletNode {
 	return predicate.WalletNode(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldCreatetimeUtc), v))
 	})
 }
 
 // LastOnlineTimeUtcEQ applies the EQ predicate on the "last_online_time_utc" field.
-func LastOnlineTimeUtcEQ(v int) predicate.WalletNode {
+func LastOnlineTimeUtcEQ(v int64) predicate.WalletNode {
 	return predicate.WalletNode(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldLastOnlineTimeUtc), v))
 	})
 }
 
 // LastOnlineTimeUtcNEQ applies the NEQ predicate on the "last_online_time_utc" field.
-func LastOnlineTimeUtcNEQ(v int) predicate.WalletNode {
+func LastOnlineTimeUtcNEQ(v int64) predicate.WalletNode {
 	return predicate.WalletNode(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldLastOnlineTimeUtc), v))
 	})
 }
 
 // LastOnlineTimeUtcIn applies the In predicate on the "last_online_time_utc" field.
-func LastOnlineTimeUtcIn(vs ...int) predicate.WalletNode {
+func LastOnlineTimeUtcIn(vs ...int64) predicate.WalletNode {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -803,7 +803,7 @@ func LastOnlineTimeUtcIn(vs ...int) predicate.WalletNode {
 }
 
 // LastOnlineTimeUtcNotIn applies the NotIn predicate on the "last_online_time_utc" field.
-func LastOnlineTimeUtcNotIn(vs ...int) predicate.WalletNode {
+func LastOnlineTimeUtcNotIn(vs ...int64) predicate.WalletNode {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -820,28 +820,28 @@ func LastOnlineTimeUtcNotIn(vs ...int) predicate.WalletNode {
 }
 
 // LastOnlineTimeUtcGT applies the GT predicate on the "last_online_time_utc" field.
-func LastOnlineTimeUtcGT(v int) predicate.WalletNode {
+func LastOnlineTimeUtcGT(v int64) predicate.WalletNode {
 	return predicate.WalletNode(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldLastOnlineTimeUtc), v))
 	})
 }
 
 // LastOnlineTimeUtcGTE applies the GTE predicate on the "last_online_time_utc" field.
-func LastOnlineTimeUtcGTE(v int) predicate.WalletNode {
+func LastOnlineTimeUtcGTE(v int64) predicate.WalletNode {
 	return predicate.WalletNode(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldLastOnlineTimeUtc), v))
 	})
 }
 
 // LastOnlineTimeUtcLT applies the LT predicate on the "last_online_time_utc" field.
-func LastOnlineTimeUtcLT(v int) predicate.WalletNode {
+func LastOnlineTimeUtcLT(v int64) predicate.WalletNode {
 	return predicate.WalletNode(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldLastOnlineTimeUtc), v))
 	})
 }
 
 // LastOnlineTimeUtcLTE applies the LTE predicate on the "last_online_time_utc" field.
-func LastOnlineTimeUtcLTE(v int) predicate.WalletNode {
+func LastOnlineTimeUtcLTE(v int64) predicate.WalletNode {
 	return predicate.WalletNode(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldLastOnlineTimeUtc), v))
 	})

@@ -59,27 +59,27 @@ func (wnu *WalletNodeUpdate) SetLocalIP(s string) *WalletNodeUpdate {
 }
 
 // SetCreatetimeUtc sets the "createtime_utc" field.
-func (wnu *WalletNodeUpdate) SetCreatetimeUtc(i int) *WalletNodeUpdate {
+func (wnu *WalletNodeUpdate) SetCreatetimeUtc(i int64) *WalletNodeUpdate {
 	wnu.mutation.ResetCreatetimeUtc()
 	wnu.mutation.SetCreatetimeUtc(i)
 	return wnu
 }
 
 // AddCreatetimeUtc adds i to the "createtime_utc" field.
-func (wnu *WalletNodeUpdate) AddCreatetimeUtc(i int) *WalletNodeUpdate {
+func (wnu *WalletNodeUpdate) AddCreatetimeUtc(i int64) *WalletNodeUpdate {
 	wnu.mutation.AddCreatetimeUtc(i)
 	return wnu
 }
 
 // SetLastOnlineTimeUtc sets the "last_online_time_utc" field.
-func (wnu *WalletNodeUpdate) SetLastOnlineTimeUtc(i int) *WalletNodeUpdate {
+func (wnu *WalletNodeUpdate) SetLastOnlineTimeUtc(i int64) *WalletNodeUpdate {
 	wnu.mutation.ResetLastOnlineTimeUtc()
 	wnu.mutation.SetLastOnlineTimeUtc(i)
 	return wnu
 }
 
 // AddLastOnlineTimeUtc adds i to the "last_online_time_utc" field.
-func (wnu *WalletNodeUpdate) AddLastOnlineTimeUtc(i int) *WalletNodeUpdate {
+func (wnu *WalletNodeUpdate) AddLastOnlineTimeUtc(i int64) *WalletNodeUpdate {
 	wnu.mutation.AddLastOnlineTimeUtc(i)
 	return wnu
 }
@@ -229,28 +229,28 @@ func (wnu *WalletNodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := wnu.mutation.CreatetimeUtc(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: walletnode.FieldCreatetimeUtc,
 		})
 	}
 	if value, ok := wnu.mutation.AddedCreatetimeUtc(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: walletnode.FieldCreatetimeUtc,
 		})
 	}
 	if value, ok := wnu.mutation.LastOnlineTimeUtc(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: walletnode.FieldLastOnlineTimeUtc,
 		})
 	}
 	if value, ok := wnu.mutation.AddedLastOnlineTimeUtc(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: walletnode.FieldLastOnlineTimeUtc,
 		})
@@ -340,27 +340,27 @@ func (wnuo *WalletNodeUpdateOne) SetLocalIP(s string) *WalletNodeUpdateOne {
 }
 
 // SetCreatetimeUtc sets the "createtime_utc" field.
-func (wnuo *WalletNodeUpdateOne) SetCreatetimeUtc(i int) *WalletNodeUpdateOne {
+func (wnuo *WalletNodeUpdateOne) SetCreatetimeUtc(i int64) *WalletNodeUpdateOne {
 	wnuo.mutation.ResetCreatetimeUtc()
 	wnuo.mutation.SetCreatetimeUtc(i)
 	return wnuo
 }
 
 // AddCreatetimeUtc adds i to the "createtime_utc" field.
-func (wnuo *WalletNodeUpdateOne) AddCreatetimeUtc(i int) *WalletNodeUpdateOne {
+func (wnuo *WalletNodeUpdateOne) AddCreatetimeUtc(i int64) *WalletNodeUpdateOne {
 	wnuo.mutation.AddCreatetimeUtc(i)
 	return wnuo
 }
 
 // SetLastOnlineTimeUtc sets the "last_online_time_utc" field.
-func (wnuo *WalletNodeUpdateOne) SetLastOnlineTimeUtc(i int) *WalletNodeUpdateOne {
+func (wnuo *WalletNodeUpdateOne) SetLastOnlineTimeUtc(i int64) *WalletNodeUpdateOne {
 	wnuo.mutation.ResetLastOnlineTimeUtc()
 	wnuo.mutation.SetLastOnlineTimeUtc(i)
 	return wnuo
 }
 
 // AddLastOnlineTimeUtc adds i to the "last_online_time_utc" field.
-func (wnuo *WalletNodeUpdateOne) AddLastOnlineTimeUtc(i int) *WalletNodeUpdateOne {
+func (wnuo *WalletNodeUpdateOne) AddLastOnlineTimeUtc(i int64) *WalletNodeUpdateOne {
 	wnuo.mutation.AddLastOnlineTimeUtc(i)
 	return wnuo
 }
@@ -534,28 +534,28 @@ func (wnuo *WalletNodeUpdateOne) sqlSave(ctx context.Context) (_node *WalletNode
 	}
 	if value, ok := wnuo.mutation.CreatetimeUtc(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: walletnode.FieldCreatetimeUtc,
 		})
 	}
 	if value, ok := wnuo.mutation.AddedCreatetimeUtc(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: walletnode.FieldCreatetimeUtc,
 		})
 	}
 	if value, ok := wnuo.mutation.LastOnlineTimeUtc(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: walletnode.FieldLastOnlineTimeUtc,
 		})
 	}
 	if value, ok := wnuo.mutation.AddedLastOnlineTimeUtc(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: walletnode.FieldLastOnlineTimeUtc,
 		})

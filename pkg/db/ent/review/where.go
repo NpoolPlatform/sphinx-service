@@ -106,14 +106,14 @@ func OperatorNote(v string) predicate.Review {
 }
 
 // CreatetimeUtc applies equality check predicate on the "createtime_utc" field. It's identical to CreatetimeUtcEQ.
-func CreatetimeUtc(v int) predicate.Review {
+func CreatetimeUtc(v int64) predicate.Review {
 	return predicate.Review(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldCreatetimeUtc), v))
 	})
 }
 
 // UpdatetimeUtc applies equality check predicate on the "updatetime_utc" field. It's identical to UpdatetimeUtcEQ.
-func UpdatetimeUtc(v int) predicate.Review {
+func UpdatetimeUtc(v int64) predicate.Review {
 	return predicate.Review(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldUpdatetimeUtc), v))
 	})
@@ -245,21 +245,21 @@ func OperatorNoteContainsFold(v string) predicate.Review {
 }
 
 // CreatetimeUtcEQ applies the EQ predicate on the "createtime_utc" field.
-func CreatetimeUtcEQ(v int) predicate.Review {
+func CreatetimeUtcEQ(v int64) predicate.Review {
 	return predicate.Review(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldCreatetimeUtc), v))
 	})
 }
 
 // CreatetimeUtcNEQ applies the NEQ predicate on the "createtime_utc" field.
-func CreatetimeUtcNEQ(v int) predicate.Review {
+func CreatetimeUtcNEQ(v int64) predicate.Review {
 	return predicate.Review(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldCreatetimeUtc), v))
 	})
 }
 
 // CreatetimeUtcIn applies the In predicate on the "createtime_utc" field.
-func CreatetimeUtcIn(vs ...int) predicate.Review {
+func CreatetimeUtcIn(vs ...int64) predicate.Review {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -276,7 +276,7 @@ func CreatetimeUtcIn(vs ...int) predicate.Review {
 }
 
 // CreatetimeUtcNotIn applies the NotIn predicate on the "createtime_utc" field.
-func CreatetimeUtcNotIn(vs ...int) predicate.Review {
+func CreatetimeUtcNotIn(vs ...int64) predicate.Review {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -293,49 +293,49 @@ func CreatetimeUtcNotIn(vs ...int) predicate.Review {
 }
 
 // CreatetimeUtcGT applies the GT predicate on the "createtime_utc" field.
-func CreatetimeUtcGT(v int) predicate.Review {
+func CreatetimeUtcGT(v int64) predicate.Review {
 	return predicate.Review(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldCreatetimeUtc), v))
 	})
 }
 
 // CreatetimeUtcGTE applies the GTE predicate on the "createtime_utc" field.
-func CreatetimeUtcGTE(v int) predicate.Review {
+func CreatetimeUtcGTE(v int64) predicate.Review {
 	return predicate.Review(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldCreatetimeUtc), v))
 	})
 }
 
 // CreatetimeUtcLT applies the LT predicate on the "createtime_utc" field.
-func CreatetimeUtcLT(v int) predicate.Review {
+func CreatetimeUtcLT(v int64) predicate.Review {
 	return predicate.Review(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldCreatetimeUtc), v))
 	})
 }
 
 // CreatetimeUtcLTE applies the LTE predicate on the "createtime_utc" field.
-func CreatetimeUtcLTE(v int) predicate.Review {
+func CreatetimeUtcLTE(v int64) predicate.Review {
 	return predicate.Review(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldCreatetimeUtc), v))
 	})
 }
 
 // UpdatetimeUtcEQ applies the EQ predicate on the "updatetime_utc" field.
-func UpdatetimeUtcEQ(v int) predicate.Review {
+func UpdatetimeUtcEQ(v int64) predicate.Review {
 	return predicate.Review(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldUpdatetimeUtc), v))
 	})
 }
 
 // UpdatetimeUtcNEQ applies the NEQ predicate on the "updatetime_utc" field.
-func UpdatetimeUtcNEQ(v int) predicate.Review {
+func UpdatetimeUtcNEQ(v int64) predicate.Review {
 	return predicate.Review(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldUpdatetimeUtc), v))
 	})
 }
 
 // UpdatetimeUtcIn applies the In predicate on the "updatetime_utc" field.
-func UpdatetimeUtcIn(vs ...int) predicate.Review {
+func UpdatetimeUtcIn(vs ...int64) predicate.Review {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -352,7 +352,7 @@ func UpdatetimeUtcIn(vs ...int) predicate.Review {
 }
 
 // UpdatetimeUtcNotIn applies the NotIn predicate on the "updatetime_utc" field.
-func UpdatetimeUtcNotIn(vs ...int) predicate.Review {
+func UpdatetimeUtcNotIn(vs ...int64) predicate.Review {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -369,28 +369,28 @@ func UpdatetimeUtcNotIn(vs ...int) predicate.Review {
 }
 
 // UpdatetimeUtcGT applies the GT predicate on the "updatetime_utc" field.
-func UpdatetimeUtcGT(v int) predicate.Review {
+func UpdatetimeUtcGT(v int64) predicate.Review {
 	return predicate.Review(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldUpdatetimeUtc), v))
 	})
 }
 
 // UpdatetimeUtcGTE applies the GTE predicate on the "updatetime_utc" field.
-func UpdatetimeUtcGTE(v int) predicate.Review {
+func UpdatetimeUtcGTE(v int64) predicate.Review {
 	return predicate.Review(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldUpdatetimeUtc), v))
 	})
 }
 
 // UpdatetimeUtcLT applies the LT predicate on the "updatetime_utc" field.
-func UpdatetimeUtcLT(v int) predicate.Review {
+func UpdatetimeUtcLT(v int64) predicate.Review {
 	return predicate.Review(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldUpdatetimeUtc), v))
 	})
 }
 
 // UpdatetimeUtcLTE applies the LTE predicate on the "updatetime_utc" field.
-func UpdatetimeUtcLTE(v int) predicate.Review {
+func UpdatetimeUtcLTE(v int64) predicate.Review {
 	return predicate.Review(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldUpdatetimeUtc), v))
 	})

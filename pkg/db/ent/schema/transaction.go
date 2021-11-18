@@ -31,8 +31,8 @@ func (Transaction) Fields() []ent.Field {
 			Default(false),
 		field.String("signature_user").MaxLen(16),
 		field.String("signature_platform").MaxLen(64),
-		field.Int("createtime_utc"),
-		field.Int("updatetime_utc"),
+		field.Int64("createtime_utc"),
+		field.Int64("updatetime_utc"),
 	}
 }
 

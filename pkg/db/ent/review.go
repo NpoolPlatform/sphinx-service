@@ -22,9 +22,9 @@ type Review struct {
 	// OperatorNote holds the value of the "operator_note" field.
 	OperatorNote string `json:"operator_note,omitempty"`
 	// CreatetimeUtc holds the value of the "createtime_utc" field.
-	CreatetimeUtc int `json:"createtime_utc,omitempty"`
+	CreatetimeUtc int64 `json:"createtime_utc,omitempty"`
 	// UpdatetimeUtc holds the value of the "updatetime_utc" field.
-	UpdatetimeUtc int `json:"updatetime_utc,omitempty"`
+	UpdatetimeUtc int64 `json:"updatetime_utc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ReviewQuery when eager-loading is set.
 	Edges              ReviewEdges `json:"edges"`
@@ -123,13 +123,13 @@ func (r *Review) assignValues(columns []string, values []interface{}) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field createtime_utc", values[i])
 			} else if value.Valid {
-				r.CreatetimeUtc = int(value.Int64)
+				r.CreatetimeUtc = value.Int64
 			}
 		case review.FieldUpdatetimeUtc:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field updatetime_utc", values[i])
 			} else if value.Valid {
-				r.UpdatetimeUtc = int(value.Int64)
+				r.UpdatetimeUtc = value.Int64
 			}
 		case review.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {

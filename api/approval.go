@@ -6,6 +6,7 @@ import (
 	"github.com/NpoolPlatform/sphinx-service/pkg/message/message"
 )
 
+// deprecated
 func ApproveTransaction(transactionIDInsite string) (isApproved bool, err error) {
 	isApproved, err = approval.ApproveTransaction(transactionIDInsite)
 	if err != nil {
@@ -17,5 +18,5 @@ func ApproveTransaction(transactionIDInsite string) (isApproved bool, err error)
 	return
 }
 
-// TODO
+// as well
 func NotifyProcessTransaction(notification *message.NotificationTransaction) {}

@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc/codes"
 )
 
+// deprecated
 // 审核通过交易
 func ApproveTransaction(transactionIDInsite string) (isApproved bool, err error) {
 	ctx := context.Background()
@@ -52,7 +53,7 @@ func ApproveTransaction(transactionIDInsite string) (isApproved bool, err error)
 		_, err = info.Update().
 			SetMutex(false).
 			SetStatus(transaction.StatusPendingProcess).
-			SetUpdatetimeUtc(int(time.Now().UTC().Unix())).
+			SetUpdatetimeUtc(time.Now().UTC().Unix()).
 			Save(ctx)
 		if err != nil {
 			err = status.Error(codes.Internal, "approval update db failed, mutex still locked")
@@ -64,7 +65,7 @@ func ApproveTransaction(transactionIDInsite string) (isApproved bool, err error)
 		_, err = info.Update().
 			SetMutex(false).
 			SetStatus(transaction.StatusRejected).
-			SetUpdatetimeUtc(int(time.Now().UTC().Unix())).
+			SetUpdatetimeUtc(time.Now().UTC().Unix()).
 			Save(ctx)
 		if err != nil {
 			err = status.Error(codes.Internal, "approval update db failed, mutex still locked")

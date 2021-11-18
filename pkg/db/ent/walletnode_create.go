@@ -51,13 +51,13 @@ func (wnc *WalletNodeCreate) SetLocalIP(s string) *WalletNodeCreate {
 }
 
 // SetCreatetimeUtc sets the "createtime_utc" field.
-func (wnc *WalletNodeCreate) SetCreatetimeUtc(i int) *WalletNodeCreate {
+func (wnc *WalletNodeCreate) SetCreatetimeUtc(i int64) *WalletNodeCreate {
 	wnc.mutation.SetCreatetimeUtc(i)
 	return wnc
 }
 
 // SetLastOnlineTimeUtc sets the "last_online_time_utc" field.
-func (wnc *WalletNodeCreate) SetLastOnlineTimeUtc(i int) *WalletNodeCreate {
+func (wnc *WalletNodeCreate) SetLastOnlineTimeUtc(i int64) *WalletNodeCreate {
 	wnc.mutation.SetLastOnlineTimeUtc(i)
 	return wnc
 }
@@ -248,7 +248,7 @@ func (wnc *WalletNodeCreate) createSpec() (*WalletNode, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := wnc.mutation.CreatetimeUtc(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: walletnode.FieldCreatetimeUtc,
 		})
@@ -256,7 +256,7 @@ func (wnc *WalletNodeCreate) createSpec() (*WalletNode, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := wnc.mutation.LastOnlineTimeUtc(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: walletnode.FieldLastOnlineTimeUtc,
 		})

@@ -76,8 +76,8 @@ var (
 		{Name: "id", Type: field.TypeInt32, Increment: true},
 		{Name: "is_approved", Type: field.TypeBool, Default: false},
 		{Name: "operator_note", Type: field.TypeString, Size: 70},
-		{Name: "createtime_utc", Type: field.TypeInt},
-		{Name: "updatetime_utc", Type: field.TypeInt},
+		{Name: "createtime_utc", Type: field.TypeInt64},
+		{Name: "updatetime_utc", Type: field.TypeInt64},
 		{Name: "coin_info_reviews", Type: field.TypeInt32, Nullable: true},
 		{Name: "transaction_review", Type: field.TypeInt32, Nullable: true},
 	}
@@ -128,8 +128,8 @@ var (
 		{Name: "mutex", Type: field.TypeBool, Default: false},
 		{Name: "signature_user", Type: field.TypeString, Size: 16},
 		{Name: "signature_platform", Type: field.TypeString, Size: 64},
-		{Name: "createtime_utc", Type: field.TypeInt},
-		{Name: "updatetime_utc", Type: field.TypeInt},
+		{Name: "createtime_utc", Type: field.TypeInt64},
+		{Name: "updatetime_utc", Type: field.TypeInt64},
 		{Name: "coin_info_transactions", Type: field.TypeInt32, Nullable: true},
 	}
 	// TransactionsTable holds the schema information for the "transactions" table.
@@ -191,8 +191,8 @@ var (
 		{Name: "host_vendor", Type: field.TypeString},
 		{Name: "public_ip", Type: field.TypeString},
 		{Name: "local_ip", Type: field.TypeString},
-		{Name: "createtime_utc", Type: field.TypeInt},
-		{Name: "last_online_time_utc", Type: field.TypeInt},
+		{Name: "createtime_utc", Type: field.TypeInt64},
+		{Name: "last_online_time_utc", Type: field.TypeInt64},
 		{Name: "coin_info_wallet_nodes", Type: field.TypeInt32, Nullable: true},
 	}
 	// WalletNodesTable holds the schema information for the "wallet_nodes" table.

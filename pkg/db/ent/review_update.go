@@ -50,27 +50,27 @@ func (ru *ReviewUpdate) SetOperatorNote(s string) *ReviewUpdate {
 }
 
 // SetCreatetimeUtc sets the "createtime_utc" field.
-func (ru *ReviewUpdate) SetCreatetimeUtc(i int) *ReviewUpdate {
+func (ru *ReviewUpdate) SetCreatetimeUtc(i int64) *ReviewUpdate {
 	ru.mutation.ResetCreatetimeUtc()
 	ru.mutation.SetCreatetimeUtc(i)
 	return ru
 }
 
 // AddCreatetimeUtc adds i to the "createtime_utc" field.
-func (ru *ReviewUpdate) AddCreatetimeUtc(i int) *ReviewUpdate {
+func (ru *ReviewUpdate) AddCreatetimeUtc(i int64) *ReviewUpdate {
 	ru.mutation.AddCreatetimeUtc(i)
 	return ru
 }
 
 // SetUpdatetimeUtc sets the "updatetime_utc" field.
-func (ru *ReviewUpdate) SetUpdatetimeUtc(i int) *ReviewUpdate {
+func (ru *ReviewUpdate) SetUpdatetimeUtc(i int64) *ReviewUpdate {
 	ru.mutation.ResetUpdatetimeUtc()
 	ru.mutation.SetUpdatetimeUtc(i)
 	return ru
 }
 
 // AddUpdatetimeUtc adds i to the "updatetime_utc" field.
-func (ru *ReviewUpdate) AddUpdatetimeUtc(i int) *ReviewUpdate {
+func (ru *ReviewUpdate) AddUpdatetimeUtc(i int64) *ReviewUpdate {
 	ru.mutation.AddUpdatetimeUtc(i)
 	return ru
 }
@@ -224,28 +224,28 @@ func (ru *ReviewUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := ru.mutation.CreatetimeUtc(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: review.FieldCreatetimeUtc,
 		})
 	}
 	if value, ok := ru.mutation.AddedCreatetimeUtc(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: review.FieldCreatetimeUtc,
 		})
 	}
 	if value, ok := ru.mutation.UpdatetimeUtc(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: review.FieldUpdatetimeUtc,
 		})
 	}
 	if value, ok := ru.mutation.AddedUpdatetimeUtc(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: review.FieldUpdatetimeUtc,
 		})
@@ -360,27 +360,27 @@ func (ruo *ReviewUpdateOne) SetOperatorNote(s string) *ReviewUpdateOne {
 }
 
 // SetCreatetimeUtc sets the "createtime_utc" field.
-func (ruo *ReviewUpdateOne) SetCreatetimeUtc(i int) *ReviewUpdateOne {
+func (ruo *ReviewUpdateOne) SetCreatetimeUtc(i int64) *ReviewUpdateOne {
 	ruo.mutation.ResetCreatetimeUtc()
 	ruo.mutation.SetCreatetimeUtc(i)
 	return ruo
 }
 
 // AddCreatetimeUtc adds i to the "createtime_utc" field.
-func (ruo *ReviewUpdateOne) AddCreatetimeUtc(i int) *ReviewUpdateOne {
+func (ruo *ReviewUpdateOne) AddCreatetimeUtc(i int64) *ReviewUpdateOne {
 	ruo.mutation.AddCreatetimeUtc(i)
 	return ruo
 }
 
 // SetUpdatetimeUtc sets the "updatetime_utc" field.
-func (ruo *ReviewUpdateOne) SetUpdatetimeUtc(i int) *ReviewUpdateOne {
+func (ruo *ReviewUpdateOne) SetUpdatetimeUtc(i int64) *ReviewUpdateOne {
 	ruo.mutation.ResetUpdatetimeUtc()
 	ruo.mutation.SetUpdatetimeUtc(i)
 	return ruo
 }
 
 // AddUpdatetimeUtc adds i to the "updatetime_utc" field.
-func (ruo *ReviewUpdateOne) AddUpdatetimeUtc(i int) *ReviewUpdateOne {
+func (ruo *ReviewUpdateOne) AddUpdatetimeUtc(i int64) *ReviewUpdateOne {
 	ruo.mutation.AddUpdatetimeUtc(i)
 	return ruo
 }
@@ -558,28 +558,28 @@ func (ruo *ReviewUpdateOne) sqlSave(ctx context.Context) (_node *Review, err err
 	}
 	if value, ok := ruo.mutation.CreatetimeUtc(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: review.FieldCreatetimeUtc,
 		})
 	}
 	if value, ok := ruo.mutation.AddedCreatetimeUtc(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: review.FieldCreatetimeUtc,
 		})
 	}
 	if value, ok := ruo.mutation.UpdatetimeUtc(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: review.FieldUpdatetimeUtc,
 		})
 	}
 	if value, ok := ruo.mutation.AddedUpdatetimeUtc(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: review.FieldUpdatetimeUtc,
 		})

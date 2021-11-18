@@ -132,27 +132,27 @@ func (tu *TransactionUpdate) SetSignaturePlatform(s string) *TransactionUpdate {
 }
 
 // SetCreatetimeUtc sets the "createtime_utc" field.
-func (tu *TransactionUpdate) SetCreatetimeUtc(i int) *TransactionUpdate {
+func (tu *TransactionUpdate) SetCreatetimeUtc(i int64) *TransactionUpdate {
 	tu.mutation.ResetCreatetimeUtc()
 	tu.mutation.SetCreatetimeUtc(i)
 	return tu
 }
 
 // AddCreatetimeUtc adds i to the "createtime_utc" field.
-func (tu *TransactionUpdate) AddCreatetimeUtc(i int) *TransactionUpdate {
+func (tu *TransactionUpdate) AddCreatetimeUtc(i int64) *TransactionUpdate {
 	tu.mutation.AddCreatetimeUtc(i)
 	return tu
 }
 
 // SetUpdatetimeUtc sets the "updatetime_utc" field.
-func (tu *TransactionUpdate) SetUpdatetimeUtc(i int) *TransactionUpdate {
+func (tu *TransactionUpdate) SetUpdatetimeUtc(i int64) *TransactionUpdate {
 	tu.mutation.ResetUpdatetimeUtc()
 	tu.mutation.SetUpdatetimeUtc(i)
 	return tu
 }
 
 // AddUpdatetimeUtc adds i to the "updatetime_utc" field.
-func (tu *TransactionUpdate) AddUpdatetimeUtc(i int) *TransactionUpdate {
+func (tu *TransactionUpdate) AddUpdatetimeUtc(i int64) *TransactionUpdate {
 	tu.mutation.AddUpdatetimeUtc(i)
 	return tu
 }
@@ -441,28 +441,28 @@ func (tu *TransactionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := tu.mutation.CreatetimeUtc(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: transaction.FieldCreatetimeUtc,
 		})
 	}
 	if value, ok := tu.mutation.AddedCreatetimeUtc(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: transaction.FieldCreatetimeUtc,
 		})
 	}
 	if value, ok := tu.mutation.UpdatetimeUtc(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: transaction.FieldUpdatetimeUtc,
 		})
 	}
 	if value, ok := tu.mutation.AddedUpdatetimeUtc(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: transaction.FieldUpdatetimeUtc,
 		})
@@ -678,27 +678,27 @@ func (tuo *TransactionUpdateOne) SetSignaturePlatform(s string) *TransactionUpda
 }
 
 // SetCreatetimeUtc sets the "createtime_utc" field.
-func (tuo *TransactionUpdateOne) SetCreatetimeUtc(i int) *TransactionUpdateOne {
+func (tuo *TransactionUpdateOne) SetCreatetimeUtc(i int64) *TransactionUpdateOne {
 	tuo.mutation.ResetCreatetimeUtc()
 	tuo.mutation.SetCreatetimeUtc(i)
 	return tuo
 }
 
 // AddCreatetimeUtc adds i to the "createtime_utc" field.
-func (tuo *TransactionUpdateOne) AddCreatetimeUtc(i int) *TransactionUpdateOne {
+func (tuo *TransactionUpdateOne) AddCreatetimeUtc(i int64) *TransactionUpdateOne {
 	tuo.mutation.AddCreatetimeUtc(i)
 	return tuo
 }
 
 // SetUpdatetimeUtc sets the "updatetime_utc" field.
-func (tuo *TransactionUpdateOne) SetUpdatetimeUtc(i int) *TransactionUpdateOne {
+func (tuo *TransactionUpdateOne) SetUpdatetimeUtc(i int64) *TransactionUpdateOne {
 	tuo.mutation.ResetUpdatetimeUtc()
 	tuo.mutation.SetUpdatetimeUtc(i)
 	return tuo
 }
 
 // AddUpdatetimeUtc adds i to the "updatetime_utc" field.
-func (tuo *TransactionUpdateOne) AddUpdatetimeUtc(i int) *TransactionUpdateOne {
+func (tuo *TransactionUpdateOne) AddUpdatetimeUtc(i int64) *TransactionUpdateOne {
 	tuo.mutation.AddUpdatetimeUtc(i)
 	return tuo
 }
@@ -1011,28 +1011,28 @@ func (tuo *TransactionUpdateOne) sqlSave(ctx context.Context) (_node *Transactio
 	}
 	if value, ok := tuo.mutation.CreatetimeUtc(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: transaction.FieldCreatetimeUtc,
 		})
 	}
 	if value, ok := tuo.mutation.AddedCreatetimeUtc(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: transaction.FieldCreatetimeUtc,
 		})
 	}
 	if value, ok := tuo.mutation.UpdatetimeUtc(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: transaction.FieldUpdatetimeUtc,
 		})
 	}
 	if value, ok := tuo.mutation.AddedUpdatetimeUtc(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
+			Type:   field.TypeInt64,
 			Value:  value,
 			Column: transaction.FieldUpdatetimeUtc,
 		})

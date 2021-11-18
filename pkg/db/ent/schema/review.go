@@ -16,8 +16,8 @@ func (Review) Fields() []ent.Field {
 		field.Int32("id"),
 		field.Bool("is_approved").Default(false),
 		field.String("operator_note").MaxLen(70),
-		field.Int("createtime_utc"),
-		field.Int("updatetime_utc"),
+		field.Int64("createtime_utc"),
+		field.Int64("updatetime_utc"),
 	}
 }
 
