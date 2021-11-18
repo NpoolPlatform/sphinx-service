@@ -16,11 +16,10 @@ import (
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
 	"github.com/NpoolPlatform/sphinx-service/pkg/message/message"
+	"github.com/NpoolPlatform/sphinx-service/pkg/message/server"
 	"github.com/gogo/status"
 	"google.golang.org/grpc/codes"
 )
-
-const priceScale = 1000000000000
 
 // 转账 / 提现
 func ApplyTransaction(ctx context.Context, in *trading.ApplyTransactionRequest) (resp *trading.SuccessInfo, err error) {
@@ -105,7 +104,7 @@ func GetBalance(ctx context.Context, in *trading.GetBalanceRequest) (resp *tradi
 		Address:  in.Address,
 	})
 	if err != nil {
-		err = status.Errorf(codes.Internal, "get wallet balance failed, %w", err)
+		err = status.Errorf(codes.Internal, "get wallet balance failed, %v", err)
 		return
 	}
 	amountUint64, amountString, amountFloat64 := UntestedDecomposeStringAmount(respRPC.Info.Balance)
@@ -167,6 +166,8 @@ func RegisterAccount(coinTypeID int32, uuid string) (account *trading.AccountAdd
 		IsSuccess:       false,
 		IsFailed:        false,
 	}
+	server.PublishDefaultNotification(notification)
+	// problems here TODO MARK
 	return
 }
 

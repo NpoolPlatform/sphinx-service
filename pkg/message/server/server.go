@@ -20,3 +20,7 @@ func PublishNotificationTransactionCreate(notification *msg.NotificationTransact
 func PublishNotificationTransactionProcess(notification *msg.NotificationTransaction) error {
 	return msgsrv.PublishToQueue(msg.QueueAgent, notification)
 }
+
+func PublishDefaultNotification(notification *msg.NotificationTransaction) error {
+	return msgsrv.PublishToQueue(msg.GetQueueName(), notification)
+}

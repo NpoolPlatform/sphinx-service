@@ -29,6 +29,9 @@ func InitQueues() (err error) {
 	if err = msgsrv.DeclareQueue(QueueTrading); err != nil {
 		return
 	}
+	if err = msgsrv.DeclareQueue(GetQueueName()); err != nil {
+		return
+	}
 	return
 }
 
