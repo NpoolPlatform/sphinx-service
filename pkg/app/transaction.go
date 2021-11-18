@@ -8,7 +8,7 @@ import (
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	"github.com/NpoolPlatform/go-service-framework/pkg/price"
-	"github.com/NpoolPlatform/message/npool/signproxy"
+	"github.com/NpoolPlatform/message/npool/sphinxplugin"
 	"github.com/NpoolPlatform/message/npool/trading"
 	"github.com/NpoolPlatform/sphinx-service/pkg/client"
 	"github.com/NpoolPlatform/sphinx-service/pkg/crud"
@@ -95,12 +95,8 @@ func GetInsiteTxStatus(ctx context.Context, in *trading.GetInsiteTxStatusRequest
 
 // 余额查询
 func GetBalance(ctx context.Context, in *trading.GetBalanceRequest) (resp *trading.AccountBalance, err error) {
-	client.ClientProxy.WalletBalance(ctx, &signproxy.WalletBalanceRequest{
-		CoinType: 0,
-		Address:  in.Address,
-	})
-	respRPC, err := client.ClientProxy.WalletBalance(ctx, &signproxy.WalletBalanceRequest{
-		CoinType: signproxy.CoinType(in.CoinId),
+	respRPC, err := client.ClientProxy.WalletBalance(ctx, &sphinxplugin.WalletBalanceRequest{
+		CoinType: sphinxplugin.CoinType(in.CoinId),
 		Address:  in.Address,
 	})
 	if err != nil {
@@ -156,15 +152,14 @@ func CheckIfTransactionComplete(tx *ent.Transaction) (err error) {
 
 // 钱包代理 创建账号
 func RegisterAccount(coinTypeID int32, uuid string) (account *trading.AccountAddress, err error) {
-	coinType := signproxy.CoinType(coinTypeID)
+	coinType := sphinxplugin.CoinType(coinTypeID)
 	notification := &message.NotificationTransaction{
-		TransactionType: signproxy.TransactionType_TransactionTypeCreateAccount,
-		CoinType:        coinType,
-		UUID:            uuid,
-		CreatetimeUtc:   time.Now().UTC().Unix(),
-		UpdatetimeUtc:   0,
-		IsSuccess:       false,
-		IsFailed:        false,
+		CoinType:      coinType,
+		UUID:          uuid,
+		CreatetimeUtc: time.Now().UTC().Unix(),
+		UpdatetimeUtc: 0,
+		IsSuccess:     false,
+		IsFailed:      false,
 	}
 	server.PublishDefaultNotification(notification)
 	// problems here TODO MARK
