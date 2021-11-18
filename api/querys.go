@@ -66,7 +66,7 @@ func (s *Server) GetInsiteTxStatus(ctx context.Context, in *npool.GetInsiteTxSta
 
 // 创建账户
 func (s *Server) RegisterAccount(ctx context.Context, in *npool.RegisterAccountRequest) (resp *npool.AccountAddress, err error) {
-	resp, err = app.RegisterAccount(ctx, in.CoinId, in.Uuid)
+	resp, err = app.RegisterAccount(ctx, in.CoinName, in.Uuid)
 	if err != nil {
 		logger.Sugar().Errorw("registeraccount error: %w", err)
 		resp = &npool.AccountAddress{}

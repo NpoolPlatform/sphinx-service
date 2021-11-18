@@ -111,7 +111,7 @@ loop:
 			continue
 		}
 		cancel()
-		fmt.Println("from grpc: ", out.AmountUint64)
+		fmt.Println("from grpc float64: ", out.AmountFloat64)
 	}
 	log.Println("grpc done")
 }

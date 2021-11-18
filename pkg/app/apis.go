@@ -16,7 +16,7 @@ import (
 )
 
 // 创建账号
-func RegisterAccount(ctx context.Context, coinTypeID int32, uuid string) (account *trading.AccountAddress, err error) {
+func RegisterAccount(ctx context.Context, coinName, uuid string) (account *trading.AccountAddress, err error) {
 	// online mode
 	// coinType := sphinxplugin.CoinType(coinTypeID)
 	// resp, err := client.ClientProxy.WalletNew(ctx, &signproxy.WalletNewRequest{
@@ -25,40 +25,49 @@ func RegisterAccount(ctx context.Context, coinTypeID int32, uuid string) (accoun
 	// })
 	// "github.com/NpoolPlatform/message/npool/signproxy"
 	// debug mode
+	coinID, err := crud.CoinName2CoinID(coinName)
+	if err != nil {
+		account = nil
+		return
+	}
 	resp, err := client.ClientProxy.WalletNew(ctx, &sphinxsign.WalletNewRequest{
-		CoinType: sphinxplugin.CoinType(coinTypeID),
+		CoinType: sphinxplugin.CoinType(coinID),
 	})
 	if err != nil {
-		resp = nil
+		account = nil
 		return
 	}
 	account = &trading.AccountAddress{
-		CoinId:  coinTypeID,
-		Address: resp.Info.Address,
-		Uuid:    uuid,
+		CoinName: coinName,
+		Address:  resp.Info.Address,
+		Uuid:     uuid,
 	}
 	return
 }
 
 // 余额查询
 func GetBalance(ctx context.Context, in *trading.GetBalanceRequest) (resp *trading.AccountBalance, err error) {
+	coinID, err := crud.CoinName2CoinID(in.CoinName)
+	if err != nil {
+		resp = nil
+		return
+	}
 	respRPC, err := client.ClientProxy.WalletBalance(ctx, &sphinxplugin.WalletBalanceRequest{
-		CoinType: sphinxplugin.CoinType(in.CoinId),
+		CoinType: sphinxplugin.CoinType(coinID),
 		Address:  in.Address,
 	})
 	if err != nil {
 		err = status.Errorf(codes.Internal, "get wallet balance failed, %v", err)
 		return
 	}
-	amountUint64, amountString, amountFloat64 := UntestedDecomposeStringAmount(respRPC.Info.Balance)
+	_, amountString, amountFloat64 := UntestedDecomposeStringAmount(respRPC.Info.Balance)
 	logger.Sugar().Infof("amount in: %v", respRPC.Info.Balance)
 	logger.Sugar().Infof("amount decomposed: %v", amountString)
 	resp = &trading.AccountBalance{
-		CoinId:        in.CoinId,
+		CoinName:      in.CoinName,
 		Address:       in.Address,
 		TimestampUtc:  time.Now().UTC().Unix(),
 		AmountFloat64: amountFloat64,
-		AmountUint64:  amountUint64,
 	}
 	return
 }
