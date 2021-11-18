@@ -47,4 +47,7 @@ metadata:
 spec:
   ports:
   - name: api
-    port: 8080
+    port: 50160
+    targetPort: 50160
+  selector:
+    app: sphinx-service

@@ -1,39 +1,57 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: sphinx-service-npool-top-ingress
   namespace: kube-system
   annotations:
-    k8s.kuboard.cn/displayName: sphinx-service
-    k8s.kuboard.cn/workload: sphinx-service
+    k8s.kuboard.cn/displayName: sphinx-service-npool
+    k8s.kuboard.cn/workload: sphinx-service-npool
     kubernetes.io/ingress.class: "traefik-internet"
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-strip-sphinx-service-prefix@kubernetescrd
+
 spec:
   rules:
-  - host: api.npool.top
-    http:
-      paths:
-      - path: /sphinx-service
-        backend:
-          serviceName: sphinx-service
-          servicePort: http
+    - host: api.npool.top
+      http:
+        paths:
+          - path: /sphinx-service
+            backend:
+              serviceName: sphinx-service
+              servicePort: 50160
 
 ---
 
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: sphinx-service-xpool-top-ingress
   namespace: kube-system
   annotations:
-    k8s.kuboard.cn/displayName: sphinx-service
-    k8s.kuboard.cn/workload: sphinx-service
+    k8s.kuboard.cn/displayName: sphinx-service-xpool
+    k8s.kuboard.cn/workload: sphinx-service-xpool
     kubernetes.io/ingress.class: "traefik-internet"
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-strip-sphinx-service-prefix@kubernetescrd
+
 spec:
   rules:
-  - host: api.xpool.top
-    http:
-      paths:
-      - path: /sphinx-service
-        backend:
-          serviceName: sphinx-service
-          servicePort: http
+    - host: api.xpool.top
+      http:
+        paths:
+          - path: /sphinx-service
+            backend:
+              serviceName: sphinx-service
+              servicePort: 50160
+
+---
+
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-sphinx-service-prefix
+  namespace: kube-system
+spec:
+  stripPrefix:
+    prefixes:
+      - /sphinx-service
