@@ -49,5 +49,11 @@ spec:
   - name: api
     port: 50160
     targetPort: 50160
+  - name: grpc
+    port: 50161
+    targetPort: 50161
+  - name: prometheus
+    port: 50163
+    targetPort: 50163
   selector:
     app: sphinx-service
