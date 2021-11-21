@@ -65,13 +65,13 @@ func CheckIfTransactionComplete(tx *ent.Transaction) (err error) {
 
 // 钱包代理 进行转账
 func LetSendTransaction(tx *ent.Transaction) {
-	coinID, err := tx.QueryCoin().OnlyID(ctxPublic)
+	entResp, err := tx.QueryCoin().Only(ctxPublic)
 	if err != nil {
 		logger.Sugar().Errorf("transaction no corresponding coin! %v", err)
 		return
 	}
 	err = server.PublishDefaultNotification(&message.NotificationTransaction{
-		CoinType:            sphinxplugin.CoinType(coinID),
+		CoinType:            sphinxplugin.CoinType(entResp.CoinTypeID),
 		TransactionIDInsite: tx.TransactionIDInsite,
 		AmountFloat64:       tx.AmountFloat64,
 		AddressFrom:         tx.AddressFrom,

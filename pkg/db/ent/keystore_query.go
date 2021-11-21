@@ -14,6 +14,7 @@ import (
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/keystore"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/predicate"
+	"github.com/google/uuid"
 )
 
 // KeyStoreQuery is the builder for querying KeyStore entities.
@@ -382,8 +383,8 @@ func (ksq *KeyStoreQuery) sqlAll(ctx context.Context) ([]*KeyStore, error) {
 	}
 
 	if query := ksq.withCoin; query != nil {
-		ids := make([]int32, 0, len(nodes))
-		nodeids := make(map[int32][]*KeyStore)
+		ids := make([]uuid.UUID, 0, len(nodes))
+		nodeids := make(map[uuid.UUID][]*KeyStore)
 		for i := range nodes {
 			if nodes[i].coin_info_keys == nil {
 				continue

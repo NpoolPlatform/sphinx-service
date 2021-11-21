@@ -5,6 +5,7 @@ import (
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
+	"github.com/google/uuid"
 )
 
 type CoinInfo struct {
@@ -13,9 +14,12 @@ type CoinInfo struct {
 
 func (CoinInfo) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int32("id"),
-		field.String("name").NotEmpty().MaxLen(16).Unique(),
-		field.String("unit").NotEmpty().MaxLen(4),
+		field.UUID("id", uuid.UUID{}).
+			Default(uuid.New).
+			Unique(),
+		field.Int32("coin_type_id"),
+		field.String("name").NotEmpty().Unique(),
+		field.String("unit").NotEmpty(),
 		field.Bool("is_presale").Default(false),
 	}
 }
@@ -33,5 +37,6 @@ func (CoinInfo) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("name").Unique(),
 		index.Fields("unit"),
+		index.Fields("id").Unique(),
 	}
 }

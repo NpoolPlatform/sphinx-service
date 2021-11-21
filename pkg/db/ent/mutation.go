@@ -13,6 +13,7 @@ import (
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/review"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/walletnode"
+	"github.com/google/uuid"
 
 	"entgo.io/ent"
 )
@@ -39,10 +40,12 @@ type CoinInfoMutation struct {
 	config
 	op                  Op
 	typ                 string
-	id                  *int32
+	id                  *uuid.UUID
+	coin_type_id        *int32
+	addcoin_type_id     *int32
 	name                *string
 	unit                *string
-	need_signinfo       *bool
+	is_presale          *bool
 	clearedFields       map[string]struct{}
 	keys                map[int32]struct{}
 	removedkeys         map[int32]struct{}
@@ -81,7 +84,7 @@ func newCoinInfoMutation(c config, op Op, opts ...coininfoOption) *CoinInfoMutat
 }
 
 // withCoinInfoID sets the ID field of the mutation.
-func withCoinInfoID(id int32) coininfoOption {
+func withCoinInfoID(id uuid.UUID) coininfoOption {
 	return func(m *CoinInfoMutation) {
 		var (
 			err   error
@@ -133,17 +136,73 @@ func (m CoinInfoMutation) Tx() (*Tx, error) {
 
 // SetID sets the value of the id field. Note that this
 // operation is only accepted on creation of CoinInfo entities.
-func (m *CoinInfoMutation) SetID(id int32) {
+func (m *CoinInfoMutation) SetID(id uuid.UUID) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *CoinInfoMutation) ID() (id int32, exists bool) {
+func (m *CoinInfoMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
 	return *m.id, true
+}
+
+// SetCoinTypeID sets the "coin_type_id" field.
+func (m *CoinInfoMutation) SetCoinTypeID(i int32) {
+	m.coin_type_id = &i
+	m.addcoin_type_id = nil
+}
+
+// CoinTypeID returns the value of the "coin_type_id" field in the mutation.
+func (m *CoinInfoMutation) CoinTypeID() (r int32, exists bool) {
+	v := m.coin_type_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCoinTypeID returns the old "coin_type_id" field's value of the CoinInfo entity.
+// If the CoinInfo object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CoinInfoMutation) OldCoinTypeID(ctx context.Context) (v int32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldCoinTypeID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldCoinTypeID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCoinTypeID: %w", err)
+	}
+	return oldValue.CoinTypeID, nil
+}
+
+// AddCoinTypeID adds i to the "coin_type_id" field.
+func (m *CoinInfoMutation) AddCoinTypeID(i int32) {
+	if m.addcoin_type_id != nil {
+		*m.addcoin_type_id += i
+	} else {
+		m.addcoin_type_id = &i
+	}
+}
+
+// AddedCoinTypeID returns the value that was added to the "coin_type_id" field in this mutation.
+func (m *CoinInfoMutation) AddedCoinTypeID() (r int32, exists bool) {
+	v := m.addcoin_type_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCoinTypeID resets all changes to the "coin_type_id" field.
+func (m *CoinInfoMutation) ResetCoinTypeID() {
+	m.coin_type_id = nil
+	m.addcoin_type_id = nil
 }
 
 // SetName sets the "name" field.
@@ -218,40 +277,40 @@ func (m *CoinInfoMutation) ResetUnit() {
 	m.unit = nil
 }
 
-// SetNeedSigninfo sets the "need_signinfo" field.
-func (m *CoinInfoMutation) SetNeedSigninfo(b bool) {
-	m.need_signinfo = &b
+// SetIsPresale sets the "is_presale" field.
+func (m *CoinInfoMutation) SetIsPresale(b bool) {
+	m.is_presale = &b
 }
 
-// NeedSigninfo returns the value of the "need_signinfo" field in the mutation.
-func (m *CoinInfoMutation) NeedSigninfo() (r bool, exists bool) {
-	v := m.need_signinfo
+// IsPresale returns the value of the "is_presale" field in the mutation.
+func (m *CoinInfoMutation) IsPresale() (r bool, exists bool) {
+	v := m.is_presale
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldNeedSigninfo returns the old "need_signinfo" field's value of the CoinInfo entity.
+// OldIsPresale returns the old "is_presale" field's value of the CoinInfo entity.
 // If the CoinInfo object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CoinInfoMutation) OldNeedSigninfo(ctx context.Context) (v bool, err error) {
+func (m *CoinInfoMutation) OldIsPresale(ctx context.Context) (v bool, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldNeedSigninfo is only allowed on UpdateOne operations")
+		return v, fmt.Errorf("OldIsPresale is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldNeedSigninfo requires an ID field in the mutation")
+		return v, fmt.Errorf("OldIsPresale requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldNeedSigninfo: %w", err)
+		return v, fmt.Errorf("querying old value for OldIsPresale: %w", err)
 	}
-	return oldValue.NeedSigninfo, nil
+	return oldValue.IsPresale, nil
 }
 
-// ResetNeedSigninfo resets all changes to the "need_signinfo" field.
-func (m *CoinInfoMutation) ResetNeedSigninfo() {
-	m.need_signinfo = nil
+// ResetIsPresale resets all changes to the "is_presale" field.
+func (m *CoinInfoMutation) ResetIsPresale() {
+	m.is_presale = nil
 }
 
 // AddKeyIDs adds the "keys" edge to the KeyStore entity by ids.
@@ -489,15 +548,18 @@ func (m *CoinInfoMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CoinInfoMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 4)
+	if m.coin_type_id != nil {
+		fields = append(fields, coininfo.FieldCoinTypeID)
+	}
 	if m.name != nil {
 		fields = append(fields, coininfo.FieldName)
 	}
 	if m.unit != nil {
 		fields = append(fields, coininfo.FieldUnit)
 	}
-	if m.need_signinfo != nil {
-		fields = append(fields, coininfo.FieldNeedSigninfo)
+	if m.is_presale != nil {
+		fields = append(fields, coininfo.FieldIsPresale)
 	}
 	return fields
 }
@@ -507,12 +569,14 @@ func (m *CoinInfoMutation) Fields() []string {
 // schema.
 func (m *CoinInfoMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case coininfo.FieldCoinTypeID:
+		return m.CoinTypeID()
 	case coininfo.FieldName:
 		return m.Name()
 	case coininfo.FieldUnit:
 		return m.Unit()
-	case coininfo.FieldNeedSigninfo:
-		return m.NeedSigninfo()
+	case coininfo.FieldIsPresale:
+		return m.IsPresale()
 	}
 	return nil, false
 }
@@ -522,12 +586,14 @@ func (m *CoinInfoMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *CoinInfoMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case coininfo.FieldCoinTypeID:
+		return m.OldCoinTypeID(ctx)
 	case coininfo.FieldName:
 		return m.OldName(ctx)
 	case coininfo.FieldUnit:
 		return m.OldUnit(ctx)
-	case coininfo.FieldNeedSigninfo:
-		return m.OldNeedSigninfo(ctx)
+	case coininfo.FieldIsPresale:
+		return m.OldIsPresale(ctx)
 	}
 	return nil, fmt.Errorf("unknown CoinInfo field %s", name)
 }
@@ -537,6 +603,13 @@ func (m *CoinInfoMutation) OldField(ctx context.Context, name string) (ent.Value
 // type.
 func (m *CoinInfoMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case coininfo.FieldCoinTypeID:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCoinTypeID(v)
+		return nil
 	case coininfo.FieldName:
 		v, ok := value.(string)
 		if !ok {
@@ -551,12 +624,12 @@ func (m *CoinInfoMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetUnit(v)
 		return nil
-	case coininfo.FieldNeedSigninfo:
+	case coininfo.FieldIsPresale:
 		v, ok := value.(bool)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetNeedSigninfo(v)
+		m.SetIsPresale(v)
 		return nil
 	}
 	return fmt.Errorf("unknown CoinInfo field %s", name)
@@ -565,13 +638,21 @@ func (m *CoinInfoMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *CoinInfoMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addcoin_type_id != nil {
+		fields = append(fields, coininfo.FieldCoinTypeID)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *CoinInfoMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case coininfo.FieldCoinTypeID:
+		return m.AddedCoinTypeID()
+	}
 	return nil, false
 }
 
@@ -580,6 +661,13 @@ func (m *CoinInfoMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *CoinInfoMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case coininfo.FieldCoinTypeID:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCoinTypeID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown CoinInfo numeric field %s", name)
 }
@@ -607,14 +695,17 @@ func (m *CoinInfoMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *CoinInfoMutation) ResetField(name string) error {
 	switch name {
+	case coininfo.FieldCoinTypeID:
+		m.ResetCoinTypeID()
+		return nil
 	case coininfo.FieldName:
 		m.ResetName()
 		return nil
 	case coininfo.FieldUnit:
 		m.ResetUnit()
 		return nil
-	case coininfo.FieldNeedSigninfo:
-		m.ResetNeedSigninfo()
+	case coininfo.FieldIsPresale:
+		m.ResetIsPresale()
 		return nil
 	}
 	return fmt.Errorf("unknown CoinInfo field %s", name)
@@ -1021,7 +1112,7 @@ type KeyStoreMutation struct {
 	address       *string
 	private_key   *string
 	clearedFields map[string]struct{}
-	coin          *int32
+	coin          *uuid.UUID
 	clearedcoin   bool
 	done          bool
 	oldValue      func(context.Context) (*KeyStore, error)
@@ -1186,7 +1277,7 @@ func (m *KeyStoreMutation) ResetPrivateKey() {
 }
 
 // SetCoinID sets the "coin" edge to the CoinInfo entity by id.
-func (m *KeyStoreMutation) SetCoinID(id int32) {
+func (m *KeyStoreMutation) SetCoinID(id uuid.UUID) {
 	m.coin = &id
 }
 
@@ -1201,7 +1292,7 @@ func (m *KeyStoreMutation) CoinCleared() bool {
 }
 
 // CoinID returns the "coin" edge ID in the mutation.
-func (m *KeyStoreMutation) CoinID() (id int32, exists bool) {
+func (m *KeyStoreMutation) CoinID() (id uuid.UUID, exists bool) {
 	if m.coin != nil {
 		return *m.coin, true
 	}
@@ -1211,7 +1302,7 @@ func (m *KeyStoreMutation) CoinID() (id int32, exists bool) {
 // CoinIDs returns the "coin" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // CoinID instead. It exists only for internal usage by the builders.
-func (m *KeyStoreMutation) CoinIDs() (ids []int32) {
+func (m *KeyStoreMutation) CoinIDs() (ids []uuid.UUID) {
 	if id := m.coin; id != nil {
 		ids = append(ids, *id)
 	}
@@ -1448,7 +1539,7 @@ type ReviewMutation struct {
 	clearedFields      map[string]struct{}
 	transaction        *int32
 	clearedtransaction bool
-	coin               *int32
+	coin               *uuid.UUID
 	clearedcoin        bool
 	done               bool
 	oldValue           func(context.Context) (*Review, error)
@@ -1764,7 +1855,7 @@ func (m *ReviewMutation) ResetTransaction() {
 }
 
 // SetCoinID sets the "coin" edge to the CoinInfo entity by id.
-func (m *ReviewMutation) SetCoinID(id int32) {
+func (m *ReviewMutation) SetCoinID(id uuid.UUID) {
 	m.coin = &id
 }
 
@@ -1779,7 +1870,7 @@ func (m *ReviewMutation) CoinCleared() bool {
 }
 
 // CoinID returns the "coin" edge ID in the mutation.
-func (m *ReviewMutation) CoinID() (id int32, exists bool) {
+func (m *ReviewMutation) CoinID() (id uuid.UUID, exists bool) {
 	if m.coin != nil {
 		return *m.coin, true
 	}
@@ -1789,7 +1880,7 @@ func (m *ReviewMutation) CoinID() (id int32, exists bool) {
 // CoinIDs returns the "coin" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // CoinID instead. It exists only for internal usage by the builders.
-func (m *ReviewMutation) CoinIDs() (ids []int32) {
+func (m *ReviewMutation) CoinIDs() (ids []uuid.UUID) {
 	if id := m.coin; id != nil {
 		ids = append(ids, *id)
 	}
@@ -2115,7 +2206,7 @@ type TransactionMutation struct {
 	updatetime_utc        *int64
 	addupdatetime_utc     *int64
 	clearedFields         map[string]struct{}
-	coin                  *int32
+	coin                  *uuid.UUID
 	clearedcoin           bool
 	review                map[int32]struct{}
 	removedreview         map[int32]struct{}
@@ -2795,7 +2886,7 @@ func (m *TransactionMutation) ResetUpdatetimeUtc() {
 }
 
 // SetCoinID sets the "coin" edge to the CoinInfo entity by id.
-func (m *TransactionMutation) SetCoinID(id int32) {
+func (m *TransactionMutation) SetCoinID(id uuid.UUID) {
 	m.coin = &id
 }
 
@@ -2810,7 +2901,7 @@ func (m *TransactionMutation) CoinCleared() bool {
 }
 
 // CoinID returns the "coin" edge ID in the mutation.
-func (m *TransactionMutation) CoinID() (id int32, exists bool) {
+func (m *TransactionMutation) CoinID() (id uuid.UUID, exists bool) {
 	if m.coin != nil {
 		return *m.coin, true
 	}
@@ -2820,7 +2911,7 @@ func (m *TransactionMutation) CoinID() (id int32, exists bool) {
 // CoinIDs returns the "coin" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // CoinID instead. It exists only for internal usage by the builders.
-func (m *TransactionMutation) CoinIDs() (ids []int32) {
+func (m *TransactionMutation) CoinIDs() (ids []uuid.UUID) {
 	if id := m.coin; id != nil {
 		ids = append(ids, *id)
 	}
@@ -3393,7 +3484,7 @@ type WalletNodeMutation struct {
 	last_online_time_utc    *int64
 	addlast_online_time_utc *int64
 	clearedFields           map[string]struct{}
-	coin                    *int32
+	coin                    *uuid.UUID
 	clearedcoin             bool
 	done                    bool
 	oldValue                func(context.Context) (*WalletNode, error)
@@ -3778,7 +3869,7 @@ func (m *WalletNodeMutation) ResetLastOnlineTimeUtc() {
 }
 
 // SetCoinID sets the "coin" edge to the CoinInfo entity by id.
-func (m *WalletNodeMutation) SetCoinID(id int32) {
+func (m *WalletNodeMutation) SetCoinID(id uuid.UUID) {
 	m.coin = &id
 }
 
@@ -3793,7 +3884,7 @@ func (m *WalletNodeMutation) CoinCleared() bool {
 }
 
 // CoinID returns the "coin" edge ID in the mutation.
-func (m *WalletNodeMutation) CoinID() (id int32, exists bool) {
+func (m *WalletNodeMutation) CoinID() (id uuid.UUID, exists bool) {
 	if m.coin != nil {
 		return *m.coin, true
 	}
@@ -3803,7 +3894,7 @@ func (m *WalletNodeMutation) CoinID() (id int32, exists bool) {
 // CoinIDs returns the "coin" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // CoinID instead. It exists only for internal usage by the builders.
-func (m *WalletNodeMutation) CoinIDs() (ids []int32) {
+func (m *WalletNodeMutation) CoinIDs() (ids []uuid.UUID) {
 	if id := m.coin; id != nil {
 		ids = append(ids, *id)
 	}

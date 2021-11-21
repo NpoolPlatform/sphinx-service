@@ -16,6 +16,7 @@ import (
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/predicate"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/review"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
+	"github.com/google/uuid"
 )
 
 // TransactionQuery is the builder for querying Transaction entities.
@@ -420,8 +421,8 @@ func (tq *TransactionQuery) sqlAll(ctx context.Context) ([]*Transaction, error) 
 	}
 
 	if query := tq.withCoin; query != nil {
-		ids := make([]int32, 0, len(nodes))
-		nodeids := make(map[int32][]*Transaction)
+		ids := make([]uuid.UUID, 0, len(nodes))
+		nodeids := make(map[uuid.UUID][]*Transaction)
 		for i := range nodes {
 			if nodes[i].coin_info_transactions == nil {
 				continue

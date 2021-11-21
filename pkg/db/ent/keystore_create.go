@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/keystore"
+	"github.com/google/uuid"
 )
 
 // KeyStoreCreate is the builder for creating a KeyStore entity.
@@ -39,7 +40,7 @@ func (ksc *KeyStoreCreate) SetID(i int32) *KeyStoreCreate {
 }
 
 // SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (ksc *KeyStoreCreate) SetCoinID(id int32) *KeyStoreCreate {
+func (ksc *KeyStoreCreate) SetCoinID(id uuid.UUID) *KeyStoreCreate {
 	ksc.mutation.SetCoinID(id)
 	return ksc
 }
@@ -196,7 +197,7 @@ func (ksc *KeyStoreCreate) createSpec() (*KeyStore, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt32,
+					Type:   field.TypeUUID,
 					Column: coininfo.FieldID,
 				},
 			},

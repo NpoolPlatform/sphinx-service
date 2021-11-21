@@ -13,6 +13,7 @@ import (
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/predicate"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/walletnode"
+	"github.com/google/uuid"
 )
 
 // WalletNodeUpdate is the builder for updating WalletNode entities.
@@ -85,7 +86,7 @@ func (wnu *WalletNodeUpdate) AddLastOnlineTimeUtc(i int64) *WalletNodeUpdate {
 }
 
 // SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (wnu *WalletNodeUpdate) SetCoinID(id int32) *WalletNodeUpdate {
+func (wnu *WalletNodeUpdate) SetCoinID(id uuid.UUID) *WalletNodeUpdate {
 	wnu.mutation.SetCoinID(id)
 	return wnu
 }
@@ -264,7 +265,7 @@ func (wnu *WalletNodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt32,
+					Type:   field.TypeUUID,
 					Column: coininfo.FieldID,
 				},
 			},
@@ -280,7 +281,7 @@ func (wnu *WalletNodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt32,
+					Type:   field.TypeUUID,
 					Column: coininfo.FieldID,
 				},
 			},
@@ -366,7 +367,7 @@ func (wnuo *WalletNodeUpdateOne) AddLastOnlineTimeUtc(i int64) *WalletNodeUpdate
 }
 
 // SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (wnuo *WalletNodeUpdateOne) SetCoinID(id int32) *WalletNodeUpdateOne {
+func (wnuo *WalletNodeUpdateOne) SetCoinID(id uuid.UUID) *WalletNodeUpdateOne {
 	wnuo.mutation.SetCoinID(id)
 	return wnuo
 }
@@ -569,7 +570,7 @@ func (wnuo *WalletNodeUpdateOne) sqlSave(ctx context.Context) (_node *WalletNode
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt32,
+					Type:   field.TypeUUID,
 					Column: coininfo.FieldID,
 				},
 			},
@@ -585,7 +586,7 @@ func (wnuo *WalletNodeUpdateOne) sqlSave(ctx context.Context) (_node *WalletNode
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt32,
+					Type:   field.TypeUUID,
 					Column: coininfo.FieldID,
 				},
 			},

@@ -9,6 +9,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
+	"github.com/google/uuid"
 )
 
 // Transaction is the model entity for the Transaction schema.
@@ -47,7 +48,7 @@ type Transaction struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TransactionQuery when eager-loading is set.
 	Edges                  TransactionEdges `json:"edges"`
-	coin_info_transactions *int32
+	coin_info_transactions *uuid.UUID
 }
 
 // TransactionEdges holds the relations/edges for other nodes in the graph.
@@ -98,7 +99,7 @@ func (*Transaction) scanValues(columns []string) ([]interface{}, error) {
 		case transaction.FieldAddressFrom, transaction.FieldAddressTo, transaction.FieldType, transaction.FieldTransactionIDInsite, transaction.FieldTransactionIDChain, transaction.FieldStatus, transaction.FieldSignatureUser, transaction.FieldSignaturePlatform:
 			values[i] = new(sql.NullString)
 		case transaction.ForeignKeys[0]: // coin_info_transactions
-			values[i] = new(sql.NullInt64)
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Transaction", columns[i])
 		}
@@ -205,11 +206,11 @@ func (t *Transaction) assignValues(columns []string, values []interface{}) error
 				t.UpdatetimeUtc = value.Int64
 			}
 		case transaction.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field coin_info_transactions", value)
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field coin_info_transactions", values[i])
 			} else if value.Valid {
-				t.coin_info_transactions = new(int32)
-				*t.coin_info_transactions = int32(value.Int64)
+				t.coin_info_transactions = new(uuid.UUID)
+				*t.coin_info_transactions = *value.S.(*uuid.UUID)
 			}
 		}
 	}

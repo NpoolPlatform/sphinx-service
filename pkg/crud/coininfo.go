@@ -15,9 +15,11 @@ func init() {
 }
 
 func CoinName2CoinID(name string) (id int32, err error) {
-	id, err = db.Client().CoinInfo.Query().Where(coininfo.Name(name)).FirstID(ctxPublic)
-	if err != nil {
+	entResp, err := db.Client().CoinInfo.Query().Where(coininfo.Name(name)).Only(ctxPublic)
+	if err != nil || entResp == nil {
 		logger.Sugar().Warnf("didn't get coin id, err:", err)
+		return
 	}
+	id = entResp.CoinTypeID
 	return
 }

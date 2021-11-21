@@ -14,6 +14,7 @@ import (
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/predicate"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/review"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
+	"github.com/google/uuid"
 )
 
 // ReviewUpdate is the builder for updating Review entities.
@@ -87,7 +88,7 @@ func (ru *ReviewUpdate) SetTransaction(t *Transaction) *ReviewUpdate {
 }
 
 // SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (ru *ReviewUpdate) SetCoinID(id int32) *ReviewUpdate {
+func (ru *ReviewUpdate) SetCoinID(id uuid.UUID) *ReviewUpdate {
 	ru.mutation.SetCoinID(id)
 	return ru
 }
@@ -294,7 +295,7 @@ func (ru *ReviewUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt32,
+					Type:   field.TypeUUID,
 					Column: coininfo.FieldID,
 				},
 			},
@@ -310,7 +311,7 @@ func (ru *ReviewUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt32,
+					Type:   field.TypeUUID,
 					Column: coininfo.FieldID,
 				},
 			},
@@ -397,7 +398,7 @@ func (ruo *ReviewUpdateOne) SetTransaction(t *Transaction) *ReviewUpdateOne {
 }
 
 // SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (ruo *ReviewUpdateOne) SetCoinID(id int32) *ReviewUpdateOne {
+func (ruo *ReviewUpdateOne) SetCoinID(id uuid.UUID) *ReviewUpdateOne {
 	ruo.mutation.SetCoinID(id)
 	return ruo
 }
@@ -628,7 +629,7 @@ func (ruo *ReviewUpdateOne) sqlSave(ctx context.Context) (_node *Review, err err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt32,
+					Type:   field.TypeUUID,
 					Column: coininfo.FieldID,
 				},
 			},
@@ -644,7 +645,7 @@ func (ruo *ReviewUpdateOne) sqlSave(ctx context.Context) (_node *Review, err err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt32,
+					Type:   field.TypeUUID,
 					Column: coininfo.FieldID,
 				},
 			},

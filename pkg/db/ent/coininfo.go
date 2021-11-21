@@ -8,19 +8,22 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
+	"github.com/google/uuid"
 )
 
 // CoinInfo is the model entity for the CoinInfo schema.
 type CoinInfo struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int32 `json:"id,omitempty"`
+	ID uuid.UUID `json:"id,omitempty"`
+	// CoinTypeID holds the value of the "coin_type_id" field.
+	CoinTypeID int32 `json:"coin_type_id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Unit holds the value of the "unit" field.
 	Unit string `json:"unit,omitempty"`
-	// NeedSigninfo holds the value of the "need_signinfo" field.
-	NeedSigninfo bool `json:"need_signinfo,omitempty"`
+	// IsPresale holds the value of the "is_presale" field.
+	IsPresale bool `json:"is_presale,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CoinInfoQuery when eager-loading is set.
 	Edges CoinInfoEdges `json:"edges"`
@@ -82,12 +85,14 @@ func (*CoinInfo) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case coininfo.FieldNeedSigninfo:
+		case coininfo.FieldIsPresale:
 			values[i] = new(sql.NullBool)
-		case coininfo.FieldID:
+		case coininfo.FieldCoinTypeID:
 			values[i] = new(sql.NullInt64)
 		case coininfo.FieldName, coininfo.FieldUnit:
 			values[i] = new(sql.NullString)
+		case coininfo.FieldID:
+			values[i] = new(uuid.UUID)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type CoinInfo", columns[i])
 		}
@@ -104,11 +109,17 @@ func (ci *CoinInfo) assignValues(columns []string, values []interface{}) error {
 	for i := range columns {
 		switch columns[i] {
 		case coininfo.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
+			} else if value != nil {
+				ci.ID = *value
 			}
-			ci.ID = int32(value.Int64)
+		case coininfo.FieldCoinTypeID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field coin_type_id", values[i])
+			} else if value.Valid {
+				ci.CoinTypeID = int32(value.Int64)
+			}
 		case coininfo.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
@@ -121,11 +132,11 @@ func (ci *CoinInfo) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				ci.Unit = value.String
 			}
-		case coininfo.FieldNeedSigninfo:
+		case coininfo.FieldIsPresale:
 			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field need_signinfo", values[i])
+				return fmt.Errorf("unexpected type %T for field is_presale", values[i])
 			} else if value.Valid {
-				ci.NeedSigninfo = value.Bool
+				ci.IsPresale = value.Bool
 			}
 		}
 	}
@@ -175,12 +186,14 @@ func (ci *CoinInfo) String() string {
 	var builder strings.Builder
 	builder.WriteString("CoinInfo(")
 	builder.WriteString(fmt.Sprintf("id=%v", ci.ID))
+	builder.WriteString(", coin_type_id=")
+	builder.WriteString(fmt.Sprintf("%v", ci.CoinTypeID))
 	builder.WriteString(", name=")
 	builder.WriteString(ci.Name)
 	builder.WriteString(", unit=")
 	builder.WriteString(ci.Unit)
-	builder.WriteString(", need_signinfo=")
-	builder.WriteString(fmt.Sprintf("%v", ci.NeedSigninfo))
+	builder.WriteString(", is_presale=")
+	builder.WriteString(fmt.Sprintf("%v", ci.IsPresale))
 	builder.WriteByte(')')
 	return builder.String()
 }

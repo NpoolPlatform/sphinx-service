@@ -8,6 +8,7 @@ import (
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/review"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/schema"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
+	"github.com/google/uuid"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -17,45 +18,21 @@ func init() {
 	coininfoFields := schema.CoinInfo{}.Fields()
 	_ = coininfoFields
 	// coininfoDescName is the schema descriptor for name field.
-	coininfoDescName := coininfoFields[1].Descriptor()
+	coininfoDescName := coininfoFields[2].Descriptor()
 	// coininfo.NameValidator is a validator for the "name" field. It is called by the builders before save.
-	coininfo.NameValidator = func() func(string) error {
-		validators := coininfoDescName.Validators
-		fns := [...]func(string) error{
-			validators[0].(func(string) error),
-			validators[1].(func(string) error),
-		}
-		return func(name string) error {
-			for _, fn := range fns {
-				if err := fn(name); err != nil {
-					return err
-				}
-			}
-			return nil
-		}
-	}()
+	coininfo.NameValidator = coininfoDescName.Validators[0].(func(string) error)
 	// coininfoDescUnit is the schema descriptor for unit field.
-	coininfoDescUnit := coininfoFields[2].Descriptor()
+	coininfoDescUnit := coininfoFields[3].Descriptor()
 	// coininfo.UnitValidator is a validator for the "unit" field. It is called by the builders before save.
-	coininfo.UnitValidator = func() func(string) error {
-		validators := coininfoDescUnit.Validators
-		fns := [...]func(string) error{
-			validators[0].(func(string) error),
-			validators[1].(func(string) error),
-		}
-		return func(unit string) error {
-			for _, fn := range fns {
-				if err := fn(unit); err != nil {
-					return err
-				}
-			}
-			return nil
-		}
-	}()
-	// coininfoDescNeedSigninfo is the schema descriptor for need_signinfo field.
-	coininfoDescNeedSigninfo := coininfoFields[3].Descriptor()
-	// coininfo.DefaultNeedSigninfo holds the default value on creation for the need_signinfo field.
-	coininfo.DefaultNeedSigninfo = coininfoDescNeedSigninfo.Default.(bool)
+	coininfo.UnitValidator = coininfoDescUnit.Validators[0].(func(string) error)
+	// coininfoDescIsPresale is the schema descriptor for is_presale field.
+	coininfoDescIsPresale := coininfoFields[4].Descriptor()
+	// coininfo.DefaultIsPresale holds the default value on creation for the is_presale field.
+	coininfo.DefaultIsPresale = coininfoDescIsPresale.Default.(bool)
+	// coininfoDescID is the schema descriptor for id field.
+	coininfoDescID := coininfoFields[0].Descriptor()
+	// coininfo.DefaultID holds the default value on creation for the id field.
+	coininfo.DefaultID = coininfoDescID.Default.(func() uuid.UUID)
 	keystoreFields := schema.KeyStore{}.Fields()
 	_ = keystoreFields
 	// keystoreDescAddress is the schema descriptor for address field.

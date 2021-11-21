@@ -12,6 +12,7 @@ import (
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/review"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
+	"github.com/google/uuid"
 )
 
 // TransactionCreate is the builder for creating a Transaction entity.
@@ -128,7 +129,7 @@ func (tc *TransactionCreate) SetID(i int32) *TransactionCreate {
 }
 
 // SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (tc *TransactionCreate) SetCoinID(id int32) *TransactionCreate {
+func (tc *TransactionCreate) SetCoinID(id uuid.UUID) *TransactionCreate {
 	tc.mutation.SetCoinID(id)
 	return tc
 }
@@ -475,7 +476,7 @@ func (tc *TransactionCreate) createSpec() (*Transaction, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt32,
+					Type:   field.TypeUUID,
 					Column: coininfo.FieldID,
 				},
 			},

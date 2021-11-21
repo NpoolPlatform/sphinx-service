@@ -8,6 +8,7 @@ import (
 	"log"
 
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/migrate"
+	"github.com/google/uuid"
 
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/empty"
@@ -197,7 +198,7 @@ func (c *CoinInfoClient) UpdateOne(ci *CoinInfo) *CoinInfoUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *CoinInfoClient) UpdateOneID(id int32) *CoinInfoUpdateOne {
+func (c *CoinInfoClient) UpdateOneID(id uuid.UUID) *CoinInfoUpdateOne {
 	mutation := newCoinInfoMutation(c.config, OpUpdateOne, withCoinInfoID(id))
 	return &CoinInfoUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -214,7 +215,7 @@ func (c *CoinInfoClient) DeleteOne(ci *CoinInfo) *CoinInfoDeleteOne {
 }
 
 // DeleteOneID returns a delete builder for the given id.
-func (c *CoinInfoClient) DeleteOneID(id int32) *CoinInfoDeleteOne {
+func (c *CoinInfoClient) DeleteOneID(id uuid.UUID) *CoinInfoDeleteOne {
 	builder := c.Delete().Where(coininfo.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -229,12 +230,12 @@ func (c *CoinInfoClient) Query() *CoinInfoQuery {
 }
 
 // Get returns a CoinInfo entity by its id.
-func (c *CoinInfoClient) Get(ctx context.Context, id int32) (*CoinInfo, error) {
+func (c *CoinInfoClient) Get(ctx context.Context, id uuid.UUID) (*CoinInfo, error) {
 	return c.Query().Where(coininfo.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *CoinInfoClient) GetX(ctx context.Context, id int32) *CoinInfo {
+func (c *CoinInfoClient) GetX(ctx context.Context, id uuid.UUID) *CoinInfo {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)

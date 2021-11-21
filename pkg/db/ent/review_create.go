@@ -12,6 +12,7 @@ import (
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/review"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
+	"github.com/google/uuid"
 )
 
 // ReviewCreate is the builder for creating a Review entity.
@@ -71,7 +72,7 @@ func (rc *ReviewCreate) SetTransaction(t *Transaction) *ReviewCreate {
 }
 
 // SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (rc *ReviewCreate) SetCoinID(id int32) *ReviewCreate {
+func (rc *ReviewCreate) SetCoinID(id uuid.UUID) *ReviewCreate {
 	rc.mutation.SetCoinID(id)
 	return rc
 }
@@ -277,7 +278,7 @@ func (rc *ReviewCreate) createSpec() (*Review, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt32,
+					Type:   field.TypeUUID,
 					Column: coininfo.FieldID,
 				},
 			},

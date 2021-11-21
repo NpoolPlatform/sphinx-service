@@ -10,6 +10,7 @@ import (
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/review"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
+	"github.com/google/uuid"
 )
 
 // Review is the model entity for the Review schema.
@@ -28,7 +29,7 @@ type Review struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ReviewQuery when eager-loading is set.
 	Edges              ReviewEdges `json:"edges"`
-	coin_info_reviews  *int32
+	coin_info_reviews  *uuid.UUID
 	transaction_review *int32
 }
 
@@ -83,7 +84,7 @@ func (*Review) scanValues(columns []string) ([]interface{}, error) {
 		case review.FieldOperatorNote:
 			values[i] = new(sql.NullString)
 		case review.ForeignKeys[0]: // coin_info_reviews
-			values[i] = new(sql.NullInt64)
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		case review.ForeignKeys[1]: // transaction_review
 			values[i] = new(sql.NullInt64)
 		default:
@@ -132,11 +133,11 @@ func (r *Review) assignValues(columns []string, values []interface{}) error {
 				r.UpdatetimeUtc = value.Int64
 			}
 		case review.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field coin_info_reviews", value)
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field coin_info_reviews", values[i])
 			} else if value.Valid {
-				r.coin_info_reviews = new(int32)
-				*r.coin_info_reviews = int32(value.Int64)
+				r.coin_info_reviews = new(uuid.UUID)
+				*r.coin_info_reviews = *value.S.(*uuid.UUID)
 			}
 		case review.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {

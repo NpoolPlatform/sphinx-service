@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/walletnode"
+	"github.com/google/uuid"
 )
 
 // WalletNodeCreate is the builder for creating a WalletNode entity.
@@ -69,7 +70,7 @@ func (wnc *WalletNodeCreate) SetID(i int32) *WalletNodeCreate {
 }
 
 // SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (wnc *WalletNodeCreate) SetCoinID(id int32) *WalletNodeCreate {
+func (wnc *WalletNodeCreate) SetCoinID(id uuid.UUID) *WalletNodeCreate {
 	wnc.mutation.SetCoinID(id)
 	return wnc
 }
@@ -271,7 +272,7 @@ func (wnc *WalletNodeCreate) createSpec() (*WalletNode, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt32,
+					Type:   field.TypeUUID,
 					Column: coininfo.FieldID,
 				},
 			},

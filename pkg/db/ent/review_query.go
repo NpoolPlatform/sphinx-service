@@ -15,6 +15,7 @@ import (
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/predicate"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/review"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
+	"github.com/google/uuid"
 )
 
 // ReviewQuery is the builder for querying Review entities.
@@ -448,8 +449,8 @@ func (rq *ReviewQuery) sqlAll(ctx context.Context) ([]*Review, error) {
 	}
 
 	if query := rq.withCoin; query != nil {
-		ids := make([]int32, 0, len(nodes))
-		nodeids := make(map[int32][]*Review)
+		ids := make([]uuid.UUID, 0, len(nodes))
+		nodeids := make(map[uuid.UUID][]*Review)
 		for i := range nodes {
 			if nodes[i].coin_info_reviews == nil {
 				continue

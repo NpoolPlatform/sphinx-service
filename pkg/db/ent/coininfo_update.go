@@ -30,6 +30,19 @@ func (ciu *CoinInfoUpdate) Where(ps ...predicate.CoinInfo) *CoinInfoUpdate {
 	return ciu
 }
 
+// SetCoinTypeID sets the "coin_type_id" field.
+func (ciu *CoinInfoUpdate) SetCoinTypeID(i int32) *CoinInfoUpdate {
+	ciu.mutation.ResetCoinTypeID()
+	ciu.mutation.SetCoinTypeID(i)
+	return ciu
+}
+
+// AddCoinTypeID adds i to the "coin_type_id" field.
+func (ciu *CoinInfoUpdate) AddCoinTypeID(i int32) *CoinInfoUpdate {
+	ciu.mutation.AddCoinTypeID(i)
+	return ciu
+}
+
 // SetName sets the "name" field.
 func (ciu *CoinInfoUpdate) SetName(s string) *CoinInfoUpdate {
 	ciu.mutation.SetName(s)
@@ -42,16 +55,16 @@ func (ciu *CoinInfoUpdate) SetUnit(s string) *CoinInfoUpdate {
 	return ciu
 }
 
-// SetNeedSigninfo sets the "need_signinfo" field.
-func (ciu *CoinInfoUpdate) SetNeedSigninfo(b bool) *CoinInfoUpdate {
-	ciu.mutation.SetNeedSigninfo(b)
+// SetIsPresale sets the "is_presale" field.
+func (ciu *CoinInfoUpdate) SetIsPresale(b bool) *CoinInfoUpdate {
+	ciu.mutation.SetIsPresale(b)
 	return ciu
 }
 
-// SetNillableNeedSigninfo sets the "need_signinfo" field if the given value is not nil.
-func (ciu *CoinInfoUpdate) SetNillableNeedSigninfo(b *bool) *CoinInfoUpdate {
+// SetNillableIsPresale sets the "is_presale" field if the given value is not nil.
+func (ciu *CoinInfoUpdate) SetNillableIsPresale(b *bool) *CoinInfoUpdate {
 	if b != nil {
-		ciu.SetNeedSigninfo(*b)
+		ciu.SetIsPresale(*b)
 	}
 	return ciu
 }
@@ -286,7 +299,7 @@ func (ciu *CoinInfoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   coininfo.Table,
 			Columns: coininfo.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt32,
+				Type:   field.TypeUUID,
 				Column: coininfo.FieldID,
 			},
 		},
@@ -297,6 +310,20 @@ func (ciu *CoinInfoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := ciu.mutation.CoinTypeID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt32,
+			Value:  value,
+			Column: coininfo.FieldCoinTypeID,
+		})
+	}
+	if value, ok := ciu.mutation.AddedCoinTypeID(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt32,
+			Value:  value,
+			Column: coininfo.FieldCoinTypeID,
+		})
 	}
 	if value, ok := ciu.mutation.Name(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
@@ -312,11 +339,11 @@ func (ciu *CoinInfoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: coininfo.FieldUnit,
 		})
 	}
-	if value, ok := ciu.mutation.NeedSigninfo(); ok {
+	if value, ok := ciu.mutation.IsPresale(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeBool,
 			Value:  value,
-			Column: coininfo.FieldNeedSigninfo,
+			Column: coininfo.FieldIsPresale,
 		})
 	}
 	if ciu.mutation.KeysCleared() {
@@ -554,6 +581,19 @@ type CoinInfoUpdateOne struct {
 	mutation *CoinInfoMutation
 }
 
+// SetCoinTypeID sets the "coin_type_id" field.
+func (ciuo *CoinInfoUpdateOne) SetCoinTypeID(i int32) *CoinInfoUpdateOne {
+	ciuo.mutation.ResetCoinTypeID()
+	ciuo.mutation.SetCoinTypeID(i)
+	return ciuo
+}
+
+// AddCoinTypeID adds i to the "coin_type_id" field.
+func (ciuo *CoinInfoUpdateOne) AddCoinTypeID(i int32) *CoinInfoUpdateOne {
+	ciuo.mutation.AddCoinTypeID(i)
+	return ciuo
+}
+
 // SetName sets the "name" field.
 func (ciuo *CoinInfoUpdateOne) SetName(s string) *CoinInfoUpdateOne {
 	ciuo.mutation.SetName(s)
@@ -566,16 +606,16 @@ func (ciuo *CoinInfoUpdateOne) SetUnit(s string) *CoinInfoUpdateOne {
 	return ciuo
 }
 
-// SetNeedSigninfo sets the "need_signinfo" field.
-func (ciuo *CoinInfoUpdateOne) SetNeedSigninfo(b bool) *CoinInfoUpdateOne {
-	ciuo.mutation.SetNeedSigninfo(b)
+// SetIsPresale sets the "is_presale" field.
+func (ciuo *CoinInfoUpdateOne) SetIsPresale(b bool) *CoinInfoUpdateOne {
+	ciuo.mutation.SetIsPresale(b)
 	return ciuo
 }
 
-// SetNillableNeedSigninfo sets the "need_signinfo" field if the given value is not nil.
-func (ciuo *CoinInfoUpdateOne) SetNillableNeedSigninfo(b *bool) *CoinInfoUpdateOne {
+// SetNillableIsPresale sets the "is_presale" field if the given value is not nil.
+func (ciuo *CoinInfoUpdateOne) SetNillableIsPresale(b *bool) *CoinInfoUpdateOne {
 	if b != nil {
-		ciuo.SetNeedSigninfo(*b)
+		ciuo.SetIsPresale(*b)
 	}
 	return ciuo
 }
@@ -817,7 +857,7 @@ func (ciuo *CoinInfoUpdateOne) sqlSave(ctx context.Context) (_node *CoinInfo, er
 			Table:   coininfo.Table,
 			Columns: coininfo.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt32,
+				Type:   field.TypeUUID,
 				Column: coininfo.FieldID,
 			},
 		},
@@ -846,6 +886,20 @@ func (ciuo *CoinInfoUpdateOne) sqlSave(ctx context.Context) (_node *CoinInfo, er
 			}
 		}
 	}
+	if value, ok := ciuo.mutation.CoinTypeID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt32,
+			Value:  value,
+			Column: coininfo.FieldCoinTypeID,
+		})
+	}
+	if value, ok := ciuo.mutation.AddedCoinTypeID(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt32,
+			Value:  value,
+			Column: coininfo.FieldCoinTypeID,
+		})
+	}
 	if value, ok := ciuo.mutation.Name(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -860,11 +914,11 @@ func (ciuo *CoinInfoUpdateOne) sqlSave(ctx context.Context) (_node *CoinInfo, er
 			Column: coininfo.FieldUnit,
 		})
 	}
-	if value, ok := ciuo.mutation.NeedSigninfo(); ok {
+	if value, ok := ciuo.mutation.IsPresale(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeBool,
 			Value:  value,
-			Column: coininfo.FieldNeedSigninfo,
+			Column: coininfo.FieldIsPresale,
 		})
 	}
 	if ciuo.mutation.KeysCleared() {

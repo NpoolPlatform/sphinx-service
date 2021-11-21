@@ -9,6 +9,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/walletnode"
+	"github.com/google/uuid"
 )
 
 // WalletNode is the model entity for the WalletNode schema.
@@ -33,7 +34,7 @@ type WalletNode struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the WalletNodeQuery when eager-loading is set.
 	Edges                  WalletNodeEdges `json:"edges"`
-	coin_info_wallet_nodes *int32
+	coin_info_wallet_nodes *uuid.UUID
 }
 
 // WalletNodeEdges holds the relations/edges for other nodes in the graph.
@@ -69,7 +70,7 @@ func (*WalletNode) scanValues(columns []string) ([]interface{}, error) {
 		case walletnode.FieldUUID, walletnode.FieldLocation, walletnode.FieldHostVendor, walletnode.FieldPublicIP, walletnode.FieldLocalIP:
 			values[i] = new(sql.NullString)
 		case walletnode.ForeignKeys[0]: // coin_info_wallet_nodes
-			values[i] = new(sql.NullInt64)
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type WalletNode", columns[i])
 		}
@@ -134,11 +135,11 @@ func (wn *WalletNode) assignValues(columns []string, values []interface{}) error
 				wn.LastOnlineTimeUtc = value.Int64
 			}
 		case walletnode.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field coin_info_wallet_nodes", value)
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field coin_info_wallet_nodes", values[i])
 			} else if value.Valid {
-				wn.coin_info_wallet_nodes = new(int32)
-				*wn.coin_info_wallet_nodes = int32(value.Int64)
+				wn.coin_info_wallet_nodes = new(uuid.UUID)
+				*wn.coin_info_wallet_nodes = *value.S.(*uuid.UUID)
 			}
 		}
 	}

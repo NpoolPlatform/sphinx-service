@@ -18,6 +18,7 @@ import (
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/review"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/walletnode"
+	"github.com/google/uuid"
 )
 
 // CoinInfoQuery is the builder for querying CoinInfo entities.
@@ -182,8 +183,8 @@ func (ciq *CoinInfoQuery) FirstX(ctx context.Context) *CoinInfo {
 
 // FirstID returns the first CoinInfo ID from the query.
 // Returns a *NotFoundError when no CoinInfo ID was found.
-func (ciq *CoinInfoQuery) FirstID(ctx context.Context) (id int32, err error) {
-	var ids []int32
+func (ciq *CoinInfoQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = ciq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -195,7 +196,7 @@ func (ciq *CoinInfoQuery) FirstID(ctx context.Context) (id int32, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (ciq *CoinInfoQuery) FirstIDX(ctx context.Context) int32 {
+func (ciq *CoinInfoQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := ciq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -233,8 +234,8 @@ func (ciq *CoinInfoQuery) OnlyX(ctx context.Context) *CoinInfo {
 // OnlyID is like Only, but returns the only CoinInfo ID in the query.
 // Returns a *NotSingularError when exactly one CoinInfo ID is not found.
 // Returns a *NotFoundError when no entities are found.
-func (ciq *CoinInfoQuery) OnlyID(ctx context.Context) (id int32, err error) {
-	var ids []int32
+func (ciq *CoinInfoQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = ciq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -250,7 +251,7 @@ func (ciq *CoinInfoQuery) OnlyID(ctx context.Context) (id int32, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (ciq *CoinInfoQuery) OnlyIDX(ctx context.Context) int32 {
+func (ciq *CoinInfoQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := ciq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -276,8 +277,8 @@ func (ciq *CoinInfoQuery) AllX(ctx context.Context) []*CoinInfo {
 }
 
 // IDs executes the query and returns a list of CoinInfo IDs.
-func (ciq *CoinInfoQuery) IDs(ctx context.Context) ([]int32, error) {
-	var ids []int32
+func (ciq *CoinInfoQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	var ids []uuid.UUID
 	if err := ciq.Select(coininfo.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -285,7 +286,7 @@ func (ciq *CoinInfoQuery) IDs(ctx context.Context) ([]int32, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (ciq *CoinInfoQuery) IDsX(ctx context.Context) []int32 {
+func (ciq *CoinInfoQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := ciq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -399,12 +400,12 @@ func (ciq *CoinInfoQuery) WithWalletNodes(opts ...func(*WalletNodeQuery)) *CoinI
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		CoinTypeID int32 `json:"coin_type_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.CoinInfo.Query().
-//		GroupBy(coininfo.FieldName).
+//		GroupBy(coininfo.FieldCoinTypeID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -426,11 +427,11 @@ func (ciq *CoinInfoQuery) GroupBy(field string, fields ...string) *CoinInfoGroup
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		CoinTypeID int32 `json:"coin_type_id,omitempty"`
 //	}
 //
 //	client.CoinInfo.Query().
-//		Select(coininfo.FieldName).
+//		Select(coininfo.FieldCoinTypeID).
 //		Scan(ctx, &v)
 //
 func (ciq *CoinInfoQuery) Select(fields ...string) *CoinInfoSelect {
@@ -487,7 +488,7 @@ func (ciq *CoinInfoQuery) sqlAll(ctx context.Context) ([]*CoinInfo, error) {
 
 	if query := ciq.withKeys; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[int32]*CoinInfo)
+		nodeids := make(map[uuid.UUID]*CoinInfo)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
@@ -516,7 +517,7 @@ func (ciq *CoinInfoQuery) sqlAll(ctx context.Context) ([]*CoinInfo, error) {
 
 	if query := ciq.withTransactions; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[int32]*CoinInfo)
+		nodeids := make(map[uuid.UUID]*CoinInfo)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
@@ -545,7 +546,7 @@ func (ciq *CoinInfoQuery) sqlAll(ctx context.Context) ([]*CoinInfo, error) {
 
 	if query := ciq.withReviews; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[int32]*CoinInfo)
+		nodeids := make(map[uuid.UUID]*CoinInfo)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
@@ -574,7 +575,7 @@ func (ciq *CoinInfoQuery) sqlAll(ctx context.Context) ([]*CoinInfo, error) {
 
 	if query := ciq.withWalletNodes; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[int32]*CoinInfo)
+		nodeids := make(map[uuid.UUID]*CoinInfo)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
@@ -623,7 +624,7 @@ func (ciq *CoinInfoQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   coininfo.Table,
 			Columns: coininfo.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt32,
+				Type:   field.TypeUUID,
 				Column: coininfo.FieldID,
 			},
 		},

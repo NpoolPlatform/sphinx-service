@@ -14,6 +14,7 @@ import (
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/predicate"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/walletnode"
+	"github.com/google/uuid"
 )
 
 // WalletNodeQuery is the builder for querying WalletNode entities.
@@ -382,8 +383,8 @@ func (wnq *WalletNodeQuery) sqlAll(ctx context.Context) ([]*WalletNode, error) {
 	}
 
 	if query := wnq.withCoin; query != nil {
-		ids := make([]int32, 0, len(nodes))
-		nodeids := make(map[int32][]*WalletNode)
+		ids := make([]uuid.UUID, 0, len(nodes))
+		nodeids := make(map[uuid.UUID][]*WalletNode)
 		for i := range nodes {
 			if nodes[i].coin_info_wallet_nodes == nil {
 				continue

@@ -13,6 +13,7 @@ import (
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/keystore"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/predicate"
+	"github.com/google/uuid"
 )
 
 // KeyStoreUpdate is the builder for updating KeyStore entities.
@@ -41,7 +42,7 @@ func (ksu *KeyStoreUpdate) SetPrivateKey(s string) *KeyStoreUpdate {
 }
 
 // SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (ksu *KeyStoreUpdate) SetCoinID(id int32) *KeyStoreUpdate {
+func (ksu *KeyStoreUpdate) SetCoinID(id uuid.UUID) *KeyStoreUpdate {
 	ksu.mutation.SetCoinID(id)
 	return ksu
 }
@@ -181,7 +182,7 @@ func (ksu *KeyStoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt32,
+					Type:   field.TypeUUID,
 					Column: coininfo.FieldID,
 				},
 			},
@@ -197,7 +198,7 @@ func (ksu *KeyStoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt32,
+					Type:   field.TypeUUID,
 					Column: coininfo.FieldID,
 				},
 			},
@@ -239,7 +240,7 @@ func (ksuo *KeyStoreUpdateOne) SetPrivateKey(s string) *KeyStoreUpdateOne {
 }
 
 // SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (ksuo *KeyStoreUpdateOne) SetCoinID(id int32) *KeyStoreUpdateOne {
+func (ksuo *KeyStoreUpdateOne) SetCoinID(id uuid.UUID) *KeyStoreUpdateOne {
 	ksuo.mutation.SetCoinID(id)
 	return ksuo
 }
@@ -403,7 +404,7 @@ func (ksuo *KeyStoreUpdateOne) sqlSave(ctx context.Context) (_node *KeyStore, er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt32,
+					Type:   field.TypeUUID,
 					Column: coininfo.FieldID,
 				},
 			},
@@ -419,7 +420,7 @@ func (ksuo *KeyStoreUpdateOne) sqlSave(ctx context.Context) (_node *KeyStore, er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt32,
+					Type:   field.TypeUUID,
 					Column: coininfo.FieldID,
 				},
 			},

@@ -9,6 +9,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/keystore"
+	"github.com/google/uuid"
 )
 
 // KeyStore is the model entity for the KeyStore schema.
@@ -23,7 +24,7 @@ type KeyStore struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the KeyStoreQuery when eager-loading is set.
 	Edges          KeyStoreEdges `json:"edges"`
-	coin_info_keys *int32
+	coin_info_keys *uuid.UUID
 }
 
 // KeyStoreEdges holds the relations/edges for other nodes in the graph.
@@ -59,7 +60,7 @@ func (*KeyStore) scanValues(columns []string) ([]interface{}, error) {
 		case keystore.FieldAddress, keystore.FieldPrivateKey:
 			values[i] = new(sql.NullString)
 		case keystore.ForeignKeys[0]: // coin_info_keys
-			values[i] = new(sql.NullInt64)
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type KeyStore", columns[i])
 		}
@@ -94,11 +95,11 @@ func (ks *KeyStore) assignValues(columns []string, values []interface{}) error {
 				ks.PrivateKey = value.String
 			}
 		case keystore.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field coin_info_keys", value)
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field coin_info_keys", values[i])
 			} else if value.Valid {
-				ks.coin_info_keys = new(int32)
-				*ks.coin_info_keys = int32(value.Int64)
+				ks.coin_info_keys = new(uuid.UUID)
+				*ks.coin_info_keys = *value.S.(*uuid.UUID)
 			}
 		}
 	}

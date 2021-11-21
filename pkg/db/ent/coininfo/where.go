@@ -6,31 +6,32 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/predicate"
+	"github.com/google/uuid"
 )
 
 // ID filters vertices based on their ID field.
-func ID(id int32) predicate.CoinInfo {
+func ID(id uuid.UUID) predicate.CoinInfo {
 	return predicate.CoinInfo(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int32) predicate.CoinInfo {
+func IDEQ(id uuid.UUID) predicate.CoinInfo {
 	return predicate.CoinInfo(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int32) predicate.CoinInfo {
+func IDNEQ(id uuid.UUID) predicate.CoinInfo {
 	return predicate.CoinInfo(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldID), id))
 	})
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int32) predicate.CoinInfo {
+func IDIn(ids ...uuid.UUID) predicate.CoinInfo {
 	return predicate.CoinInfo(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
 		// since we can't apply "IN ()". This will make this predicate falsy.
@@ -47,7 +48,7 @@ func IDIn(ids ...int32) predicate.CoinInfo {
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int32) predicate.CoinInfo {
+func IDNotIn(ids ...uuid.UUID) predicate.CoinInfo {
 	return predicate.CoinInfo(func(s *sql.Selector) {
 		// if not arguments were provided, append the FALSE constants,
 		// since we can't apply "IN ()". This will make this predicate falsy.
@@ -64,30 +65,37 @@ func IDNotIn(ids ...int32) predicate.CoinInfo {
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int32) predicate.CoinInfo {
+func IDGT(id uuid.UUID) predicate.CoinInfo {
 	return predicate.CoinInfo(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldID), id))
 	})
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int32) predicate.CoinInfo {
+func IDGTE(id uuid.UUID) predicate.CoinInfo {
 	return predicate.CoinInfo(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldID), id))
 	})
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int32) predicate.CoinInfo {
+func IDLT(id uuid.UUID) predicate.CoinInfo {
 	return predicate.CoinInfo(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldID), id))
 	})
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int32) predicate.CoinInfo {
+func IDLTE(id uuid.UUID) predicate.CoinInfo {
 	return predicate.CoinInfo(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldID), id))
+	})
+}
+
+// CoinTypeID applies equality check predicate on the "coin_type_id" field. It's identical to CoinTypeIDEQ.
+func CoinTypeID(v int32) predicate.CoinInfo {
+	return predicate.CoinInfo(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldCoinTypeID), v))
 	})
 }
 
@@ -105,10 +113,86 @@ func Unit(v string) predicate.CoinInfo {
 	})
 }
 
-// NeedSigninfo applies equality check predicate on the "need_signinfo" field. It's identical to NeedSigninfoEQ.
-func NeedSigninfo(v bool) predicate.CoinInfo {
+// IsPresale applies equality check predicate on the "is_presale" field. It's identical to IsPresaleEQ.
+func IsPresale(v bool) predicate.CoinInfo {
 	return predicate.CoinInfo(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldNeedSigninfo), v))
+		s.Where(sql.EQ(s.C(FieldIsPresale), v))
+	})
+}
+
+// CoinTypeIDEQ applies the EQ predicate on the "coin_type_id" field.
+func CoinTypeIDEQ(v int32) predicate.CoinInfo {
+	return predicate.CoinInfo(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldCoinTypeID), v))
+	})
+}
+
+// CoinTypeIDNEQ applies the NEQ predicate on the "coin_type_id" field.
+func CoinTypeIDNEQ(v int32) predicate.CoinInfo {
+	return predicate.CoinInfo(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldCoinTypeID), v))
+	})
+}
+
+// CoinTypeIDIn applies the In predicate on the "coin_type_id" field.
+func CoinTypeIDIn(vs ...int32) predicate.CoinInfo {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.CoinInfo(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldCoinTypeID), v...))
+	})
+}
+
+// CoinTypeIDNotIn applies the NotIn predicate on the "coin_type_id" field.
+func CoinTypeIDNotIn(vs ...int32) predicate.CoinInfo {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.CoinInfo(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldCoinTypeID), v...))
+	})
+}
+
+// CoinTypeIDGT applies the GT predicate on the "coin_type_id" field.
+func CoinTypeIDGT(v int32) predicate.CoinInfo {
+	return predicate.CoinInfo(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldCoinTypeID), v))
+	})
+}
+
+// CoinTypeIDGTE applies the GTE predicate on the "coin_type_id" field.
+func CoinTypeIDGTE(v int32) predicate.CoinInfo {
+	return predicate.CoinInfo(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldCoinTypeID), v))
+	})
+}
+
+// CoinTypeIDLT applies the LT predicate on the "coin_type_id" field.
+func CoinTypeIDLT(v int32) predicate.CoinInfo {
+	return predicate.CoinInfo(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldCoinTypeID), v))
+	})
+}
+
+// CoinTypeIDLTE applies the LTE predicate on the "coin_type_id" field.
+func CoinTypeIDLTE(v int32) predicate.CoinInfo {
+	return predicate.CoinInfo(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldCoinTypeID), v))
 	})
 }
 
@@ -334,17 +418,17 @@ func UnitContainsFold(v string) predicate.CoinInfo {
 	})
 }
 
-// NeedSigninfoEQ applies the EQ predicate on the "need_signinfo" field.
-func NeedSigninfoEQ(v bool) predicate.CoinInfo {
+// IsPresaleEQ applies the EQ predicate on the "is_presale" field.
+func IsPresaleEQ(v bool) predicate.CoinInfo {
 	return predicate.CoinInfo(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldNeedSigninfo), v))
+		s.Where(sql.EQ(s.C(FieldIsPresale), v))
 	})
 }
 
-// NeedSigninfoNEQ applies the NEQ predicate on the "need_signinfo" field.
-func NeedSigninfoNEQ(v bool) predicate.CoinInfo {
+// IsPresaleNEQ applies the NEQ predicate on the "is_presale" field.
+func IsPresaleNEQ(v bool) predicate.CoinInfo {
 	return predicate.CoinInfo(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldNeedSigninfo), v))
+		s.Where(sql.NEQ(s.C(FieldIsPresale), v))
 	})
 }
 
