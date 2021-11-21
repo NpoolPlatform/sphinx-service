@@ -9,5 +9,9 @@ OUTPUT=./output
 
 mkdir -p $OUTPUT/$PLATFORM
 for service_name in `ls $(pwd)/cmd`; do
-    kill -9 `pidof $service_name`
+    if [ -z `pidof $service_name` ];then
+        echo "[WARNING] $service_name process not found"
+    else
+        kill -9 `pidof $service_name`
+    fi
 done
