@@ -16,8 +16,6 @@ type Tx struct {
 	CoinInfo *CoinInfoClient
 	// Empty is the client for interacting with the Empty builders.
 	Empty *EmptyClient
-	// KeyStore is the client for interacting with the KeyStore builders.
-	KeyStore *KeyStoreClient
 	// Review is the client for interacting with the Review builders.
 	Review *ReviewClient
 	// Transaction is the client for interacting with the Transaction builders.
@@ -161,7 +159,6 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.CoinInfo = NewCoinInfoClient(tx.config)
 	tx.Empty = NewEmptyClient(tx.config)
-	tx.KeyStore = NewKeyStoreClient(tx.config)
 	tx.Review = NewReviewClient(tx.config)
 	tx.Transaction = NewTransactionClient(tx.config)
 	tx.WalletNode = NewWalletNodeClient(tx.config)

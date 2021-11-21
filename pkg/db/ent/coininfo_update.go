@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
-	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/keystore"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/predicate"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/review"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
@@ -69,21 +68,6 @@ func (ciu *CoinInfoUpdate) SetNillableIsPresale(b *bool) *CoinInfoUpdate {
 	return ciu
 }
 
-// AddKeyIDs adds the "keys" edge to the KeyStore entity by IDs.
-func (ciu *CoinInfoUpdate) AddKeyIDs(ids ...int32) *CoinInfoUpdate {
-	ciu.mutation.AddKeyIDs(ids...)
-	return ciu
-}
-
-// AddKeys adds the "keys" edges to the KeyStore entity.
-func (ciu *CoinInfoUpdate) AddKeys(k ...*KeyStore) *CoinInfoUpdate {
-	ids := make([]int32, len(k))
-	for i := range k {
-		ids[i] = k[i].ID
-	}
-	return ciu.AddKeyIDs(ids...)
-}
-
 // AddTransactionIDs adds the "transactions" edge to the Transaction entity by IDs.
 func (ciu *CoinInfoUpdate) AddTransactionIDs(ids ...int32) *CoinInfoUpdate {
 	ciu.mutation.AddTransactionIDs(ids...)
@@ -132,27 +116,6 @@ func (ciu *CoinInfoUpdate) AddWalletNodes(w ...*WalletNode) *CoinInfoUpdate {
 // Mutation returns the CoinInfoMutation object of the builder.
 func (ciu *CoinInfoUpdate) Mutation() *CoinInfoMutation {
 	return ciu.mutation
-}
-
-// ClearKeys clears all "keys" edges to the KeyStore entity.
-func (ciu *CoinInfoUpdate) ClearKeys() *CoinInfoUpdate {
-	ciu.mutation.ClearKeys()
-	return ciu
-}
-
-// RemoveKeyIDs removes the "keys" edge to KeyStore entities by IDs.
-func (ciu *CoinInfoUpdate) RemoveKeyIDs(ids ...int32) *CoinInfoUpdate {
-	ciu.mutation.RemoveKeyIDs(ids...)
-	return ciu
-}
-
-// RemoveKeys removes "keys" edges to KeyStore entities.
-func (ciu *CoinInfoUpdate) RemoveKeys(k ...*KeyStore) *CoinInfoUpdate {
-	ids := make([]int32, len(k))
-	for i := range k {
-		ids[i] = k[i].ID
-	}
-	return ciu.RemoveKeyIDs(ids...)
 }
 
 // ClearTransactions clears all "transactions" edges to the Transaction entity.
@@ -345,60 +308,6 @@ func (ciu *CoinInfoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Value:  value,
 			Column: coininfo.FieldIsPresale,
 		})
-	}
-	if ciu.mutation.KeysCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   coininfo.KeysTable,
-			Columns: []string{coininfo.KeysColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt32,
-					Column: keystore.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ciu.mutation.RemovedKeysIDs(); len(nodes) > 0 && !ciu.mutation.KeysCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   coininfo.KeysTable,
-			Columns: []string{coininfo.KeysColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt32,
-					Column: keystore.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ciu.mutation.KeysIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   coininfo.KeysTable,
-			Columns: []string{coininfo.KeysColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt32,
-					Column: keystore.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if ciu.mutation.TransactionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -620,21 +529,6 @@ func (ciuo *CoinInfoUpdateOne) SetNillableIsPresale(b *bool) *CoinInfoUpdateOne 
 	return ciuo
 }
 
-// AddKeyIDs adds the "keys" edge to the KeyStore entity by IDs.
-func (ciuo *CoinInfoUpdateOne) AddKeyIDs(ids ...int32) *CoinInfoUpdateOne {
-	ciuo.mutation.AddKeyIDs(ids...)
-	return ciuo
-}
-
-// AddKeys adds the "keys" edges to the KeyStore entity.
-func (ciuo *CoinInfoUpdateOne) AddKeys(k ...*KeyStore) *CoinInfoUpdateOne {
-	ids := make([]int32, len(k))
-	for i := range k {
-		ids[i] = k[i].ID
-	}
-	return ciuo.AddKeyIDs(ids...)
-}
-
 // AddTransactionIDs adds the "transactions" edge to the Transaction entity by IDs.
 func (ciuo *CoinInfoUpdateOne) AddTransactionIDs(ids ...int32) *CoinInfoUpdateOne {
 	ciuo.mutation.AddTransactionIDs(ids...)
@@ -683,27 +577,6 @@ func (ciuo *CoinInfoUpdateOne) AddWalletNodes(w ...*WalletNode) *CoinInfoUpdateO
 // Mutation returns the CoinInfoMutation object of the builder.
 func (ciuo *CoinInfoUpdateOne) Mutation() *CoinInfoMutation {
 	return ciuo.mutation
-}
-
-// ClearKeys clears all "keys" edges to the KeyStore entity.
-func (ciuo *CoinInfoUpdateOne) ClearKeys() *CoinInfoUpdateOne {
-	ciuo.mutation.ClearKeys()
-	return ciuo
-}
-
-// RemoveKeyIDs removes the "keys" edge to KeyStore entities by IDs.
-func (ciuo *CoinInfoUpdateOne) RemoveKeyIDs(ids ...int32) *CoinInfoUpdateOne {
-	ciuo.mutation.RemoveKeyIDs(ids...)
-	return ciuo
-}
-
-// RemoveKeys removes "keys" edges to KeyStore entities.
-func (ciuo *CoinInfoUpdateOne) RemoveKeys(k ...*KeyStore) *CoinInfoUpdateOne {
-	ids := make([]int32, len(k))
-	for i := range k {
-		ids[i] = k[i].ID
-	}
-	return ciuo.RemoveKeyIDs(ids...)
 }
 
 // ClearTransactions clears all "transactions" edges to the Transaction entity.
@@ -920,60 +793,6 @@ func (ciuo *CoinInfoUpdateOne) sqlSave(ctx context.Context) (_node *CoinInfo, er
 			Value:  value,
 			Column: coininfo.FieldIsPresale,
 		})
-	}
-	if ciuo.mutation.KeysCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   coininfo.KeysTable,
-			Columns: []string{coininfo.KeysColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt32,
-					Column: keystore.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ciuo.mutation.RemovedKeysIDs(); len(nodes) > 0 && !ciuo.mutation.KeysCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   coininfo.KeysTable,
-			Columns: []string{coininfo.KeysColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt32,
-					Column: keystore.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ciuo.mutation.KeysIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   coininfo.KeysTable,
-			Columns: []string{coininfo.KeysColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt32,
-					Column: keystore.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if ciuo.mutation.TransactionsCleared() {
 		edge := &sqlgraph.EdgeSpec{

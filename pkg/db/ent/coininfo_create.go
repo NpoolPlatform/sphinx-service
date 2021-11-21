@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
-	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/keystore"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/review"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/walletnode"
@@ -60,21 +59,6 @@ func (cic *CoinInfoCreate) SetNillableIsPresale(b *bool) *CoinInfoCreate {
 func (cic *CoinInfoCreate) SetID(u uuid.UUID) *CoinInfoCreate {
 	cic.mutation.SetID(u)
 	return cic
-}
-
-// AddKeyIDs adds the "keys" edge to the KeyStore entity by IDs.
-func (cic *CoinInfoCreate) AddKeyIDs(ids ...int32) *CoinInfoCreate {
-	cic.mutation.AddKeyIDs(ids...)
-	return cic
-}
-
-// AddKeys adds the "keys" edges to the KeyStore entity.
-func (cic *CoinInfoCreate) AddKeys(k ...*KeyStore) *CoinInfoCreate {
-	ids := make([]int32, len(k))
-	for i := range k {
-		ids[i] = k[i].ID
-	}
-	return cic.AddKeyIDs(ids...)
 }
 
 // AddTransactionIDs adds the "transactions" edge to the Transaction entity by IDs.
@@ -290,25 +274,6 @@ func (cic *CoinInfoCreate) createSpec() (*CoinInfo, *sqlgraph.CreateSpec) {
 			Column: coininfo.FieldIsPresale,
 		})
 		_node.IsPresale = value
-	}
-	if nodes := cic.mutation.KeysIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   coininfo.KeysTable,
-			Columns: []string{coininfo.KeysColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt32,
-					Column: keystore.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := cic.mutation.TransactionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

@@ -35,19 +35,6 @@ func (f EmptyFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 	return f(ctx, mv)
 }
 
-// The KeyStoreFunc type is an adapter to allow the use of ordinary
-// function as KeyStore mutator.
-type KeyStoreFunc func(context.Context, *ent.KeyStoreMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f KeyStoreFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.KeyStoreMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.KeyStoreMutation", m)
-	}
-	return f(ctx, mv)
-}
-
 // The ReviewFunc type is an adapter to allow the use of ordinary
 // function as Review mutator.
 type ReviewFunc func(context.Context, *ent.ReviewMutation) (ent.Value, error)

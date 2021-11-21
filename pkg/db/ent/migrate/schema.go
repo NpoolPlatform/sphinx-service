@@ -49,34 +49,6 @@ var (
 		Columns:    EmptiesColumns,
 		PrimaryKey: []*schema.Column{EmptiesColumns[0]},
 	}
-	// KeyStoresColumns holds the columns for the "key_stores" table.
-	KeyStoresColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt32, Increment: true},
-		{Name: "address", Type: field.TypeString, Size: 48},
-		{Name: "private_key", Type: field.TypeString, Size: 80},
-		{Name: "coin_info_keys", Type: field.TypeUUID, Nullable: true},
-	}
-	// KeyStoresTable holds the schema information for the "key_stores" table.
-	KeyStoresTable = &schema.Table{
-		Name:       "key_stores",
-		Columns:    KeyStoresColumns,
-		PrimaryKey: []*schema.Column{KeyStoresColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "key_stores_coin_infos_keys",
-				Columns:    []*schema.Column{KeyStoresColumns[3]},
-				RefColumns: []*schema.Column{CoinInfosColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
-		Indexes: []*schema.Index{
-			{
-				Name:    "keystore_address_coin_info_keys",
-				Unique:  true,
-				Columns: []*schema.Column{KeyStoresColumns[1], KeyStoresColumns[3]},
-			},
-		},
-	}
 	// ReviewsColumns holds the columns for the "reviews" table.
 	ReviewsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt32, Increment: true},
@@ -241,7 +213,6 @@ var (
 	Tables = []*schema.Table{
 		CoinInfosTable,
 		EmptiesTable,
-		KeyStoresTable,
 		ReviewsTable,
 		TransactionsTable,
 		WalletNodesTable,
@@ -249,7 +220,6 @@ var (
 )
 
 func init() {
-	KeyStoresTable.ForeignKeys[0].RefTable = CoinInfosTable
 	ReviewsTable.ForeignKeys[0].RefTable = CoinInfosTable
 	ReviewsTable.ForeignKeys[1].RefTable = TransactionsTable
 	TransactionsTable.ForeignKeys[0].RefTable = CoinInfosTable

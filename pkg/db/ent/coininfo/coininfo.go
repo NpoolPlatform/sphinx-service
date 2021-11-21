@@ -19,8 +19,6 @@ const (
 	FieldUnit = "unit"
 	// FieldIsPresale holds the string denoting the is_presale field in the database.
 	FieldIsPresale = "is_presale"
-	// EdgeKeys holds the string denoting the keys edge name in mutations.
-	EdgeKeys = "keys"
 	// EdgeTransactions holds the string denoting the transactions edge name in mutations.
 	EdgeTransactions = "transactions"
 	// EdgeReviews holds the string denoting the reviews edge name in mutations.
@@ -29,13 +27,6 @@ const (
 	EdgeWalletNodes = "wallet_nodes"
 	// Table holds the table name of the coininfo in the database.
 	Table = "coin_infos"
-	// KeysTable is the table that holds the keys relation/edge.
-	KeysTable = "key_stores"
-	// KeysInverseTable is the table name for the KeyStore entity.
-	// It exists in this package in order to avoid circular dependency with the "keystore" package.
-	KeysInverseTable = "key_stores"
-	// KeysColumn is the table column denoting the keys relation/edge.
-	KeysColumn = "coin_info_keys"
 	// TransactionsTable is the table that holds the transactions relation/edge.
 	TransactionsTable = "transactions"
 	// TransactionsInverseTable is the table name for the Transaction entity.

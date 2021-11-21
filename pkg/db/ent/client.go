@@ -12,7 +12,6 @@ import (
 
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/empty"
-	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/keystore"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/review"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/walletnode"
@@ -31,8 +30,6 @@ type Client struct {
 	CoinInfo *CoinInfoClient
 	// Empty is the client for interacting with the Empty builders.
 	Empty *EmptyClient
-	// KeyStore is the client for interacting with the KeyStore builders.
-	KeyStore *KeyStoreClient
 	// Review is the client for interacting with the Review builders.
 	Review *ReviewClient
 	// Transaction is the client for interacting with the Transaction builders.
@@ -54,7 +51,6 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.CoinInfo = NewCoinInfoClient(c.config)
 	c.Empty = NewEmptyClient(c.config)
-	c.KeyStore = NewKeyStoreClient(c.config)
 	c.Review = NewReviewClient(c.config)
 	c.Transaction = NewTransactionClient(c.config)
 	c.WalletNode = NewWalletNodeClient(c.config)
@@ -93,7 +89,6 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		config:      cfg,
 		CoinInfo:    NewCoinInfoClient(cfg),
 		Empty:       NewEmptyClient(cfg),
-		KeyStore:    NewKeyStoreClient(cfg),
 		Review:      NewReviewClient(cfg),
 		Transaction: NewTransactionClient(cfg),
 		WalletNode:  NewWalletNodeClient(cfg),
@@ -117,7 +112,6 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		config:      cfg,
 		CoinInfo:    NewCoinInfoClient(cfg),
 		Empty:       NewEmptyClient(cfg),
-		KeyStore:    NewKeyStoreClient(cfg),
 		Review:      NewReviewClient(cfg),
 		Transaction: NewTransactionClient(cfg),
 		WalletNode:  NewWalletNodeClient(cfg),
@@ -152,7 +146,6 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	c.CoinInfo.Use(hooks...)
 	c.Empty.Use(hooks...)
-	c.KeyStore.Use(hooks...)
 	c.Review.Use(hooks...)
 	c.Transaction.Use(hooks...)
 	c.WalletNode.Use(hooks...)
@@ -241,22 +234,6 @@ func (c *CoinInfoClient) GetX(ctx context.Context, id uuid.UUID) *CoinInfo {
 		panic(err)
 	}
 	return obj
-}
-
-// QueryKeys queries the keys edge of a CoinInfo.
-func (c *CoinInfoClient) QueryKeys(ci *CoinInfo) *KeyStoreQuery {
-	query := &KeyStoreQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
-		id := ci.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(coininfo.Table, coininfo.FieldID, id),
-			sqlgraph.To(keystore.Table, keystore.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, coininfo.KeysTable, coininfo.KeysColumn),
-		)
-		fromV = sqlgraph.Neighbors(ci.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
 }
 
 // QueryTransactions queries the transactions edge of a CoinInfo.
@@ -400,112 +377,6 @@ func (c *EmptyClient) GetX(ctx context.Context, id int) *Empty {
 // Hooks returns the client hooks.
 func (c *EmptyClient) Hooks() []Hook {
 	return c.hooks.Empty
-}
-
-// KeyStoreClient is a client for the KeyStore schema.
-type KeyStoreClient struct {
-	config
-}
-
-// NewKeyStoreClient returns a client for the KeyStore from the given config.
-func NewKeyStoreClient(c config) *KeyStoreClient {
-	return &KeyStoreClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `keystore.Hooks(f(g(h())))`.
-func (c *KeyStoreClient) Use(hooks ...Hook) {
-	c.hooks.KeyStore = append(c.hooks.KeyStore, hooks...)
-}
-
-// Create returns a create builder for KeyStore.
-func (c *KeyStoreClient) Create() *KeyStoreCreate {
-	mutation := newKeyStoreMutation(c.config, OpCreate)
-	return &KeyStoreCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of KeyStore entities.
-func (c *KeyStoreClient) CreateBulk(builders ...*KeyStoreCreate) *KeyStoreCreateBulk {
-	return &KeyStoreCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for KeyStore.
-func (c *KeyStoreClient) Update() *KeyStoreUpdate {
-	mutation := newKeyStoreMutation(c.config, OpUpdate)
-	return &KeyStoreUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *KeyStoreClient) UpdateOne(ks *KeyStore) *KeyStoreUpdateOne {
-	mutation := newKeyStoreMutation(c.config, OpUpdateOne, withKeyStore(ks))
-	return &KeyStoreUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *KeyStoreClient) UpdateOneID(id int32) *KeyStoreUpdateOne {
-	mutation := newKeyStoreMutation(c.config, OpUpdateOne, withKeyStoreID(id))
-	return &KeyStoreUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for KeyStore.
-func (c *KeyStoreClient) Delete() *KeyStoreDelete {
-	mutation := newKeyStoreMutation(c.config, OpDelete)
-	return &KeyStoreDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a delete builder for the given entity.
-func (c *KeyStoreClient) DeleteOne(ks *KeyStore) *KeyStoreDeleteOne {
-	return c.DeleteOneID(ks.ID)
-}
-
-// DeleteOneID returns a delete builder for the given id.
-func (c *KeyStoreClient) DeleteOneID(id int32) *KeyStoreDeleteOne {
-	builder := c.Delete().Where(keystore.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &KeyStoreDeleteOne{builder}
-}
-
-// Query returns a query builder for KeyStore.
-func (c *KeyStoreClient) Query() *KeyStoreQuery {
-	return &KeyStoreQuery{
-		config: c.config,
-	}
-}
-
-// Get returns a KeyStore entity by its id.
-func (c *KeyStoreClient) Get(ctx context.Context, id int32) (*KeyStore, error) {
-	return c.Query().Where(keystore.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *KeyStoreClient) GetX(ctx context.Context, id int32) *KeyStore {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// QueryCoin queries the coin edge of a KeyStore.
-func (c *KeyStoreClient) QueryCoin(ks *KeyStore) *CoinInfoQuery {
-	query := &CoinInfoQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
-		id := ks.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(keystore.Table, keystore.FieldID, id),
-			sqlgraph.To(coininfo.Table, coininfo.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, keystore.CoinTable, keystore.CoinColumn),
-		)
-		fromV = sqlgraph.Neighbors(ks.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// Hooks returns the client hooks.
-func (c *KeyStoreClient) Hooks() []Hook {
-	return c.hooks.KeyStore
 }
 
 // ReviewClient is a client for the Review schema.

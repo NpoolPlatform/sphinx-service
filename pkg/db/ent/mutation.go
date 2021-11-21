@@ -8,7 +8,6 @@ import (
 	"sync"
 
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
-	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/keystore"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/predicate"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/review"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
@@ -29,7 +28,6 @@ const (
 	// Node types.
 	TypeCoinInfo    = "CoinInfo"
 	TypeEmpty       = "Empty"
-	TypeKeyStore    = "KeyStore"
 	TypeReview      = "Review"
 	TypeTransaction = "Transaction"
 	TypeWalletNode  = "WalletNode"
@@ -47,9 +45,6 @@ type CoinInfoMutation struct {
 	unit                *string
 	is_presale          *bool
 	clearedFields       map[string]struct{}
-	keys                map[int32]struct{}
-	removedkeys         map[int32]struct{}
-	clearedkeys         bool
 	transactions        map[int32]struct{}
 	removedtransactions map[int32]struct{}
 	clearedtransactions bool
@@ -311,60 +306,6 @@ func (m *CoinInfoMutation) OldIsPresale(ctx context.Context) (v bool, err error)
 // ResetIsPresale resets all changes to the "is_presale" field.
 func (m *CoinInfoMutation) ResetIsPresale() {
 	m.is_presale = nil
-}
-
-// AddKeyIDs adds the "keys" edge to the KeyStore entity by ids.
-func (m *CoinInfoMutation) AddKeyIDs(ids ...int32) {
-	if m.keys == nil {
-		m.keys = make(map[int32]struct{})
-	}
-	for i := range ids {
-		m.keys[ids[i]] = struct{}{}
-	}
-}
-
-// ClearKeys clears the "keys" edge to the KeyStore entity.
-func (m *CoinInfoMutation) ClearKeys() {
-	m.clearedkeys = true
-}
-
-// KeysCleared reports if the "keys" edge to the KeyStore entity was cleared.
-func (m *CoinInfoMutation) KeysCleared() bool {
-	return m.clearedkeys
-}
-
-// RemoveKeyIDs removes the "keys" edge to the KeyStore entity by IDs.
-func (m *CoinInfoMutation) RemoveKeyIDs(ids ...int32) {
-	if m.removedkeys == nil {
-		m.removedkeys = make(map[int32]struct{})
-	}
-	for i := range ids {
-		delete(m.keys, ids[i])
-		m.removedkeys[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedKeys returns the removed IDs of the "keys" edge to the KeyStore entity.
-func (m *CoinInfoMutation) RemovedKeysIDs() (ids []int32) {
-	for id := range m.removedkeys {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// KeysIDs returns the "keys" edge IDs in the mutation.
-func (m *CoinInfoMutation) KeysIDs() (ids []int32) {
-	for id := range m.keys {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetKeys resets all changes to the "keys" edge.
-func (m *CoinInfoMutation) ResetKeys() {
-	m.keys = nil
-	m.clearedkeys = false
-	m.removedkeys = nil
 }
 
 // AddTransactionIDs adds the "transactions" edge to the Transaction entity by ids.
@@ -713,10 +654,7 @@ func (m *CoinInfoMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *CoinInfoMutation) AddedEdges() []string {
-	edges := make([]string, 0, 4)
-	if m.keys != nil {
-		edges = append(edges, coininfo.EdgeKeys)
-	}
+	edges := make([]string, 0, 3)
 	if m.transactions != nil {
 		edges = append(edges, coininfo.EdgeTransactions)
 	}
@@ -733,12 +671,6 @@ func (m *CoinInfoMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *CoinInfoMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case coininfo.EdgeKeys:
-		ids := make([]ent.Value, 0, len(m.keys))
-		for id := range m.keys {
-			ids = append(ids, id)
-		}
-		return ids
 	case coininfo.EdgeTransactions:
 		ids := make([]ent.Value, 0, len(m.transactions))
 		for id := range m.transactions {
@@ -763,10 +695,7 @@ func (m *CoinInfoMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *CoinInfoMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 4)
-	if m.removedkeys != nil {
-		edges = append(edges, coininfo.EdgeKeys)
-	}
+	edges := make([]string, 0, 3)
 	if m.removedtransactions != nil {
 		edges = append(edges, coininfo.EdgeTransactions)
 	}
@@ -783,12 +712,6 @@ func (m *CoinInfoMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *CoinInfoMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case coininfo.EdgeKeys:
-		ids := make([]ent.Value, 0, len(m.removedkeys))
-		for id := range m.removedkeys {
-			ids = append(ids, id)
-		}
-		return ids
 	case coininfo.EdgeTransactions:
 		ids := make([]ent.Value, 0, len(m.removedtransactions))
 		for id := range m.removedtransactions {
@@ -813,10 +736,7 @@ func (m *CoinInfoMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *CoinInfoMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 4)
-	if m.clearedkeys {
-		edges = append(edges, coininfo.EdgeKeys)
-	}
+	edges := make([]string, 0, 3)
 	if m.clearedtransactions {
 		edges = append(edges, coininfo.EdgeTransactions)
 	}
@@ -833,8 +753,6 @@ func (m *CoinInfoMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *CoinInfoMutation) EdgeCleared(name string) bool {
 	switch name {
-	case coininfo.EdgeKeys:
-		return m.clearedkeys
 	case coininfo.EdgeTransactions:
 		return m.clearedtransactions
 	case coininfo.EdgeReviews:
@@ -857,9 +775,6 @@ func (m *CoinInfoMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *CoinInfoMutation) ResetEdge(name string) error {
 	switch name {
-	case coininfo.EdgeKeys:
-		m.ResetKeys()
-		return nil
 	case coininfo.EdgeTransactions:
 		m.ResetTransactions()
 		return nil
@@ -1101,427 +1016,6 @@ func (m *EmptyMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *EmptyMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Empty edge %s", name)
-}
-
-// KeyStoreMutation represents an operation that mutates the KeyStore nodes in the graph.
-type KeyStoreMutation struct {
-	config
-	op            Op
-	typ           string
-	id            *int32
-	address       *string
-	private_key   *string
-	clearedFields map[string]struct{}
-	coin          *uuid.UUID
-	clearedcoin   bool
-	done          bool
-	oldValue      func(context.Context) (*KeyStore, error)
-	predicates    []predicate.KeyStore
-}
-
-var _ ent.Mutation = (*KeyStoreMutation)(nil)
-
-// keystoreOption allows management of the mutation configuration using functional options.
-type keystoreOption func(*KeyStoreMutation)
-
-// newKeyStoreMutation creates new mutation for the KeyStore entity.
-func newKeyStoreMutation(c config, op Op, opts ...keystoreOption) *KeyStoreMutation {
-	m := &KeyStoreMutation{
-		config:        c,
-		op:            op,
-		typ:           TypeKeyStore,
-		clearedFields: make(map[string]struct{}),
-	}
-	for _, opt := range opts {
-		opt(m)
-	}
-	return m
-}
-
-// withKeyStoreID sets the ID field of the mutation.
-func withKeyStoreID(id int32) keystoreOption {
-	return func(m *KeyStoreMutation) {
-		var (
-			err   error
-			once  sync.Once
-			value *KeyStore
-		)
-		m.oldValue = func(ctx context.Context) (*KeyStore, error) {
-			once.Do(func() {
-				if m.done {
-					err = fmt.Errorf("querying old values post mutation is not allowed")
-				} else {
-					value, err = m.Client().KeyStore.Get(ctx, id)
-				}
-			})
-			return value, err
-		}
-		m.id = &id
-	}
-}
-
-// withKeyStore sets the old KeyStore of the mutation.
-func withKeyStore(node *KeyStore) keystoreOption {
-	return func(m *KeyStoreMutation) {
-		m.oldValue = func(context.Context) (*KeyStore, error) {
-			return node, nil
-		}
-		m.id = &node.ID
-	}
-}
-
-// Client returns a new `ent.Client` from the mutation. If the mutation was
-// executed in a transaction (ent.Tx), a transactional client is returned.
-func (m KeyStoreMutation) Client() *Client {
-	client := &Client{config: m.config}
-	client.init()
-	return client
-}
-
-// Tx returns an `ent.Tx` for mutations that were executed in transactions;
-// it returns an error otherwise.
-func (m KeyStoreMutation) Tx() (*Tx, error) {
-	if _, ok := m.driver.(*txDriver); !ok {
-		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
-	}
-	tx := &Tx{config: m.config}
-	tx.init()
-	return tx, nil
-}
-
-// SetID sets the value of the id field. Note that this
-// operation is only accepted on creation of KeyStore entities.
-func (m *KeyStoreMutation) SetID(id int32) {
-	m.id = &id
-}
-
-// ID returns the ID value in the mutation. Note that the ID is only available
-// if it was provided to the builder or after it was returned from the database.
-func (m *KeyStoreMutation) ID() (id int32, exists bool) {
-	if m.id == nil {
-		return
-	}
-	return *m.id, true
-}
-
-// SetAddress sets the "address" field.
-func (m *KeyStoreMutation) SetAddress(s string) {
-	m.address = &s
-}
-
-// Address returns the value of the "address" field in the mutation.
-func (m *KeyStoreMutation) Address() (r string, exists bool) {
-	v := m.address
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldAddress returns the old "address" field's value of the KeyStore entity.
-// If the KeyStore object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *KeyStoreMutation) OldAddress(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldAddress is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldAddress requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldAddress: %w", err)
-	}
-	return oldValue.Address, nil
-}
-
-// ResetAddress resets all changes to the "address" field.
-func (m *KeyStoreMutation) ResetAddress() {
-	m.address = nil
-}
-
-// SetPrivateKey sets the "private_key" field.
-func (m *KeyStoreMutation) SetPrivateKey(s string) {
-	m.private_key = &s
-}
-
-// PrivateKey returns the value of the "private_key" field in the mutation.
-func (m *KeyStoreMutation) PrivateKey() (r string, exists bool) {
-	v := m.private_key
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldPrivateKey returns the old "private_key" field's value of the KeyStore entity.
-// If the KeyStore object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *KeyStoreMutation) OldPrivateKey(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldPrivateKey is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldPrivateKey requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPrivateKey: %w", err)
-	}
-	return oldValue.PrivateKey, nil
-}
-
-// ResetPrivateKey resets all changes to the "private_key" field.
-func (m *KeyStoreMutation) ResetPrivateKey() {
-	m.private_key = nil
-}
-
-// SetCoinID sets the "coin" edge to the CoinInfo entity by id.
-func (m *KeyStoreMutation) SetCoinID(id uuid.UUID) {
-	m.coin = &id
-}
-
-// ClearCoin clears the "coin" edge to the CoinInfo entity.
-func (m *KeyStoreMutation) ClearCoin() {
-	m.clearedcoin = true
-}
-
-// CoinCleared reports if the "coin" edge to the CoinInfo entity was cleared.
-func (m *KeyStoreMutation) CoinCleared() bool {
-	return m.clearedcoin
-}
-
-// CoinID returns the "coin" edge ID in the mutation.
-func (m *KeyStoreMutation) CoinID() (id uuid.UUID, exists bool) {
-	if m.coin != nil {
-		return *m.coin, true
-	}
-	return
-}
-
-// CoinIDs returns the "coin" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// CoinID instead. It exists only for internal usage by the builders.
-func (m *KeyStoreMutation) CoinIDs() (ids []uuid.UUID) {
-	if id := m.coin; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetCoin resets all changes to the "coin" edge.
-func (m *KeyStoreMutation) ResetCoin() {
-	m.coin = nil
-	m.clearedcoin = false
-}
-
-// Where appends a list predicates to the KeyStoreMutation builder.
-func (m *KeyStoreMutation) Where(ps ...predicate.KeyStore) {
-	m.predicates = append(m.predicates, ps...)
-}
-
-// Op returns the operation name.
-func (m *KeyStoreMutation) Op() Op {
-	return m.op
-}
-
-// Type returns the node type of this mutation (KeyStore).
-func (m *KeyStoreMutation) Type() string {
-	return m.typ
-}
-
-// Fields returns all fields that were changed during this mutation. Note that in
-// order to get all numeric fields that were incremented/decremented, call
-// AddedFields().
-func (m *KeyStoreMutation) Fields() []string {
-	fields := make([]string, 0, 2)
-	if m.address != nil {
-		fields = append(fields, keystore.FieldAddress)
-	}
-	if m.private_key != nil {
-		fields = append(fields, keystore.FieldPrivateKey)
-	}
-	return fields
-}
-
-// Field returns the value of a field with the given name. The second boolean
-// return value indicates that this field was not set, or was not defined in the
-// schema.
-func (m *KeyStoreMutation) Field(name string) (ent.Value, bool) {
-	switch name {
-	case keystore.FieldAddress:
-		return m.Address()
-	case keystore.FieldPrivateKey:
-		return m.PrivateKey()
-	}
-	return nil, false
-}
-
-// OldField returns the old value of the field from the database. An error is
-// returned if the mutation operation is not UpdateOne, or the query to the
-// database failed.
-func (m *KeyStoreMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	switch name {
-	case keystore.FieldAddress:
-		return m.OldAddress(ctx)
-	case keystore.FieldPrivateKey:
-		return m.OldPrivateKey(ctx)
-	}
-	return nil, fmt.Errorf("unknown KeyStore field %s", name)
-}
-
-// SetField sets the value of a field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *KeyStoreMutation) SetField(name string, value ent.Value) error {
-	switch name {
-	case keystore.FieldAddress:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetAddress(v)
-		return nil
-	case keystore.FieldPrivateKey:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetPrivateKey(v)
-		return nil
-	}
-	return fmt.Errorf("unknown KeyStore field %s", name)
-}
-
-// AddedFields returns all numeric fields that were incremented/decremented during
-// this mutation.
-func (m *KeyStoreMutation) AddedFields() []string {
-	return nil
-}
-
-// AddedField returns the numeric value that was incremented/decremented on a field
-// with the given name. The second boolean return value indicates that this field
-// was not set, or was not defined in the schema.
-func (m *KeyStoreMutation) AddedField(name string) (ent.Value, bool) {
-	return nil, false
-}
-
-// AddField adds the value to the field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *KeyStoreMutation) AddField(name string, value ent.Value) error {
-	switch name {
-	}
-	return fmt.Errorf("unknown KeyStore numeric field %s", name)
-}
-
-// ClearedFields returns all nullable fields that were cleared during this
-// mutation.
-func (m *KeyStoreMutation) ClearedFields() []string {
-	return nil
-}
-
-// FieldCleared returns a boolean indicating if a field with the given name was
-// cleared in this mutation.
-func (m *KeyStoreMutation) FieldCleared(name string) bool {
-	_, ok := m.clearedFields[name]
-	return ok
-}
-
-// ClearField clears the value of the field with the given name. It returns an
-// error if the field is not defined in the schema.
-func (m *KeyStoreMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown KeyStore nullable field %s", name)
-}
-
-// ResetField resets all changes in the mutation for the field with the given name.
-// It returns an error if the field is not defined in the schema.
-func (m *KeyStoreMutation) ResetField(name string) error {
-	switch name {
-	case keystore.FieldAddress:
-		m.ResetAddress()
-		return nil
-	case keystore.FieldPrivateKey:
-		m.ResetPrivateKey()
-		return nil
-	}
-	return fmt.Errorf("unknown KeyStore field %s", name)
-}
-
-// AddedEdges returns all edge names that were set/added in this mutation.
-func (m *KeyStoreMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.coin != nil {
-		edges = append(edges, keystore.EdgeCoin)
-	}
-	return edges
-}
-
-// AddedIDs returns all IDs (to other nodes) that were added for the given edge
-// name in this mutation.
-func (m *KeyStoreMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case keystore.EdgeCoin:
-		if id := m.coin; id != nil {
-			return []ent.Value{*id}
-		}
-	}
-	return nil
-}
-
-// RemovedEdges returns all edge names that were removed in this mutation.
-func (m *KeyStoreMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
-	return edges
-}
-
-// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
-// the given name in this mutation.
-func (m *KeyStoreMutation) RemovedIDs(name string) []ent.Value {
-	switch name {
-	}
-	return nil
-}
-
-// ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *KeyStoreMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.clearedcoin {
-		edges = append(edges, keystore.EdgeCoin)
-	}
-	return edges
-}
-
-// EdgeCleared returns a boolean which indicates if the edge with the given name
-// was cleared in this mutation.
-func (m *KeyStoreMutation) EdgeCleared(name string) bool {
-	switch name {
-	case keystore.EdgeCoin:
-		return m.clearedcoin
-	}
-	return false
-}
-
-// ClearEdge clears the value of the edge with the given name. It returns an error
-// if that edge is not defined in the schema.
-func (m *KeyStoreMutation) ClearEdge(name string) error {
-	switch name {
-	case keystore.EdgeCoin:
-		m.ClearCoin()
-		return nil
-	}
-	return fmt.Errorf("unknown KeyStore unique edge %s", name)
-}
-
-// ResetEdge resets all changes to the edge with the given name in this mutation.
-// It returns an error if the edge is not defined in the schema.
-func (m *KeyStoreMutation) ResetEdge(name string) error {
-	switch name {
-	case keystore.EdgeCoin:
-		m.ResetCoin()
-		return nil
-	}
-	return fmt.Errorf("unknown KeyStore edge %s", name)
 }
 
 // ReviewMutation represents an operation that mutates the Review nodes in the graph.

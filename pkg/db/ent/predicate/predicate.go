@@ -12,9 +12,6 @@ type CoinInfo func(*sql.Selector)
 // Empty is the predicate function for empty builders.
 type Empty func(*sql.Selector)
 
-// KeyStore is the predicate function for keystore builders.
-type KeyStore func(*sql.Selector)
-
 // Review is the predicate function for review builders.
 type Review func(*sql.Selector)
 

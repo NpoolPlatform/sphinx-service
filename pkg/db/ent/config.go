@@ -26,7 +26,6 @@ type config struct {
 type hooks struct {
 	CoinInfo    []ent.Hook
 	Empty       []ent.Hook
-	KeyStore    []ent.Hook
 	Review      []ent.Hook
 	Transaction []ent.Hook
 	WalletNode  []ent.Hook

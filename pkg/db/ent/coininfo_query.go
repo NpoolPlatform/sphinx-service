@@ -13,7 +13,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
-	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/keystore"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/predicate"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/review"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
@@ -31,7 +30,6 @@ type CoinInfoQuery struct {
 	fields     []string
 	predicates []predicate.CoinInfo
 	// eager-loading edges.
-	withKeys         *KeyStoreQuery
 	withTransactions *TransactionQuery
 	withReviews      *ReviewQuery
 	withWalletNodes  *WalletNodeQuery
@@ -69,28 +67,6 @@ func (ciq *CoinInfoQuery) Unique(unique bool) *CoinInfoQuery {
 func (ciq *CoinInfoQuery) Order(o ...OrderFunc) *CoinInfoQuery {
 	ciq.order = append(ciq.order, o...)
 	return ciq
-}
-
-// QueryKeys chains the current query on the "keys" edge.
-func (ciq *CoinInfoQuery) QueryKeys() *KeyStoreQuery {
-	query := &KeyStoreQuery{config: ciq.config}
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := ciq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := ciq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(coininfo.Table, coininfo.FieldID, selector),
-			sqlgraph.To(keystore.Table, keystore.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, coininfo.KeysTable, coininfo.KeysColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(ciq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
 }
 
 // QueryTransactions chains the current query on the "transactions" edge.
@@ -340,7 +316,6 @@ func (ciq *CoinInfoQuery) Clone() *CoinInfoQuery {
 		offset:           ciq.offset,
 		order:            append([]OrderFunc{}, ciq.order...),
 		predicates:       append([]predicate.CoinInfo{}, ciq.predicates...),
-		withKeys:         ciq.withKeys.Clone(),
 		withTransactions: ciq.withTransactions.Clone(),
 		withReviews:      ciq.withReviews.Clone(),
 		withWalletNodes:  ciq.withWalletNodes.Clone(),
@@ -348,17 +323,6 @@ func (ciq *CoinInfoQuery) Clone() *CoinInfoQuery {
 		sql:  ciq.sql.Clone(),
 		path: ciq.path,
 	}
-}
-
-// WithKeys tells the query-builder to eager-load the nodes that are connected to
-// the "keys" edge. The optional arguments are used to configure the query builder of the edge.
-func (ciq *CoinInfoQuery) WithKeys(opts ...func(*KeyStoreQuery)) *CoinInfoQuery {
-	query := &KeyStoreQuery{config: ciq.config}
-	for _, opt := range opts {
-		opt(query)
-	}
-	ciq.withKeys = query
-	return ciq
 }
 
 // WithTransactions tells the query-builder to eager-load the nodes that are connected to
@@ -459,8 +423,7 @@ func (ciq *CoinInfoQuery) sqlAll(ctx context.Context) ([]*CoinInfo, error) {
 	var (
 		nodes       = []*CoinInfo{}
 		_spec       = ciq.querySpec()
-		loadedTypes = [4]bool{
-			ciq.withKeys != nil,
+		loadedTypes = [3]bool{
 			ciq.withTransactions != nil,
 			ciq.withReviews != nil,
 			ciq.withWalletNodes != nil,
@@ -484,35 +447,6 @@ func (ciq *CoinInfoQuery) sqlAll(ctx context.Context) ([]*CoinInfo, error) {
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
-	}
-
-	if query := ciq.withKeys; query != nil {
-		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[uuid.UUID]*CoinInfo)
-		for i := range nodes {
-			fks = append(fks, nodes[i].ID)
-			nodeids[nodes[i].ID] = nodes[i]
-			nodes[i].Edges.Keys = []*KeyStore{}
-		}
-		query.withFKs = true
-		query.Where(predicate.KeyStore(func(s *sql.Selector) {
-			s.Where(sql.InValues(coininfo.KeysColumn, fks...))
-		}))
-		neighbors, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, n := range neighbors {
-			fk := n.coin_info_keys
-			if fk == nil {
-				return nil, fmt.Errorf(`foreign-key "coin_info_keys" is nil for node %v`, n.ID)
-			}
-			node, ok := nodeids[*fk]
-			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "coin_info_keys" returned %v for node %v`, *fk, n.ID)
-			}
-			node.Edges.Keys = append(node.Edges.Keys, n)
-		}
 	}
 
 	if query := ciq.withTransactions; query != nil {

@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/empty"
-	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/keystore"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/review"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/walletnode"
@@ -36,7 +35,6 @@ func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
 		coininfo.Table:    coininfo.ValidColumn,
 		empty.Table:       empty.ValidColumn,
-		keystore.Table:    keystore.ValidColumn,
 		review.Table:      review.ValidColumn,
 		transaction.Table: transaction.ValidColumn,
 		walletnode.Table:  walletnode.ValidColumn,

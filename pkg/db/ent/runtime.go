@@ -4,7 +4,6 @@ package ent
 
 import (
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
-	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/keystore"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/review"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/schema"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
@@ -33,44 +32,6 @@ func init() {
 	coininfoDescID := coininfoFields[0].Descriptor()
 	// coininfo.DefaultID holds the default value on creation for the id field.
 	coininfo.DefaultID = coininfoDescID.Default.(func() uuid.UUID)
-	keystoreFields := schema.KeyStore{}.Fields()
-	_ = keystoreFields
-	// keystoreDescAddress is the schema descriptor for address field.
-	keystoreDescAddress := keystoreFields[1].Descriptor()
-	// keystore.AddressValidator is a validator for the "address" field. It is called by the builders before save.
-	keystore.AddressValidator = func() func(string) error {
-		validators := keystoreDescAddress.Validators
-		fns := [...]func(string) error{
-			validators[0].(func(string) error),
-			validators[1].(func(string) error),
-		}
-		return func(address string) error {
-			for _, fn := range fns {
-				if err := fn(address); err != nil {
-					return err
-				}
-			}
-			return nil
-		}
-	}()
-	// keystoreDescPrivateKey is the schema descriptor for private_key field.
-	keystoreDescPrivateKey := keystoreFields[2].Descriptor()
-	// keystore.PrivateKeyValidator is a validator for the "private_key" field. It is called by the builders before save.
-	keystore.PrivateKeyValidator = func() func(string) error {
-		validators := keystoreDescPrivateKey.Validators
-		fns := [...]func(string) error{
-			validators[0].(func(string) error),
-			validators[1].(func(string) error),
-		}
-		return func(private_key string) error {
-			for _, fn := range fns {
-				if err := fn(private_key); err != nil {
-					return err
-				}
-			}
-			return nil
-		}
-	}()
 	reviewFields := schema.Review{}.Fields()
 	_ = reviewFields
 	// reviewDescIsApproved is the schema descriptor for is_approved field.

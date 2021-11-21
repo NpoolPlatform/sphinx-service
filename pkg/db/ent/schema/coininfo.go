@@ -26,7 +26,6 @@ func (CoinInfo) Fields() []ent.Field {
 
 func (CoinInfo) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("keys", KeyStore.Type),
 		edge.To("transactions", Transaction.Type),
 		edge.To("reviews", Review.Type),
 		edge.To("wallet_nodes", WalletNode.Type),
