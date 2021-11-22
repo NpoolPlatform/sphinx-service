@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/NpoolPlatform/message/npool/trading"
+	"github.com/NpoolPlatform/message/npool/trading" //nolint
 	"github.com/NpoolPlatform/sphinx-service/pkg/crud"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
 	"github.com/gogo/status"

@@ -1,7 +1,7 @@
 package crud
 
 import (
-	"github.com/NpoolPlatform/message/npool/trading"
+	"github.com/NpoolPlatform/message/npool/trading" //nolint
 	"github.com/NpoolPlatform/sphinx-service/pkg/db"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"

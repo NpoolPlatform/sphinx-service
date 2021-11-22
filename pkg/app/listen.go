@@ -3,7 +3,7 @@ package app
 import (
 	"time"
 
-	"github.com/NpoolPlatform/message/npool/trading"
+	"github.com/NpoolPlatform/message/npool/trading" //nolint
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

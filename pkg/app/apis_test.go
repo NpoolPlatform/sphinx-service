@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/NpoolPlatform/message/npool/coininfo"
-	"github.com/NpoolPlatform/message/npool/trading"
+	"github.com/NpoolPlatform/message/npool/coininfo" //nolint
+	"github.com/NpoolPlatform/message/npool/trading"  //nolint
 	testinit "github.com/NpoolPlatform/sphinx-service/pkg/test-init"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"

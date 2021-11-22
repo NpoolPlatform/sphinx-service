@@ -5,8 +5,8 @@ import (
 	"reflect"
 
 	msgsrv "github.com/NpoolPlatform/go-service-framework/pkg/rabbitmq/server"
-	"github.com/NpoolPlatform/message/npool/signproxy"
-	"github.com/NpoolPlatform/message/npool/sphinxplugin"
+	"github.com/NpoolPlatform/message/npool/signproxy"    //nolint
+	"github.com/NpoolPlatform/message/npool/sphinxplugin" //nolint
 	constant "github.com/NpoolPlatform/sphinx-service/pkg/message/const"
 )
 

@@ -8,8 +8,8 @@ import (
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	"github.com/NpoolPlatform/go-service-framework/pkg/price"
-	"github.com/NpoolPlatform/message/npool/signproxy"
-	"github.com/NpoolPlatform/message/npool/sphinxplugin"
+	"github.com/NpoolPlatform/message/npool/signproxy"    //nolint
+	"github.com/NpoolPlatform/message/npool/sphinxplugin" //nolint
 	"github.com/NpoolPlatform/sphinx-service/pkg/db"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"

@@ -3,9 +3,9 @@ package client
 import (
 	"github.com/NpoolPlatform/go-service-framework/pkg/grpc"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
-	"github.com/NpoolPlatform/message/npool/coininfo"
-	review "github.com/NpoolPlatform/message/npool/review"
-	"github.com/NpoolPlatform/message/npool/signproxy"
+	"github.com/NpoolPlatform/message/npool/coininfo"      //nolint
+	review "github.com/NpoolPlatform/message/npool/review" //nolint
+	"github.com/NpoolPlatform/message/npool/signproxy"     //nolint
 )
 
 var (

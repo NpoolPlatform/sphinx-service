@@ -1,7 +1,7 @@
 package version
 
 import (
-	npool "github.com/NpoolPlatform/message/npool/trading"
+	npool "github.com/NpoolPlatform/message/npool/trading" //nolint
 
 	cv "github.com/NpoolPlatform/go-service-framework/pkg/version"
 

@@ -14,7 +14,7 @@ import (
 	"testing"
 	"time"
 
-	npool "github.com/NpoolPlatform/message/npool/trading"
+	npool "github.com/NpoolPlatform/message/npool/trading" //nolint
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
