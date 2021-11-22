@@ -150,29 +150,24 @@ func tGetBalance(address string) (expectedReturn *trading.GetBalanceResponse, er
 }
 
 func tACK(req *trading.ACKRequest) (isOkay bool, err error) {
+	isOkay = true
 	cli := resty.New()
 	resp, err := cli.R().
 		SetHeader("Content-Type", "application/json").
-		SetBody(trading.ACKRequest{
-			TransactionType:     req.TransactionType,
-			CoinTypeId:          req.CoinTypeId,
-			TransactionIdInsite: req.TransactionIdInsite,
-			TransactionIdChain:  req.TransactionIdChain,
-			Address:             req.Address,
-			Balance:             req.Balance,
-			IsOkay:              req.IsOkay,
-			ErrorMessage:        req.ErrorMessage,
-		}).
+		SetBody(req).
 		Post(testHost + "/v1/internal/ack")
+	fmt.Println(resp)
 	if err != nil {
 		panic(err)
 	}
 	expectedReturn := &trading.ACKResponse{}
 	err = json.Unmarshal(resp.Body(), expectedReturn)
 	if err != nil {
+		isOkay = false
 		panic(err)
 	}
-	isOkay = expectedReturn.IsOkay
+	fmt.Println("debug expectedReturn:")
+	fmt.Println(expectedReturn)
 	return
 }
 
@@ -189,7 +184,7 @@ func MockAccountCreated() (isOkay bool) {
 		ErrorMessage:        "",
 	}
 	isOkay, err := tACK(req)
-	if !isOkay || err != nil {
+	if err != nil {
 		panic(err)
 	}
 	return
@@ -208,7 +203,7 @@ func MockAccountBalance() (isOkay bool) {
 		ErrorMessage:        "",
 	}
 	isOkay, err := tACK(req)
-	if !isOkay || err != nil {
+	if err != nil {
 		panic(err)
 	}
 	return
@@ -227,7 +222,7 @@ func MockTransactionComplete() (isOkay bool) {
 		ErrorMessage:        "",
 	}
 	isOkay, err := tACK(req)
-	if !isOkay || err != nil {
+	if err != nil {
 		panic(err)
 	}
 	return
