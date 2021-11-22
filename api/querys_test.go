@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/NpoolPlatform/go-service-framework/pkg/logger" //nolint
-	"github.com/NpoolPlatform/message/npool/coininfo"          //nolint
+	//nolint
+	"github.com/NpoolPlatform/message/npool/coininfo" //nolint
 	"github.com/NpoolPlatform/message/npool/signproxy"
 	"github.com/NpoolPlatform/message/npool/trading"
 	testinit "github.com/NpoolPlatform/sphinx-service/pkg/test-init"
@@ -144,7 +144,16 @@ func tACK(req *trading.ACKRequest) (isOkay bool, err error) {
 	cli := resty.New()
 	resp, err := cli.R().
 		SetHeader("Content-Type", "application/json").
-		SetBody(req).
+		SetBody(trading.ACKRequest{
+			TransactionType:     req.TransactionType,
+			CoinTypeId:          req.CoinTypeId,
+			TransactionIdInsite: req.TransactionIdInsite,
+			TransactionIdChain:  req.TransactionIdChain,
+			Address:             req.Address,
+			Balance:             req.Balance,
+			IsOkay:              req.IsOkay,
+			ErrorMessage:        req.ErrorMessage,
+		}).
 		Post(testHost + "/v1/internal/ack")
 	if err != nil {
 		return
@@ -171,7 +180,7 @@ func MockAccountCreated() (isOkay bool) {
 	isOkay, err := tACK(req)
 	if err != nil {
 		isOkay = false
-		logger.Sugar().Errorf("create account ack error: ", err)
+		panic(err)
 	}
 	return
 }
@@ -190,7 +199,7 @@ func MockAccountBalance() (isOkay bool) {
 	isOkay, err := tACK(req)
 	if err != nil {
 		isOkay = false
-		logger.Sugar().Errorf("account balance ack error: ", err)
+		panic(err)
 	}
 	return
 }
@@ -209,7 +218,7 @@ func MockTransactionComplete() (isOkay bool) {
 	isOkay, err := tACK(req)
 	if err != nil {
 		isOkay = false
-		logger.Sugar().Errorf("account balance ack error: ", err)
+		panic(err)
 	}
 	return
 }
