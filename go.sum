@@ -53,8 +53,8 @@ github.com/DATA-DOG/go-sqlmock v1.5.0/go.mod h1:f/Ixk793poVmq4qj/V1dPUg2JEAKC73Q
 github.com/NpoolPlatform/go-service-framework v0.0.0-20211104061935-a1f3ca021a26/go.mod h1:73fH7GhlbKHZgnPA2hwoMmW7CHjINsXgOzCVU5NQ0Yo=
 github.com/NpoolPlatform/go-service-framework v0.0.0-20211114053533-27f7b296cb9a/go.mod h1:6OR9IRTWXpkr7Igky6a7zbnDG2o5Vmx9zuIzNJ3M9xs=
 github.com/NpoolPlatform/go-service-framework v0.0.0-20211117074545-bc1340849b08/go.mod h1:6OR9IRTWXpkr7Igky6a7zbnDG2o5Vmx9zuIzNJ3M9xs=
-github.com/NpoolPlatform/go-service-framework v0.0.0-20211121104402-9abc32fd422a h1:Lhq0Mkt5F7skSKZx9SBtTBUVXUnxk9GQcMZS6BC5Ni0=
-github.com/NpoolPlatform/go-service-framework v0.0.0-20211121104402-9abc32fd422a/go.mod h1:6OR9IRTWXpkr7Igky6a7zbnDG2o5Vmx9zuIzNJ3M9xs=
+github.com/NpoolPlatform/go-service-framework v0.0.0-20211122070118-139aac84bc79 h1:PZ83OUi+bnA1yJE3epSBwAP6Pfy9fMbMAre0O0SjJqo=
+github.com/NpoolPlatform/go-service-framework v0.0.0-20211122070118-139aac84bc79/go.mod h1:6OR9IRTWXpkr7Igky6a7zbnDG2o5Vmx9zuIzNJ3M9xs=
 github.com/NpoolPlatform/message v0.0.0-20211118031636-e8c78a0a0c3f/go.mod h1:TpqErU/o7lECBW1gcmbUsbrQkpVj27cgzi7qpVbZHzk=
 github.com/NpoolPlatform/message v0.0.0-20211118042348-c8b8138f631d/go.mod h1:TpqErU/o7lECBW1gcmbUsbrQkpVj27cgzi7qpVbZHzk=
 github.com/NpoolPlatform/message v0.0.0-20211118083406-0de35a6ec50a/go.mod h1:TpqErU/o7lECBW1gcmbUsbrQkpVj27cgzi7qpVbZHzk=
