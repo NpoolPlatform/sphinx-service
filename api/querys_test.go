@@ -176,6 +176,7 @@ func tACK(req *trading.ACKRequest) (isOkay bool, err error) {
 }
 
 func MockAccountCreated() (isOkay bool) {
+	isOkay = true
 	req := &trading.ACKRequest{
 		TransactionType:     signproxy.TransactionType_WalletNew,
 		CoinTypeId:          tmpCoinInfo.Enum,
@@ -195,6 +196,7 @@ func MockAccountCreated() (isOkay bool) {
 }
 
 func MockAccountBalance() (isOkay bool) {
+	isOkay = true
 	req := &trading.ACKRequest{
 		TransactionType:     signproxy.TransactionType_Balance,
 		CoinTypeId:          tmpCoinInfo.Enum,
@@ -214,6 +216,7 @@ func MockAccountBalance() (isOkay bool) {
 }
 
 func MockTransactionComplete() (isOkay bool) {
+	isOkay = true
 	req := &trading.ACKRequest{
 		TransactionType:     signproxy.TransactionType_PreSign,
 		CoinTypeId:          tmpCoinInfo.Enum,
@@ -233,9 +236,11 @@ func MockTransactionComplete() (isOkay bool) {
 }
 
 func LogError(err error) {
-	fmt.Println(err)
-	err2 := os.WriteFile("/tmp/sphinx-test-log.txt", []byte(fmt.Sprintf("%s \n", err)), fs.ModeAppend)
-	if err2 != nil {
-		panic(err)
+	if err != nil {
+		fmt.Println(err)
+		err2 := os.WriteFile("/tmp/sphinx-test-log.txt", []byte(fmt.Sprintf("%s \n", err)), fs.ModeAppend)
+		if err2 != nil {
+			panic(err)
+		}
 	}
 }
