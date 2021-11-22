@@ -46,19 +46,19 @@ func TestWholeProcedure(t *testing.T) {
 	var err error
 	// test create account
 	go MockAccountCreated() // mock success
-	err = TestCreateAccount()
+	err = tCreateAccount()
 	assert.Nil(t, err)
 	assert.NotEmpty(t, tmpAccountInfo.Address)
 	// test get balance
 	go MockAccountBalance() // mock success
-	resp, err := TestGetBalance(tmpAccountInfo.Address)
+	resp, err := tGetBalance(tmpAccountInfo.Address)
 	assert.Nil(t, err)
 	assert.NotNil(t, resp)
 	assert.Zero(t, resp.AmountFloat64)
 	// test create transaction
 	// transaction would fail, but err should be nil
 	go MockTransactionComplete() // mock success
-	err = TestCreateTransaction(tmpAccountInfo.Address, tmpAccountInfo.Address)
+	err = tCreateTransaction(tmpAccountInfo.Address, tmpAccountInfo.Address)
 	assert.Nil(t, err)
 }
 
@@ -78,7 +78,7 @@ func runByGithub() bool {
 	return err == nil
 }
 
-func TestCreateAccount() (err error) {
+func tCreateAccount() (err error) {
 	cli := resty.New()
 	resp, err := cli.R().
 		SetHeader("Content-Type", "application/json").
@@ -99,7 +99,7 @@ func TestCreateAccount() (err error) {
 	return
 }
 
-func TestCreateTransaction(addressFrom, addressTo string) (err error) {
+func tCreateTransaction(addressFrom, addressTo string) (err error) {
 	cli := resty.New()
 	resp, err := cli.R().
 		SetHeader("Content-Type", "application/json").
@@ -122,7 +122,7 @@ func TestCreateTransaction(addressFrom, addressTo string) (err error) {
 	return
 }
 
-func TestGetBalance(address string) (expectedReturn *trading.GetBalanceResponse, err error) {
+func tGetBalance(address string) (expectedReturn *trading.GetBalanceResponse, err error) {
 	cli := resty.New()
 	resp, err := cli.R().
 		SetHeader("Content-Type", "application/json").
@@ -140,7 +140,7 @@ func TestGetBalance(address string) (expectedReturn *trading.GetBalanceResponse,
 	return
 }
 
-func TestACK(req *trading.ACKRequest) (isOkay bool, err error) {
+func tACK(req *trading.ACKRequest) (isOkay bool, err error) {
 	cli := resty.New()
 	resp, err := cli.R().
 		SetHeader("Content-Type", "application/json").
@@ -168,7 +168,7 @@ func MockAccountCreated() (isOkay bool) {
 		IsOkay:              true,
 		ErrorMessage:        "",
 	}
-	isOkay, err := TestACK(req)
+	isOkay, err := tACK(req)
 	if err != nil {
 		isOkay = false
 		logger.Sugar().Errorf("create account ack error: ", err)
@@ -187,7 +187,7 @@ func MockAccountBalance() (isOkay bool) {
 		IsOkay:              true,
 		ErrorMessage:        "",
 	}
-	isOkay, err := TestACK(req)
+	isOkay, err := tACK(req)
 	if err != nil {
 		isOkay = false
 		logger.Sugar().Errorf("account balance ack error: ", err)
@@ -206,7 +206,7 @@ func MockTransactionComplete() (isOkay bool) {
 		IsOkay:              true,
 		ErrorMessage:        "",
 	}
-	isOkay, err := TestACK(req)
+	isOkay, err := tACK(req)
 	if err != nil {
 		isOkay = false
 		logger.Sugar().Errorf("account balance ack error: ", err)
