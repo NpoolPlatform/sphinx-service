@@ -46,14 +46,17 @@ func TestWholeProcedure(t *testing.T) {
 		return
 	}
 	var err error
+	var flag bool
 	// test create account
-	assert.True(t, MockAccountCreated()) // mock success
+	flag = MockAccountCreated()
+	assert.True(t, flag) // mock success
 	err = tCreateAccount()
 	go LogError(err)
 	assert.Nil(t, err)
 	assert.NotEmpty(t, tmpAccountInfo.Address)
 	// test get balance
-	assert.True(t, MockAccountBalance()) // mock success
+	flag = MockAccountBalance()
+	assert.True(t, flag) // mock success
 	resp, err := tGetBalance(tmpAccountInfo.Address)
 	go LogError(err)
 	assert.Nil(t, err)
@@ -61,7 +64,8 @@ func TestWholeProcedure(t *testing.T) {
 	assert.Zero(t, resp.AmountFloat64)
 	// test create transaction
 	// transaction would fail, but err should be nil
-	assert.True(t, MockTransactionComplete()) // mock success
+	flag = MockTransactionComplete()
+	assert.True(t, flag) // mock success
 	err = tCreateTransaction(tmpAccountInfo.Address, tmpAccountInfo.Address)
 	go LogError(err)
 	assert.Nil(t, err)
@@ -230,9 +234,10 @@ func MockTransactionComplete() (isOkay bool) {
 
 func LogError(err error) {
 	if err != nil {
-		err = os.WriteFile("/tmp/sphinx-test-log.txt", []byte(fmt.Sprintf("%s \n", err)), fs.ModeAppend)
-		if err != nil {
-			return
+		fmt.Println(err)
+		err2 := os.WriteFile("/tmp/sphinx-test-log.txt", []byte(fmt.Sprintf("%s \n", err)), fs.ModeAppend)
+		if err2 != nil {
+			panic(err)
 		}
 	}
 }
