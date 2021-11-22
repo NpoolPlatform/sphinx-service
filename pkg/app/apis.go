@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
+	"github.com/NpoolPlatform/message/npool/signproxy"
 	"github.com/NpoolPlatform/message/npool/sphinxplugin"
-	"github.com/NpoolPlatform/message/npool/sphinxsign"
 	"github.com/NpoolPlatform/message/npool/trading"
 	"github.com/NpoolPlatform/sphinx-service/pkg/client"
 	"github.com/NpoolPlatform/sphinx-service/pkg/crud"
@@ -30,7 +30,7 @@ func RegisterAccount(ctx context.Context, coinName, uuid string) (account *tradi
 		account = nil
 		return
 	}
-	resp, err := client.ClientProxy.WalletNew(ctx, &sphinxsign.WalletNewRequest{
+	resp, err := client.ClientProxy.WalletNew(ctx, &signproxy.WalletNewRequest{
 		CoinType: sphinxplugin.CoinType(coinID),
 	})
 	if err != nil {
@@ -39,7 +39,7 @@ func RegisterAccount(ctx context.Context, coinName, uuid string) (account *tradi
 	}
 	account = &trading.AccountAddress{
 		CoinName: coinName,
-		Address:  resp.Info.Address,
+		Address:  resp.Address,
 		Uuid:     uuid,
 	}
 	return
@@ -60,8 +60,8 @@ func GetBalance(ctx context.Context, in *trading.GetBalanceRequest) (resp *tradi
 		err = status.Errorf(codes.Internal, "get wallet balance failed, %v", err)
 		return
 	}
-	_, amountString, amountFloat64 := UntestedDecomposeStringAmount(respRPC.Info.Balance)
-	logger.Sugar().Infof("amount in: %v", respRPC.Info.Balance)
+	_, amountString, amountFloat64 := UntestedDecomposeStringAmount(respRPC.Balance)
+	logger.Sugar().Infof("amount in: %v", respRPC.Balance)
 	logger.Sugar().Infof("amount decomposed: %v", amountString)
 	resp = &trading.AccountBalance{
 		CoinName:      in.CoinName,
