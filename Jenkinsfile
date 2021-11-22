@@ -24,6 +24,7 @@ pipeline {
         // Get dependencies
         sh 'go get golang.org/x/image/tiff/lzw'
         sh 'go get github.com/boombuler/barcode'
+        sh 'rm -rf message'
         sh 'make deps'
       }
     }
@@ -44,7 +45,6 @@ pipeline {
       steps {
         sh (returnStdout: false, script: '''
           make -C tools/grpc install
-          rm -rf message
           git clone https://github.com/NpoolPlatform/message.git /tmp/message
           mkdir message; mkdir message/npool
           cp -r /tmp/message/npool/trading message/npool/trading
