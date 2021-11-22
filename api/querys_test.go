@@ -72,10 +72,10 @@ func runByGithub() bool {
 		testInitAlready = true
 		err = testinit.Init()
 		if err != nil {
-			logger.Sugar().Errorf("test init failed: %v", err)
+			panic(err)
 		}
 	}
-	return err == nil
+	return false
 }
 
 func tCreateAccount() (err error) {
