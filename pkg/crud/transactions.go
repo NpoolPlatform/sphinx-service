@@ -105,5 +105,5 @@ func UpdateTransactionStatus(in *trading.ACKRequest) (isSuccess bool) {
 		logger.Sugar().Errorf("update transaction db failed: %v", err)
 	}
 	isSuccess = err == nil
-	return
+	return isSuccess
 }
