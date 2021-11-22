@@ -84,7 +84,7 @@ func LetGetWalletBalance(coinName, address string) (balance float64, err error) 
 	ackResp, err := ListenTillSucceeded(tmpTID)
 	if err != nil {
 		logger.Sugar().Errorf("query account timeout: %v", err)
-	} else if len(ackResp.Address) == 0 {
+	} else if ackResp.Address == "" {
 		logger.Sugar().Error("empty reply from account server")
 		err = status.Error(codes.DataLoss, "internal error, empty reply from account server")
 	} else {
@@ -149,7 +149,7 @@ func LetCreateAccount(coinName, uuid string) (address string, err error) {
 	ackResp, err := ListenTillSucceeded(uuid + entResp.Name)
 	if err != nil {
 		logger.Sugar().Errorf("create account timeout: %v", err)
-	} else if len(ackResp.Address) == 0 {
+	} else if ackResp.Address == "" {
 		logger.Sugar().Error("empty reply from account server")
 		err = status.Error(codes.DataLoss, "internal error, empty reply from account server")
 	} else {

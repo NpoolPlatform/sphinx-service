@@ -28,7 +28,7 @@ func ListenTillSucceeded(transactionIDInsite string) (val *trading.ACKRequest, e
 	loopIntervalMs := 50
 	timeoutMs := 6000
 	var ok bool
-	for ok == false && timeoutMs > 0 {
+	for !ok && timeoutMs > 0 {
 		time.Sleep(time.Duration(loopIntervalMs) * time.Millisecond)
 		timeoutMs -= loopIntervalMs
 		val, ok = mapACK[transactionIDInsite]
