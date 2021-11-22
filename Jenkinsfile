@@ -46,13 +46,8 @@ pipeline {
         sh (returnStdout: false, script: '''
           make -C tools/grpc install
           make verify-build
-          git clone https://github.com/NpoolPlatform/message.git /tmp/message
-          mkdir message; mkdir message/npool
-          cp -r /tmp/message/npool/trading message/npool/trading
-          cp -r /tmp/message/google message/google
-          cp /tmp/message/* message/ || true
+          git clone https://github.com/NpoolPlatform/message.git message
           PATH=$PATH:/usr/go/bin:$HOME/go/bin make -C message clean proto
-          rm -rf /tmp/message
         '''.stripIndent())
       }
     }
