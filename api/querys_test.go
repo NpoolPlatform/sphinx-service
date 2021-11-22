@@ -165,13 +165,14 @@ func tACK(req *trading.ACKRequest) (isOkay bool, err error) {
 		}).
 		Post(testHost + "/v1/internal/ack")
 	if err != nil {
-		return
+		panic(err)
 	}
 	expectedReturn := &trading.ACKResponse{}
 	err = json.Unmarshal(resp.Body(), expectedReturn)
-	if err == nil {
-		isOkay = expectedReturn.IsOkay
+	if err != nil {
+		panic(err)
 	}
+	isOkay = expectedReturn.IsOkay
 	return
 }
 
