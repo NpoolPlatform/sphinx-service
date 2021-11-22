@@ -26,6 +26,7 @@ func ACK(in *trading.ACKRequest) (resp *trading.ACKResponse) {
 		resp.IsOkay = crud.UpdateTransactionStatus(in)
 	} else {
 		mapACK[in.TransactionIdInsite] = in
+		resp.IsOkay = true
 	}
 	return
 }
