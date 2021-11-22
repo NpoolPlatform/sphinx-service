@@ -188,9 +188,8 @@ func MockAccountCreated() (isOkay bool) {
 		ErrorMessage:        "",
 	}
 	isOkay, err := tACK(req)
-	if err != nil {
-		isOkay = false
-		LogError(err)
+	if !isOkay || err != nil {
+		panic(err)
 	}
 	return
 }
@@ -208,9 +207,8 @@ func MockAccountBalance() (isOkay bool) {
 		ErrorMessage:        "",
 	}
 	isOkay, err := tACK(req)
-	if err != nil {
-		isOkay = false
-		LogError(err)
+	if !isOkay || err != nil {
+		panic(err)
 	}
 	return
 }
@@ -228,9 +226,8 @@ func MockTransactionComplete() (isOkay bool) {
 		ErrorMessage:        "",
 	}
 	isOkay, err := tACK(req)
-	if err != nil {
-		isOkay = false
-		LogError(err)
+	if !isOkay || err != nil {
+		panic(err)
 	}
 	return
 }
