@@ -51,7 +51,8 @@ func CheckRecordIfExistTransaction(in *trading.CreateTransactionRequest) (isExis
 	return
 }
 
-func UpdateTransactionStatus(in *trading.ACKRequest) (isSuccess bool) {
+func UpdateTransactionStatus(in *trading.ACKRequest) (isSuccess bool, err error) {
+	isSuccess = true
 	entResp, err := db.Client().Transaction.Query().
 		Where(
 			transaction.And(
@@ -100,10 +101,11 @@ func UpdateTransactionStatus(in *trading.ACKRequest) (isSuccess bool) {
 	}
 	if flagErr == 1 {
 		logger.Sugar().Errorf("failed to update transaction status, %v", err)
+		isSuccess = false
 	}
 	if err != nil {
 		logger.Sugar().Errorf("update transaction db failed: %v", err)
+		isSuccess = false
 	}
-	isSuccess = err == nil
-	return isSuccess
+	return isSuccess, err
 }

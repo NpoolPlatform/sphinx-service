@@ -18,12 +18,12 @@ func init() {
 	mapACK = make(map[string]*trading.ACKRequest)
 }
 
-func ACK(in *trading.ACKRequest) (resp *trading.ACKResponse) {
+func ACK(in *trading.ACKRequest) (resp *trading.ACKResponse, err error) {
 	resp = &trading.ACKResponse{
 		IsOkay: false,
 	}
 	if in.TransactionType == signproxy.TransactionType_TransactionNew || in.TransactionType == signproxy.TransactionType_PreSign || in.TransactionType == signproxy.TransactionType_Signature || in.TransactionType == signproxy.TransactionType_Broadcast {
-		resp.IsOkay = crud.UpdateTransactionStatus(in)
+		resp.IsOkay, err = crud.UpdateTransactionStatus(in)
 	} else {
 		mapACK[in.TransactionIdInsite] = in
 		resp.IsOkay = true

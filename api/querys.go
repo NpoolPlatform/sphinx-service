@@ -79,5 +79,5 @@ func (s *Server) CreateAccount(ctx context.Context, in *npool.CreateAccountReque
 
 // 接收异步返回
 func (s *Server) ACK(_ context.Context, in *npool.ACKRequest) (*npool.ACKResponse, error) {
-	return app.ACK(in), nil
+	return app.ACK(in)
 }
