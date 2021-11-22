@@ -55,6 +55,12 @@ func (cic *CoinInfoCreate) SetNillableIsPresale(b *bool) *CoinInfoCreate {
 	return cic
 }
 
+// SetLogoImage sets the "logo_image" field.
+func (cic *CoinInfoCreate) SetLogoImage(s string) *CoinInfoCreate {
+	cic.mutation.SetLogoImage(s)
+	return cic
+}
+
 // SetID sets the "id" field.
 func (cic *CoinInfoCreate) SetID(u uuid.UUID) *CoinInfoCreate {
 	cic.mutation.SetID(u)
@@ -211,6 +217,9 @@ func (cic *CoinInfoCreate) check() error {
 	if _, ok := cic.mutation.IsPresale(); !ok {
 		return &ValidationError{Name: "is_presale", err: errors.New(`ent: missing required field "is_presale"`)}
 	}
+	if _, ok := cic.mutation.LogoImage(); !ok {
+		return &ValidationError{Name: "logo_image", err: errors.New(`ent: missing required field "logo_image"`)}
+	}
 	return nil
 }
 
@@ -274,6 +283,14 @@ func (cic *CoinInfoCreate) createSpec() (*CoinInfo, *sqlgraph.CreateSpec) {
 			Column: coininfo.FieldIsPresale,
 		})
 		_node.IsPresale = value
+	}
+	if value, ok := cic.mutation.LogoImage(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: coininfo.FieldLogoImage,
+		})
+		_node.LogoImage = value
 	}
 	if nodes := cic.mutation.TransactionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

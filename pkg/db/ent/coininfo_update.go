@@ -68,6 +68,12 @@ func (ciu *CoinInfoUpdate) SetNillableIsPresale(b *bool) *CoinInfoUpdate {
 	return ciu
 }
 
+// SetLogoImage sets the "logo_image" field.
+func (ciu *CoinInfoUpdate) SetLogoImage(s string) *CoinInfoUpdate {
+	ciu.mutation.SetLogoImage(s)
+	return ciu
+}
+
 // AddTransactionIDs adds the "transactions" edge to the Transaction entity by IDs.
 func (ciu *CoinInfoUpdate) AddTransactionIDs(ids ...int32) *CoinInfoUpdate {
 	ciu.mutation.AddTransactionIDs(ids...)
@@ -309,6 +315,13 @@ func (ciu *CoinInfoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: coininfo.FieldIsPresale,
 		})
 	}
+	if value, ok := ciu.mutation.LogoImage(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: coininfo.FieldLogoImage,
+		})
+	}
 	if ciu.mutation.TransactionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -526,6 +539,12 @@ func (ciuo *CoinInfoUpdateOne) SetNillableIsPresale(b *bool) *CoinInfoUpdateOne 
 	if b != nil {
 		ciuo.SetIsPresale(*b)
 	}
+	return ciuo
+}
+
+// SetLogoImage sets the "logo_image" field.
+func (ciuo *CoinInfoUpdateOne) SetLogoImage(s string) *CoinInfoUpdateOne {
+	ciuo.mutation.SetLogoImage(s)
 	return ciuo
 }
 
@@ -792,6 +811,13 @@ func (ciuo *CoinInfoUpdateOne) sqlSave(ctx context.Context) (_node *CoinInfo, er
 			Type:   field.TypeBool,
 			Value:  value,
 			Column: coininfo.FieldIsPresale,
+		})
+	}
+	if value, ok := ciuo.mutation.LogoImage(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: coininfo.FieldLogoImage,
 		})
 	}
 	if ciuo.mutation.TransactionsCleared() {

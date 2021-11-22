@@ -24,6 +24,8 @@ type CoinInfo struct {
 	Unit string `json:"unit,omitempty"`
 	// IsPresale holds the value of the "is_presale" field.
 	IsPresale bool `json:"is_presale,omitempty"`
+	// LogoImage holds the value of the "logo_image" field.
+	LogoImage string `json:"logo_image,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CoinInfoQuery when eager-loading is set.
 	Edges CoinInfoEdges `json:"edges"`
@@ -78,7 +80,7 @@ func (*CoinInfo) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullBool)
 		case coininfo.FieldCoinTypeID:
 			values[i] = new(sql.NullInt64)
-		case coininfo.FieldName, coininfo.FieldUnit:
+		case coininfo.FieldName, coininfo.FieldUnit, coininfo.FieldLogoImage:
 			values[i] = new(sql.NullString)
 		case coininfo.FieldID:
 			values[i] = new(uuid.UUID)
@@ -126,6 +128,12 @@ func (ci *CoinInfo) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field is_presale", values[i])
 			} else if value.Valid {
 				ci.IsPresale = value.Bool
+			}
+		case coininfo.FieldLogoImage:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field logo_image", values[i])
+			} else if value.Valid {
+				ci.LogoImage = value.String
 			}
 		}
 	}
@@ -178,6 +186,8 @@ func (ci *CoinInfo) String() string {
 	builder.WriteString(ci.Unit)
 	builder.WriteString(", is_presale=")
 	builder.WriteString(fmt.Sprintf("%v", ci.IsPresale))
+	builder.WriteString(", logo_image=")
+	builder.WriteString(ci.LogoImage)
 	builder.WriteByte(')')
 	return builder.String()
 }

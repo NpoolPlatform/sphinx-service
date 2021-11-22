@@ -19,6 +19,8 @@ const (
 	FieldUnit = "unit"
 	// FieldIsPresale holds the string denoting the is_presale field in the database.
 	FieldIsPresale = "is_presale"
+	// FieldLogoImage holds the string denoting the logo_image field in the database.
+	FieldLogoImage = "logo_image"
 	// EdgeTransactions holds the string denoting the transactions edge name in mutations.
 	EdgeTransactions = "transactions"
 	// EdgeReviews holds the string denoting the reviews edge name in mutations.
@@ -57,6 +59,7 @@ var Columns = []string{
 	FieldName,
 	FieldUnit,
 	FieldIsPresale,
+	FieldLogoImage,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

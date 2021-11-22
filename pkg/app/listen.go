@@ -3,7 +3,9 @@ package app
 import (
 	"time"
 
+	"github.com/NpoolPlatform/message/npool/signproxy"
 	"github.com/NpoolPlatform/message/npool/trading" //nolint
+	"github.com/NpoolPlatform/sphinx-service/pkg/crud"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -17,9 +19,13 @@ func init() {
 }
 
 func ACK(in *trading.ACKRequest) (resp *trading.ACKResponse) {
-	mapACK[in.TransactionIdInsite] = in
 	resp = &trading.ACKResponse{
-		IsOkay: true,
+		IsOkay: false,
+	}
+	if in.TransactionType == signproxy.TransactionType_TransactionNew || in.TransactionType == signproxy.TransactionType_PreSign || in.TransactionType == signproxy.TransactionType_Signature || in.TransactionType == signproxy.TransactionType_Broadcast {
+		resp.IsOkay = crud.UpdateTransactionStatus(in)
+	} else {
+		mapACK[in.TransactionIdInsite] = in
 	}
 	return
 }

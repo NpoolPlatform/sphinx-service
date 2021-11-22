@@ -44,6 +44,7 @@ type CoinInfoMutation struct {
 	name                *string
 	unit                *string
 	is_presale          *bool
+	logo_image          *string
 	clearedFields       map[string]struct{}
 	transactions        map[int32]struct{}
 	removedtransactions map[int32]struct{}
@@ -308,6 +309,42 @@ func (m *CoinInfoMutation) ResetIsPresale() {
 	m.is_presale = nil
 }
 
+// SetLogoImage sets the "logo_image" field.
+func (m *CoinInfoMutation) SetLogoImage(s string) {
+	m.logo_image = &s
+}
+
+// LogoImage returns the value of the "logo_image" field in the mutation.
+func (m *CoinInfoMutation) LogoImage() (r string, exists bool) {
+	v := m.logo_image
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLogoImage returns the old "logo_image" field's value of the CoinInfo entity.
+// If the CoinInfo object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CoinInfoMutation) OldLogoImage(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldLogoImage is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldLogoImage requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLogoImage: %w", err)
+	}
+	return oldValue.LogoImage, nil
+}
+
+// ResetLogoImage resets all changes to the "logo_image" field.
+func (m *CoinInfoMutation) ResetLogoImage() {
+	m.logo_image = nil
+}
+
 // AddTransactionIDs adds the "transactions" edge to the Transaction entity by ids.
 func (m *CoinInfoMutation) AddTransactionIDs(ids ...int32) {
 	if m.transactions == nil {
@@ -489,7 +526,7 @@ func (m *CoinInfoMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CoinInfoMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
 	if m.coin_type_id != nil {
 		fields = append(fields, coininfo.FieldCoinTypeID)
 	}
@@ -501,6 +538,9 @@ func (m *CoinInfoMutation) Fields() []string {
 	}
 	if m.is_presale != nil {
 		fields = append(fields, coininfo.FieldIsPresale)
+	}
+	if m.logo_image != nil {
+		fields = append(fields, coininfo.FieldLogoImage)
 	}
 	return fields
 }
@@ -518,6 +558,8 @@ func (m *CoinInfoMutation) Field(name string) (ent.Value, bool) {
 		return m.Unit()
 	case coininfo.FieldIsPresale:
 		return m.IsPresale()
+	case coininfo.FieldLogoImage:
+		return m.LogoImage()
 	}
 	return nil, false
 }
@@ -535,6 +577,8 @@ func (m *CoinInfoMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldUnit(ctx)
 	case coininfo.FieldIsPresale:
 		return m.OldIsPresale(ctx)
+	case coininfo.FieldLogoImage:
+		return m.OldLogoImage(ctx)
 	}
 	return nil, fmt.Errorf("unknown CoinInfo field %s", name)
 }
@@ -571,6 +615,13 @@ func (m *CoinInfoMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetIsPresale(v)
+		return nil
+	case coininfo.FieldLogoImage:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLogoImage(v)
 		return nil
 	}
 	return fmt.Errorf("unknown CoinInfo field %s", name)
@@ -647,6 +698,9 @@ func (m *CoinInfoMutation) ResetField(name string) error {
 		return nil
 	case coininfo.FieldIsPresale:
 		m.ResetIsPresale()
+		return nil
+	case coininfo.FieldLogoImage:
+		m.ResetLogoImage()
 		return nil
 	}
 	return fmt.Errorf("unknown CoinInfo field %s", name)
