@@ -12,7 +12,7 @@ import (
 	"google.golang.org/grpc/codes"
 )
 
-func CreateRecordTransaction(in *trading.ApplyTransactionRequest, needManualReview bool, txType transaction.Type) (info *ent.Transaction, err error) {
+func CreateRecordTransaction(in *trading.CreateTransactionRequest, needManualReview bool, txType transaction.Type) (info *ent.Transaction, err error) {
 	tmpCoinInfo, err := db.Client().CoinInfo.Query().Where(coininfo.Name(in.CoinName)).First(ctxPublic)
 	if err != nil {
 		info = nil
@@ -33,7 +33,7 @@ func CreateRecordTransaction(in *trading.ApplyTransactionRequest, needManualRevi
 	return
 }
 
-func CheckRecordIfExistTransaction(in *trading.ApplyTransactionRequest) (isExisted bool, err error) {
+func CheckRecordIfExistTransaction(in *trading.CreateTransactionRequest) (isExisted bool, err error) {
 	var info *ent.Transaction
 	info, err = db.Client().Transaction.Query().
 		Where(

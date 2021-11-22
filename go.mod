@@ -5,13 +5,13 @@ go 1.16
 require (
 	entgo.io/ent v0.9.1
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20211122070118-139aac84bc79
-	github.com/NpoolPlatform/message v0.0.0-20211122095625-9c53fdaf63f5
+	github.com/NpoolPlatform/message v0.0.0-20211122123817-749327e9ad97
+	github.com/go-resty/resty/v2 v2.7.0
 	github.com/gogo/status v1.1.0
 	github.com/google/uuid v1.3.0
-	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
-	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
+	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.0
-	github.com/prometheus/client_golang v1.11.0
+	github.com/prometheus/client_golang v1.11.0 // indirect
 	github.com/streadway/amqp v1.0.0
 	github.com/stretchr/testify v1.7.0
 	github.com/urfave/cli/v2 v2.3.0

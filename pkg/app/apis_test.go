@@ -44,7 +44,7 @@ func initStruct() {
 	tmpCoinInfo.Unit = "DK"
 }
 
-func TestRegisterAccount(t *testing.T) {
+func TestCreateAccount(t *testing.T) {
 	if runByGithub() {
 		return
 	}
@@ -54,7 +54,7 @@ func TestRegisterAccount(t *testing.T) {
 	} else {
 		panic("uuid too short!")
 	}
-	account, err := RegisterAccount(ctxPublic, tmpCoinInfo.Name, tmpUUID)
+	account, err := CreateAccount(ctxPublic, tmpCoinInfo.Name, tmpUUID)
 	if err == nil {
 		assert.NotNil(t, account)
 		assert.Equal(t, tmpCoinInfo.Name, account.CoinName)

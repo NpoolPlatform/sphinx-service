@@ -13,11 +13,11 @@ import (
 var errInternal = status.Error(codes.Internal, "internal server error")
 
 // 余额查询
-func (s *Server) GetBalance(ctx context.Context, in *npool.GetBalanceRequest) (resp *npool.AccountBalance, err error) {
+func (s *Server) GetBalance(ctx context.Context, in *npool.GetBalanceRequest) (resp *npool.GetBalanceResponse, err error) {
 	resp, err = app.GetBalance(ctx, in)
 	if err != nil {
 		logger.Sugar().Errorf("getbalance error: %f", err)
-		resp = &npool.AccountBalance{}
+		resp = &npool.GetBalanceResponse{}
 		if DebugFlag {
 			err = errInternal
 		}
@@ -26,11 +26,11 @@ func (s *Server) GetBalance(ctx context.Context, in *npool.GetBalanceRequest) (r
 }
 
 // 转账 / 提现
-func (s *Server) ApplyTransaction(ctx context.Context, in *npool.ApplyTransactionRequest) (resp *npool.SuccessInfo, err error) {
-	resp, err = app.ApplyTransaction(ctx, in)
+func (s *Server) CreateTransaction(ctx context.Context, in *npool.CreateTransactionRequest) (resp *npool.CreateTransactionResponse, err error) {
+	resp, err = app.CreateTransaction(ctx, in)
 	if err != nil {
-		logger.Sugar().Errorf("applytransaction error: %f", err)
-		resp = &npool.SuccessInfo{}
+		logger.Sugar().Errorf("CreateTransaction error: %f", err)
+		resp = &npool.CreateTransactionResponse{}
 		if DebugFlag {
 			err = errInternal
 		}
@@ -65,11 +65,11 @@ func (s *Server) GetInsiteTxStatus(ctx context.Context, in *npool.GetInsiteTxSta
 }
 
 // 创建账户
-func (s *Server) RegisterAccount(ctx context.Context, in *npool.RegisterAccountRequest) (resp *npool.AccountAddress, err error) {
-	resp, err = app.RegisterAccount(ctx, in.CoinName, in.Uuid)
+func (s *Server) CreateAccount(ctx context.Context, in *npool.CreateAccountRequest) (resp *npool.CreateAccountResponse, err error) {
+	resp, err = app.CreateAccount(ctx, in.CoinName, in.Uuid)
 	if err != nil {
-		logger.Sugar().Errorf("registeraccount error: %v", err)
-		resp = &npool.AccountAddress{}
+		logger.Sugar().Errorf("create account error: %v", err)
+		resp = &npool.CreateAccountResponse{}
 		if DebugFlag {
 			err = errInternal
 		}

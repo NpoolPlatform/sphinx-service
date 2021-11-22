@@ -12,7 +12,7 @@ import (
 )
 
 // 创建账号
-func RegisterAccount(ctx context.Context, coinName, uuid string) (account *trading.AccountAddress, err error) {
+func CreateAccount(ctx context.Context, coinName, uuid string) (account *trading.CreateAccountResponse, err error) {
 	account = nil
 	_, err = crud.CoinName2CoinID(coinName)
 	if err != nil {
@@ -22,7 +22,7 @@ func RegisterAccount(ctx context.Context, coinName, uuid string) (account *tradi
 	if err != nil {
 		return
 	}
-	account = &trading.AccountAddress{
+	account = &trading.CreateAccountResponse{
 		CoinName: coinName,
 		Address:  address,
 		Uuid:     uuid,
@@ -31,12 +31,12 @@ func RegisterAccount(ctx context.Context, coinName, uuid string) (account *tradi
 }
 
 // 余额查询
-func GetBalance(ctx context.Context, in *trading.GetBalanceRequest) (resp *trading.AccountBalance, err error) {
+func GetBalance(ctx context.Context, in *trading.GetBalanceRequest) (resp *trading.GetBalanceResponse, err error) {
 	balance, err := LetGetWalletBalance(in.CoinName, in.Address)
 	if err != nil {
 		return
 	}
-	resp = &trading.AccountBalance{
+	resp = &trading.GetBalanceResponse{
 		CoinName:      in.CoinName,
 		Address:       in.Address,
 		TimestampUtc:  time.Now().UTC().Unix(),
@@ -46,9 +46,9 @@ func GetBalance(ctx context.Context, in *trading.GetBalanceRequest) (resp *tradi
 }
 
 // 转账 / 提现
-func ApplyTransaction(ctx context.Context, in *trading.ApplyTransactionRequest) (resp *trading.SuccessInfo, err error) {
+func CreateTransaction(ctx context.Context, in *trading.CreateTransactionRequest) (resp *trading.CreateTransactionResponse, err error) {
 	// preset
-	resp = &trading.SuccessInfo{
+	resp = &trading.CreateTransactionResponse{
 		Info: "aborted",
 	}
 	isExisted, err := crud.CheckRecordIfExistTransaction(in)
