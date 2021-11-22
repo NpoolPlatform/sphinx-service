@@ -2,6 +2,8 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
+	"io/fs"
 	"os"
 	"strconv"
 	"testing"
@@ -47,11 +49,13 @@ func TestWholeProcedure(t *testing.T) {
 	// test create account
 	assert.True(t, MockAccountCreated()) // mock success
 	err = tCreateAccount()
+	go LogError(err)
 	assert.Nil(t, err)
 	assert.NotEmpty(t, tmpAccountInfo.Address)
 	// test get balance
 	assert.True(t, MockAccountBalance()) // mock success
 	resp, err := tGetBalance(tmpAccountInfo.Address)
+	go LogError(err)
 	assert.Nil(t, err)
 	assert.NotNil(t, resp)
 	assert.Zero(t, resp.AmountFloat64)
@@ -59,6 +63,7 @@ func TestWholeProcedure(t *testing.T) {
 	// transaction would fail, but err should be nil
 	assert.True(t, MockTransactionComplete()) // mock success
 	err = tCreateTransaction(tmpAccountInfo.Address, tmpAccountInfo.Address)
+	go LogError(err)
 	assert.Nil(t, err)
 }
 
@@ -180,7 +185,7 @@ func MockAccountCreated() (isOkay bool) {
 	isOkay, err := tACK(req)
 	if err != nil {
 		isOkay = false
-		panic(err)
+		LogError(err)
 	}
 	return
 }
@@ -199,7 +204,7 @@ func MockAccountBalance() (isOkay bool) {
 	isOkay, err := tACK(req)
 	if err != nil {
 		isOkay = false
-		panic(err)
+		LogError(err)
 	}
 	return
 }
@@ -218,7 +223,16 @@ func MockTransactionComplete() (isOkay bool) {
 	isOkay, err := tACK(req)
 	if err != nil {
 		isOkay = false
-		panic(err)
+		LogError(err)
 	}
 	return
+}
+
+func LogError(err error) {
+	if err != nil {
+		err = os.WriteFile("/tmp/sphinx-test-log.txt", []byte(fmt.Sprintf("%s \n", err)), fs.ModeAppend)
+		if err != nil {
+			return
+		}
+	}
 }
