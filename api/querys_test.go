@@ -36,7 +36,7 @@ func init() {
 	tmpAccountInfo.CoinName = "Unknown"
 	tmpAccountInfo.Uuid = "6ba7b812-9dad-80b4-11d1-00c04fd430c8"
 	tmpTransactionIDInsite = "test-tx-6ba7b812-80b4-9dad-11d1"
-	testHost = "http://localhost:50160/v1"
+	testHost = "http://localhost:50160"
 }
 
 func TestWholeProcedure(t *testing.T) {
