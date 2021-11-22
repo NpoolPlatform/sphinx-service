@@ -45,19 +45,19 @@ func TestWholeProcedure(t *testing.T) {
 	}
 	var err error
 	// test create account
-	go MockAccountCreated() // mock success
+	assert.True(t, MockAccountCreated()) // mock success
 	err = tCreateAccount()
 	assert.Nil(t, err)
 	assert.NotEmpty(t, tmpAccountInfo.Address)
 	// test get balance
-	go MockAccountBalance() // mock success
+	assert.True(t, MockAccountBalance()) // mock success
 	resp, err := tGetBalance(tmpAccountInfo.Address)
 	assert.Nil(t, err)
 	assert.NotNil(t, resp)
 	assert.Zero(t, resp.AmountFloat64)
 	// test create transaction
 	// transaction would fail, but err should be nil
-	go MockTransactionComplete() // mock success
+	assert.True(t, MockTransactionComplete()) // mock success
 	err = tCreateTransaction(tmpAccountInfo.Address, tmpAccountInfo.Address)
 	assert.Nil(t, err)
 }
