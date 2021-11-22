@@ -8,9 +8,11 @@ import (
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	"github.com/NpoolPlatform/go-service-framework/pkg/price"
+	"github.com/NpoolPlatform/message/npool/signproxy"
 	"github.com/NpoolPlatform/message/npool/sphinxplugin"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent"
+	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
 	"github.com/NpoolPlatform/sphinx-service/pkg/message/message"
 	"github.com/NpoolPlatform/sphinx-service/pkg/message/server"
@@ -58,12 +60,40 @@ func LetApproveTransaction(tx *ent.Transaction) (err error) {
 	return
 }
 
-// 钱包代理 查询交易状态
-func CheckIfTransactionComplete(tx *ent.Transaction) (err error) {
+// 钱包代理 余额查询
+func LetGetWalletBalance(coinName, address string) (balance float64, err error) {
+	entResp, err := db.Client().CoinInfo.Query().Where(coininfo.Name(coinName)).Only(ctxPublic)
+	if err != nil {
+		logger.Sugar().Errorf("no corresponding coin! when creating account %v", err)
+		return
+	}
+	tmpTID := "balance-" + entResp.Name + "-" + address
+	err = server.PublishDefaultNotification(&message.NotificationTransaction{
+		CoinType:            sphinxplugin.CoinType(entResp.CoinTypeID),
+		TransactionType:     signproxy.TransactionType_Balance,
+		TransactionIDInsite: tmpTID,
+		AddressFrom:         address,
+		AddressTo:           address,
+		CreatetimeUtc:       time.Now().UTC().Unix(),
+		UpdatetimeUtc:       time.Now().UTC().Unix(),
+	})
+	if err != nil {
+		logger.Sugar().Errorf("failed to send transaction to proxy: %v", err)
+		return
+	}
+	ackResp, err := ListenTillSucceeded(tmpTID)
+	if err != nil {
+		logger.Sugar().Errorf("query account timeout: %v", err)
+	} else if len(ackResp.Address) == 0 {
+		logger.Sugar().Error("empty reply from account server")
+		err = status.Error(codes.DataLoss, "internal error, empty reply from account server")
+	} else {
+		balance = ackResp.Balance
+	}
 	return
 }
 
-// 钱包代理 进行转账
+// 钱包代理 进行转账 pending type update
 func LetSendTransaction(tx *ent.Transaction) {
 	entResp, err := tx.QueryCoin().Only(ctxPublic)
 	if err != nil {
@@ -72,6 +102,7 @@ func LetSendTransaction(tx *ent.Transaction) {
 	}
 	err = server.PublishDefaultNotification(&message.NotificationTransaction{
 		CoinType:            sphinxplugin.CoinType(entResp.CoinTypeID),
+		TransactionType:     signproxy.TransactionType_TransactionNew,
 		TransactionIDInsite: tx.TransactionIDInsite,
 		AmountFloat64:       tx.AmountFloat64,
 		AddressFrom:         tx.AddressFrom,
@@ -95,4 +126,34 @@ func LetSendTransaction(tx *ent.Transaction) {
 	if err != nil {
 		logger.Sugar().Errorf("[!WARNING!] db update failed: %v", err)
 	}
+}
+
+// 钱包代理 创建账户 done
+func LetCreateAccount(coinName, uuid string) (address string, err error) {
+	entResp, err := db.Client().CoinInfo.Query().Where(coininfo.Name(coinName)).Only(ctxPublic)
+	if err != nil {
+		logger.Sugar().Errorf("no corresponding coin! when creating account %v", err)
+		return
+	}
+	err = server.PublishDefaultNotification(&message.NotificationTransaction{
+		CoinType:            sphinxplugin.CoinType(entResp.CoinTypeID),
+		TransactionType:     signproxy.TransactionType_WalletNew,
+		TransactionIDInsite: uuid + entResp.Name,
+		CreatetimeUtc:       time.Now().UTC().Unix(),
+		UpdatetimeUtc:       time.Now().UTC().Unix(),
+	})
+	if err != nil {
+		logger.Sugar().Errorf("failed to send transaction to proxy: %v", err)
+		return
+	}
+	ackResp, err := ListenTillSucceeded(uuid + entResp.Name)
+	if err != nil {
+		logger.Sugar().Errorf("create account timeout: %v", err)
+	} else if len(ackResp.Address) == 0 {
+		logger.Sugar().Error("empty reply from account server")
+		err = status.Error(codes.DataLoss, "internal error, empty reply from account server")
+	} else {
+		address = ackResp.Address
+	}
+	return
 }

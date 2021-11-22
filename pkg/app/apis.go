@@ -4,11 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
-	"github.com/NpoolPlatform/message/npool/signproxy"
-	"github.com/NpoolPlatform/message/npool/sphinxplugin"
 	"github.com/NpoolPlatform/message/npool/trading"
-	"github.com/NpoolPlatform/sphinx-service/pkg/client"
 	"github.com/NpoolPlatform/sphinx-service/pkg/crud"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
 	"github.com/gogo/status"
@@ -17,29 +13,18 @@ import (
 
 // 创建账号
 func RegisterAccount(ctx context.Context, coinName, uuid string) (account *trading.AccountAddress, err error) {
-	// online mode
-	// coinType := sphinxplugin.CoinType(coinTypeID)
-	// resp, err := client.ClientProxy.WalletNew(ctx, &signproxy.WalletNewRequest{
-	// 	UUID: uuid,
-	// 	CoinType: coinType,
-	// })
-	// "github.com/NpoolPlatform/message/npool/signproxy"
-	// debug mode
-	coinID, err := crud.CoinName2CoinID(coinName)
+	account = nil
+	_, err = crud.CoinName2CoinID(coinName)
 	if err != nil {
-		account = nil
 		return
 	}
-	resp, err := client.ClientProxy.WalletNew(ctx, &signproxy.WalletNewRequest{
-		CoinType: sphinxplugin.CoinType(coinID),
-	})
+	address, err := LetCreateAccount(coinName, uuid)
 	if err != nil {
-		account = nil
 		return
 	}
 	account = &trading.AccountAddress{
 		CoinName: coinName,
-		Address:  resp.Address,
+		Address:  address,
 		Uuid:     uuid,
 	}
 	return
@@ -47,27 +32,15 @@ func RegisterAccount(ctx context.Context, coinName, uuid string) (account *tradi
 
 // 余额查询
 func GetBalance(ctx context.Context, in *trading.GetBalanceRequest) (resp *trading.AccountBalance, err error) {
-	coinID, err := crud.CoinName2CoinID(in.CoinName)
+	balance, err := LetGetWalletBalance(in.CoinName, in.Address)
 	if err != nil {
-		resp = nil
 		return
 	}
-	respRPC, err := client.ClientProxy.WalletBalance(ctx, &sphinxplugin.WalletBalanceRequest{
-		CoinType: sphinxplugin.CoinType(coinID),
-		Address:  in.Address,
-	})
-	if err != nil {
-		err = status.Errorf(codes.Internal, "get wallet balance failed, %v", err)
-		return
-	}
-	_, amountString, amountFloat64 := UntestedDecomposeStringAmount(respRPC.Balance)
-	logger.Sugar().Infof("amount in: %v", respRPC.Balance)
-	logger.Sugar().Infof("amount decomposed: %v", amountString)
 	resp = &trading.AccountBalance{
 		CoinName:      in.CoinName,
 		Address:       in.Address,
 		TimestampUtc:  time.Now().UTC().Unix(),
-		AmountFloat64: amountFloat64,
+		AmountFloat64: balance,
 	}
 	return
 }

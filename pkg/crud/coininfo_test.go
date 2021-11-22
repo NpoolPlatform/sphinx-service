@@ -14,7 +14,7 @@ import (
 
 var (
 	testInitAlready bool
-	tmpCoinInfo     coininfo.CoinInfoRow
+	tmpCoinInfo     coininfo.CoinInfo
 )
 
 func runByGithub() bool {
@@ -35,8 +35,8 @@ func runByGithub() bool {
 
 func initStruct() {
 	ctxPublic = context.Background()
-	tmpCoinInfo.CoinType = 0
-	tmpCoinInfo.IsPresale = false
+	tmpCoinInfo.Enum = 0
+	tmpCoinInfo.PreSale = false
 	tmpCoinInfo.Name = "Unknown"
 	tmpCoinInfo.Unit = "DK"
 }

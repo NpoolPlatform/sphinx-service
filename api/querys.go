@@ -16,7 +16,7 @@ var errInternal = status.Error(codes.Internal, "internal server error")
 func (s *Server) GetBalance(ctx context.Context, in *npool.GetBalanceRequest) (resp *npool.AccountBalance, err error) {
 	resp, err = app.GetBalance(ctx, in)
 	if err != nil {
-		logger.Sugar().Errorw("getbalance error: %w", err)
+		logger.Sugar().Errorf("getbalance error: %f", err)
 		resp = &npool.AccountBalance{}
 		if DebugFlag {
 			err = errInternal
@@ -29,7 +29,7 @@ func (s *Server) GetBalance(ctx context.Context, in *npool.GetBalanceRequest) (r
 func (s *Server) ApplyTransaction(ctx context.Context, in *npool.ApplyTransactionRequest) (resp *npool.SuccessInfo, err error) {
 	resp, err = app.ApplyTransaction(ctx, in)
 	if err != nil {
-		logger.Sugar().Errorw("applytransaction error: %w", err)
+		logger.Sugar().Errorf("applytransaction error: %f", err)
 		resp = &npool.SuccessInfo{}
 		if DebugFlag {
 			err = errInternal
@@ -42,7 +42,7 @@ func (s *Server) ApplyTransaction(ctx context.Context, in *npool.ApplyTransactio
 func (s *Server) GetTxJSON(ctx context.Context, in *npool.GetTxJSONRequest) (resp *npool.AccountTxJSON, err error) {
 	resp, err = app.GetTxJSON(ctx, in)
 	if err != nil {
-		logger.Sugar().Errorw("gettxjson error: %w", err)
+		logger.Sugar().Errorf("gettxjson error: %f", err)
 		resp = &npool.AccountTxJSON{}
 		if DebugFlag {
 			err = errInternal
@@ -55,7 +55,7 @@ func (s *Server) GetTxJSON(ctx context.Context, in *npool.GetTxJSONRequest) (res
 func (s *Server) GetInsiteTxStatus(ctx context.Context, in *npool.GetInsiteTxStatusRequest) (resp *npool.GetInsiteTxStatusResponse, err error) {
 	resp, err = app.GetInsiteTxStatus(ctx, in)
 	if err != nil {
-		logger.Sugar().Errorw("getinsitetxstatus error: %w", err)
+		logger.Sugar().Errorf("getinsitetxstatus error: %v", err)
 		resp = &npool.GetInsiteTxStatusResponse{}
 		if DebugFlag {
 			err = errInternal
@@ -68,11 +68,16 @@ func (s *Server) GetInsiteTxStatus(ctx context.Context, in *npool.GetInsiteTxSta
 func (s *Server) RegisterAccount(ctx context.Context, in *npool.RegisterAccountRequest) (resp *npool.AccountAddress, err error) {
 	resp, err = app.RegisterAccount(ctx, in.CoinName, in.Uuid)
 	if err != nil {
-		logger.Sugar().Errorw("registeraccount error: %w", err)
+		logger.Sugar().Errorf("registeraccount error: %v", err)
 		resp = &npool.AccountAddress{}
 		if DebugFlag {
 			err = errInternal
 		}
 	}
 	return
+}
+
+// 接收异步返回
+func (s *Server) ACK(_ context.Context, in *npool.ACKRequest) (*npool.ACKResponse, error) {
+	return app.ACK(in), nil
 }
