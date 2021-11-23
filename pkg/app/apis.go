@@ -77,7 +77,6 @@ func CreateTransaction(ctx context.Context, in *trading.CreateTransactionRequest
 	// insert sql record
 	info, err := crud.CreateRecordTransaction(in, needManualReview, txType)
 	if err != nil {
-		err = status.Error(codes.Internal, "database error")
 		return
 	}
 	/*

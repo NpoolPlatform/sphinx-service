@@ -13,9 +13,9 @@ import (
 )
 
 func CreateRecordTransaction(in *trading.CreateTransactionRequest, needManualReview bool, txType transaction.Type) (info *ent.Transaction, err error) {
-	tmpCoinInfo, err := db.Client().CoinInfo.Query().Where(coininfo.Name(in.CoinName)).First(ctxPublic)
+	tmpCoinInfo, err := db.Client().CoinInfo.Query().Where(coininfo.Name(in.CoinName)).Only(ctxPublic)
 	if err != nil {
-		info = nil
+		logger.Sugar().Warn(in.CoinName, "coin not found", err)
 		return
 	}
 	info, err = db.Client().Transaction.Create().

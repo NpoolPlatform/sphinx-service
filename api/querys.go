@@ -16,7 +16,7 @@ var errInternal = status.Error(codes.Internal, "internal server error")
 func (s *Server) GetBalance(ctx context.Context, in *npool.GetBalanceRequest) (resp *npool.GetBalanceResponse, err error) {
 	resp, err = app.GetBalance(ctx, in)
 	if err != nil {
-		logger.Sugar().Errorf("getbalance error: %f", err)
+		logger.Sugar().Errorf("getbalance error: %v", err)
 		resp = &npool.GetBalanceResponse{}
 		if DebugFlag {
 			err = errInternal
@@ -42,7 +42,7 @@ func (s *Server) CreateTransaction(ctx context.Context, in *npool.CreateTransact
 func (s *Server) GetTxJSON(ctx context.Context, in *npool.GetTxJSONRequest) (resp *npool.AccountTxJSON, err error) {
 	resp, err = app.GetTxJSON(ctx, in)
 	if err != nil {
-		logger.Sugar().Errorf("gettxjson error: %f", err)
+		logger.Sugar().Errorf("gettxjson error: %v", err)
 		resp = &npool.AccountTxJSON{}
 		if DebugFlag {
 			err = errInternal

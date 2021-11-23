@@ -17,6 +17,7 @@ import (
 	"github.com/NpoolPlatform/sphinx-service/pkg/message/message"
 	"github.com/NpoolPlatform/sphinx-service/pkg/message/server"
 	"github.com/gogo/status"
+	"golang.org/x/xerrors"
 	"google.golang.org/grpc/codes"
 )
 
@@ -53,7 +54,8 @@ func LetApproveTransaction(tx *ent.Transaction) (err error) {
 		SetUpdatetimeUtc(time.Now().UTC().Unix()).
 		Save(context.Background())
 	if err != nil {
-		err = status.Error(codes.Internal, "database error")
+		logger.Sugar().Warn(err)
+		err = xerrors.Errorf("approval err %v", err)
 		return
 	}
 	go LetSendTransaction(tx)
