@@ -12,7 +12,6 @@ import (
 	"github.com/NpoolPlatform/message/npool/coininfo" //nolint
 	"github.com/NpoolPlatform/message/npool/signproxy"
 	"github.com/NpoolPlatform/message/npool/trading"
-	msglistener "github.com/NpoolPlatform/sphinx-service/pkg/message/listener"
 	testinit "github.com/NpoolPlatform/sphinx-service/pkg/test-init"
 	resty "github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/assert"
@@ -31,7 +30,6 @@ func TestWholeProcedure(t *testing.T) {
 	if runByGithub() {
 		return
 	}
-	msglistener.Listen(true)
 	// test create account
 	// go MockAccountCreated()
 	address := tCreateAccount()
