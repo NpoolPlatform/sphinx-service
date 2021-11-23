@@ -2,8 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
-	"io/fs"
 	"os"
 	"strconv"
 	"testing"
@@ -77,9 +75,7 @@ func runByGithub() bool {
 	if testInitAlready == false {
 		testInitAlready = true
 		err = testinit.Init()
-		if err != nil {
-			panic(err)
-		}
+		LogError(err)
 	}
 	return false
 }
@@ -154,15 +150,11 @@ func tACK(req *trading.ACKRequest) (isOkay bool, err error) {
 		SetBody(req).
 		Post(testHost + "/v1/internal/ack")
 	logger.Sugar().Warn(resp)
-	if err != nil {
-		panic(err)
-	}
+	LogError(err)
 	expectedReturn := &trading.ACKResponse{}
 	err = json.Unmarshal(resp.Body(), expectedReturn)
-	if err != nil {
-		isOkay = false
-		panic(err)
-	}
+	isOkay = (err == nil)
+	LogError(err)
 	logger.Sugar().Warn("debug expectedReturn:")
 	logger.Sugar().Warn(expectedReturn)
 	return
@@ -182,9 +174,7 @@ func MockAccountCreated() (isOkay bool) {
 		ErrorMessage:        "",
 	}
 	isOkay, err := tACK(req)
-	if err != nil {
-		panic(err)
-	}
+	LogError(err)
 	return
 }
 
@@ -202,9 +192,7 @@ func MockAccountBalance() (isOkay bool) {
 		ErrorMessage:        "",
 	}
 	isOkay, err := tACK(req)
-	if err != nil {
-		panic(err)
-	}
+	LogError(err)
 	return
 }
 
@@ -221,24 +209,16 @@ func MockTransactionComplete() (isOkay bool) {
 		IsOkay:              true,
 		ErrorMessage:        "",
 	}
-	isOkay, err := tACK(req)
-	if err != nil {
-		panic(err)
-	}
+	_, err := tACK(req)
+	LogError(err)
 	req.TransactionType = signproxy.TransactionType_PreSign
 	isOkay, err = tACK(req)
-	if err != nil {
-		panic(err)
-	}
+	LogError(err)
 	return
 }
 
 func LogError(err error) {
 	if err != nil {
 		logger.Sugar().Warn(err)
-		err2 := os.WriteFile("/tmp/sphinx-test-log.txt", []byte(fmt.Sprintf("%s \n", err)), fs.ModeAppend)
-		if err2 != nil {
-			panic(err)
-		}
 	}
 }
