@@ -29,7 +29,7 @@ func (s *Server) GetBalance(ctx context.Context, in *npool.GetBalanceRequest) (r
 func (s *Server) CreateTransaction(ctx context.Context, in *npool.CreateTransactionRequest) (resp *npool.CreateTransactionResponse, err error) {
 	resp, err = app.CreateTransaction(ctx, in)
 	if err != nil {
-		logger.Sugar().Errorf("CreateTransaction error: %f", err)
+		logger.Sugar().Error(err)
 		resp = &npool.CreateTransactionResponse{}
 		if DebugFlag {
 			err = errInternal

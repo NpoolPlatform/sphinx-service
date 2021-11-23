@@ -34,17 +34,16 @@ func CreateRecordTransaction(in *trading.CreateTransactionRequest, needManualRev
 }
 
 func CheckRecordIfExistTransaction(in *trading.CreateTransactionRequest) (isExisted bool, err error) {
-	var info *ent.Transaction
+	var info []*ent.Transaction
 	info, err = db.Client().Transaction.Query().
 		Where(
 			transaction.And(
 				transaction.TransactionIDInsite(in.TransactionIdInsite),
 			),
-		).
-		First(ctxPublic)
-	if info != nil { // has record
+		).All(ctxPublic)
+	if len(info) > 0 { // has record, definitely len == 1
 		isExisted = true
-		if info.AddressFrom != in.AddressFrom || info.AddressTo != info.AddressFrom {
+		if info[0].AddressFrom != in.AddressFrom || info[0].AddressTo != info[0].AddressFrom {
 			err = status.Error(codes.AlreadyExists, "transaction id insite already exists")
 		}
 	}
