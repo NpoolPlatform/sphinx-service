@@ -61,6 +61,14 @@ func (cic *CoinInfoCreate) SetLogoImage(s string) *CoinInfoCreate {
 	return cic
 }
 
+// SetNillableLogoImage sets the "logo_image" field if the given value is not nil.
+func (cic *CoinInfoCreate) SetNillableLogoImage(s *string) *CoinInfoCreate {
+	if s != nil {
+		cic.SetLogoImage(*s)
+	}
+	return cic
+}
+
 // SetID sets the "id" field.
 func (cic *CoinInfoCreate) SetID(u uuid.UUID) *CoinInfoCreate {
 	cic.mutation.SetID(u)
@@ -186,6 +194,10 @@ func (cic *CoinInfoCreate) defaults() {
 	if _, ok := cic.mutation.IsPresale(); !ok {
 		v := coininfo.DefaultIsPresale
 		cic.mutation.SetIsPresale(v)
+	}
+	if _, ok := cic.mutation.LogoImage(); !ok {
+		v := coininfo.DefaultLogoImage
+		cic.mutation.SetLogoImage(v)
 	}
 	if _, ok := cic.mutation.ID(); !ok {
 		v := coininfo.DefaultID()

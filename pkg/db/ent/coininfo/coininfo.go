@@ -79,6 +79,8 @@ var (
 	UnitValidator func(string) error
 	// DefaultIsPresale holds the default value on creation for the "is_presale" field.
 	DefaultIsPresale bool
+	// DefaultLogoImage holds the default value on creation for the "logo_image" field.
+	DefaultLogoImage string
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )

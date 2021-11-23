@@ -74,6 +74,14 @@ func (ciu *CoinInfoUpdate) SetLogoImage(s string) *CoinInfoUpdate {
 	return ciu
 }
 
+// SetNillableLogoImage sets the "logo_image" field if the given value is not nil.
+func (ciu *CoinInfoUpdate) SetNillableLogoImage(s *string) *CoinInfoUpdate {
+	if s != nil {
+		ciu.SetLogoImage(*s)
+	}
+	return ciu
+}
+
 // AddTransactionIDs adds the "transactions" edge to the Transaction entity by IDs.
 func (ciu *CoinInfoUpdate) AddTransactionIDs(ids ...int32) *CoinInfoUpdate {
 	ciu.mutation.AddTransactionIDs(ids...)
@@ -545,6 +553,14 @@ func (ciuo *CoinInfoUpdateOne) SetNillableIsPresale(b *bool) *CoinInfoUpdateOne 
 // SetLogoImage sets the "logo_image" field.
 func (ciuo *CoinInfoUpdateOne) SetLogoImage(s string) *CoinInfoUpdateOne {
 	ciuo.mutation.SetLogoImage(s)
+	return ciuo
+}
+
+// SetNillableLogoImage sets the "logo_image" field if the given value is not nil.
+func (ciuo *CoinInfoUpdateOne) SetNillableLogoImage(s *string) *CoinInfoUpdateOne {
+	if s != nil {
+		ciuo.SetLogoImage(*s)
+	}
 	return ciuo
 }
 

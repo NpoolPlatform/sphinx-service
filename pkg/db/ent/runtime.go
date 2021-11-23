@@ -28,6 +28,10 @@ func init() {
 	coininfoDescIsPresale := coininfoFields[4].Descriptor()
 	// coininfo.DefaultIsPresale holds the default value on creation for the is_presale field.
 	coininfo.DefaultIsPresale = coininfoDescIsPresale.Default.(bool)
+	// coininfoDescLogoImage is the schema descriptor for logo_image field.
+	coininfoDescLogoImage := coininfoFields[5].Descriptor()
+	// coininfo.DefaultLogoImage holds the default value on creation for the logo_image field.
+	coininfo.DefaultLogoImage = coininfoDescLogoImage.Default.(string)
 	// coininfoDescID is the schema descriptor for id field.
 	coininfoDescID := coininfoFields[0].Descriptor()
 	// coininfo.DefaultID holds the default value on creation for the id field.

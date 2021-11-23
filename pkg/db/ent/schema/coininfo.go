@@ -21,7 +21,7 @@ func (CoinInfo) Fields() []ent.Field {
 		field.String("name").NotEmpty().Unique(),
 		field.String("unit").NotEmpty(),
 		field.Bool("is_presale").Default(false),
-		field.String("logo_image"),
+		field.String("logo_image").Default(""),
 	}
 }
 
