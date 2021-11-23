@@ -29,11 +29,11 @@ func CreateRecordTransaction(in *trading.CreateTransactionRequest, needManualRev
 		SetAddressTo(in.AddressTo).
 		SetNeedManualReview(needManualReview).
 		SetType(txType).
-		SetTransactionIDInsite(in.TransactionIdInsite).
+		SetTransactionIDInsite(in.TransactionIDInsite).
 		SetTransactionIDChain("").
 		SetStatus(transaction.StatusPendingReview).
 		SetMutex(false).
-		SetSignatureUser(in.UuidSignature).
+		SetSignatureUser(in.UUIDSignature).
 		SetSignaturePlatform("test-version-direct-pass").
 		SetCreatetimeUtc(time.Now().UTC().Unix()).
 		SetUpdatetimeUtc(time.Now().UTC().Unix()).
@@ -47,7 +47,7 @@ func CheckRecordIfExistTransaction(in *trading.CreateTransactionRequest) (isExis
 	info, err = db.Client().Transaction.Query().
 		Where(
 			transaction.And(
-				transaction.TransactionIDInsite(in.TransactionIdInsite),
+				transaction.TransactionIDInsite(in.TransactionIDInsite),
 			),
 		).All(ctxPublic)
 	if len(info) > 0 { // has record, definitely len == 1

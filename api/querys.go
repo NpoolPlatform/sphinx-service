@@ -66,7 +66,7 @@ func (s *Server) GetInsiteTxStatus(ctx context.Context, in *npool.GetInsiteTxSta
 
 // 创建账户
 func (s *Server) CreateAccount(ctx context.Context, in *npool.CreateAccountRequest) (resp *npool.CreateAccountResponse, err error) {
-	resp, err = app.CreateAccount(ctx, in.CoinName, in.Uuid)
+	resp, err = app.CreateAccount(ctx, in.CoinName, in.UUID)
 	if err != nil {
 		logger.Sugar().Errorf("create account error: %v", err)
 		resp = &npool.CreateAccountResponse{}

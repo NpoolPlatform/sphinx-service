@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"time"
 
 	"github.com/NpoolPlatform/message/npool/trading" //nolint
 	"github.com/NpoolPlatform/sphinx-service/pkg/crud"
@@ -23,9 +22,11 @@ func CreateAccount(ctx context.Context, coinName, uuid string) (account *trading
 		return
 	}
 	account = &trading.CreateAccountResponse{
-		CoinName: coinName,
-		Address:  address,
-		Uuid:     uuid,
+		Info: &trading.EntAccount{
+			CoinName: coinName,
+			Address:  address,
+			UUID:     uuid,
+		},
 	}
 	return
 }
@@ -37,10 +38,11 @@ func GetBalance(ctx context.Context, in *trading.GetBalanceRequest) (resp *tradi
 		return
 	}
 	resp = &trading.GetBalanceResponse{
-		CoinName:      in.CoinName,
-		Address:       in.Address,
-		TimestampUtc:  time.Now().UTC().Unix(),
-		AmountFloat64: balance,
+		Info: &trading.EntAccount{
+			CoinName:      in.CoinName,
+			Address:       in.Address,
+			AmountFloat64: balance,
+		},
 	}
 	return
 }
@@ -59,7 +61,7 @@ func CreateTransaction(ctx context.Context, in *trading.CreateTransactionRequest
 		return
 	}
 	// check uuid signature
-	if in.UuidSignature == "forbidden" {
+	if in.UUIDSignature == "forbidden" {
 		err = status.Error(codes.Canceled, "user signature invalid")
 		return
 	}
@@ -67,11 +69,11 @@ func CreateTransaction(ctx context.Context, in *trading.CreateTransactionRequest
 	needManualReview := true
 	// convert type
 	txType := transaction.TypeUnknown
-	if in.Type == "withdraw" {
+	if in.InsiteTxType == "withdraw" {
 		txType = transaction.TypeWithdraw
-	} else if in.Type == "recharge" {
+	} else if in.InsiteTxType == "recharge" {
 		txType = transaction.TypeRecharge
-	} else if in.Type == "payment" {
+	} else if in.InsiteTxType == "payment" {
 		txType = transaction.TypePayment
 	}
 	// insert sql record

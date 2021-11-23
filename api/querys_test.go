@@ -57,7 +57,7 @@ func UnifyRestyQuery(path string, body interface{}) (resp *resty.Response) {
 func tCreateAccount() string {
 	body := &trading.CreateAccountRequest{
 		CoinName: tmpCoinInfo.Name,
-		Uuid:     tmpAccountInfo.Uuid,
+		UUID:     tmpAccountInfo.Info.UUID,
 	}
 	path := "/v1/create/wallet"
 	resp := UnifyRestyQuery(path, body)
@@ -66,20 +66,20 @@ func tCreateAccount() string {
 	if err != nil {
 		panic(resp.String())
 	}
-	tmpAccountInfo.Address = expectedReturn.Address
-	return expectedReturn.Address
+	tmpAccountInfo.Info.Address = expectedReturn.Info.Address
+	return expectedReturn.Info.Address
 }
 
 func tCreateTransaction(addressFrom, addressTo string) (info string) {
 	body := &trading.CreateTransactionRequest{
 		CoinName:            tmpCoinInfo.Name,
-		TransactionIdInsite: tmpTransactionIDInsite,
+		TransactionIDInsite: tmpTransactionIDInsite,
 		AddressFrom:         addressFrom,
 		AddressTo:           addressTo,
 		AmountFloat64:       123456.789,
-		Type:                "payment",
-		UuidSignature:       "",
-		CreatetimeUtc:       time.Now().UTC().Unix(),
+		InsiteTxType:        "payment",
+		UUIDSignature:       "",
+		CreatetimeUTC:       time.Now().UTC().Unix(),
 	}
 	path := "/v1/create/transaction"
 	resp := UnifyRestyQuery(path, body)
@@ -95,7 +95,7 @@ func tGetBalance(address string) (balance float64) {
 	body := &trading.GetBalanceRequest{
 		CoinName:     "Unknown",
 		Address:      address,
-		TimestampUtc: time.Now().UTC().Unix(),
+		TimestampUTC: time.Now().UTC().Unix(),
 	}
 	path := "/v1/get/wallet/balance"
 	resp := UnifyRestyQuery(path, body)
@@ -104,7 +104,7 @@ func tGetBalance(address string) (balance float64) {
 	if err != nil {
 		panic(resp.String())
 	}
-	return expectedReturn.AmountFloat64
+	return expectedReturn.Info.AmountFloat64
 }
 
 func tACK(req *trading.ACKRequest) (isOkay bool) {
@@ -124,7 +124,7 @@ func MockAccountCreated() (isOkay bool) {
 	body := &trading.ACKRequest{
 		TransactionType:     signproxy.TransactionType_WalletNew,
 		CoinTypeId:          tmpCoinInfo.Enum,
-		TransactionIdInsite: tmpAccountInfo.Uuid + tmpAccountInfo.CoinName,
+		TransactionIdInsite: tmpAccountInfo.Info.UUID + tmpAccountInfo.Info.CoinName,
 		TransactionIdChain:  "",
 		Address:             "testaddresshere",
 		Balance:             0.00,
@@ -178,8 +178,8 @@ func init() {
 	tmpCoinInfo.PreSale = false
 	tmpCoinInfo.Name = "Unknown"
 	tmpCoinInfo.Unit = "DK"
-	tmpAccountInfo.CoinName = "Unknown"
-	tmpAccountInfo.Uuid = "6ba7b812-9dad-80b4-11d1-00c04fd430c8"
+	tmpAccountInfo.Info.CoinName = "Unknown"
+	tmpAccountInfo.Info.UUID = "6ba7b812-9dad-80b4-11d1-00c04fd430c8"
 	tmpTransactionIDInsite = "test-tx-6ba7b812-80b4-9dad-11d1"
 	testHost = "http://localhost:50160"
 	RestyClient = resty.New()

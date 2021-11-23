@@ -57,9 +57,9 @@ func TestCreateAccount(t *testing.T) {
 	account, err := CreateAccount(ctxPublic, tmpCoinInfo.Name, tmpUUID)
 	if err == nil {
 		assert.NotNil(t, account)
-		assert.Equal(t, tmpCoinInfo.Name, account.CoinName)
-		assert.NotEmpty(t, account.Address)
-		assert.Equal(t, tmpUUID, account.Uuid)
+		assert.Equal(t, tmpCoinInfo.Name, account.Info.CoinName)
+		assert.NotEmpty(t, account.Info.Address)
+		assert.Equal(t, tmpUUID, account.Info.UUID)
 	} else {
 		assert.Nil(t, account)
 	}
@@ -78,12 +78,11 @@ func TestGetBalance(t *testing.T) {
 	resp, err := GetBalance(ctxPublic, &trading.GetBalanceRequest{
 		CoinName:     tmpCoinInfo.Name,
 		Address:      tmpUUID,
-		TimestampUtc: time.Now().UTC().Unix(),
+		TimestampUTC: time.Now().UTC().Unix(),
 	})
 	if err == nil {
 		assert.NotNil(t, resp)
-		assert.Equal(t, tmpCoinInfo.Name, resp.CoinName)
-		assert.Positive(t, resp.TimestampUtc)
-		assert.Positive(t, resp.AmountFloat64+0.1)
+		assert.Equal(t, tmpCoinInfo.Name, resp.Info.CoinName)
+		assert.Positive(t, resp.Info.AmountFloat64+0.1)
 	}
 }
