@@ -2,6 +2,7 @@ package crud
 
 import (
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
+	"github.com/NpoolPlatform/go-service-framework/pkg/price"
 	"github.com/NpoolPlatform/message/npool/signproxy"
 	"github.com/NpoolPlatform/message/npool/trading" //nolint
 	"github.com/NpoolPlatform/sphinx-service/pkg/db"
@@ -24,6 +25,7 @@ func CreateRecordTransaction(in *trading.CreateTransactionRequest, needManualRev
 		SetStatus(transaction.StatusPendingReview).
 		SetTransactionIDChain(in.TransactionIdInsite).
 		SetAmountFloat64(in.AmountFloat64).
+		SetAmountUint64(price.VisualPriceToDBPrice(in.AmountFloat64)).
 		SetAddressFrom(in.AddressFrom).
 		SetAddressTo(in.AddressTo).
 		SetNeedManualReview(needManualReview).
