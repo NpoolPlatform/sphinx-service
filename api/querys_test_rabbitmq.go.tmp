@@ -14,6 +14,7 @@ import (
 	"github.com/NpoolPlatform/message/npool/trading"
 	testinit "github.com/NpoolPlatform/sphinx-service/pkg/test-init"
 	resty "github.com/go-resty/resty/v2"
+	"github.com/stretchr/testify/assert"
 )
 
 var (
@@ -32,13 +33,13 @@ func TestWholeProcedure(t *testing.T) {
 	// test create account
 	// go MockAccountCreated()
 	address := tCreateAccount()
-	logger.Sugar().Info(address)
+	assert.NotEmpty(t, address)
 	// test get balance
 	// go MockAccountBalance()
-	logger.Sugar().Info(tGetBalance(address))
+	assert.Zero(t, tGetBalance(address))
 	// test create transaction
 	// go MockTransactionComplete()
-	logger.Sugar().Info(tCreateTransaction(address, address))
+	assert.NotEmpty(t, tCreateTransaction(address, address))
 }
 
 func UnifyRestyQuery(path string, body interface{}) (resp *resty.Response) {
