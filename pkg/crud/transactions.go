@@ -1,6 +1,8 @@
 package crud
 
 import (
+	"time"
+
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	"github.com/NpoolPlatform/go-service-framework/pkg/price"
 	"github.com/NpoolPlatform/message/npool/signproxy"
@@ -20,17 +22,21 @@ func CreateRecordTransaction(in *trading.CreateTransactionRequest, needManualRev
 		return
 	}
 	info, err = db.Client().Transaction.Create().
-		SetCoin(tmpCoinInfo).
-		SetMutex(false).
-		SetStatus(transaction.StatusPendingReview).
-		SetTransactionIDChain(in.TransactionIdInsite).
-		SetAmountFloat64(in.AmountFloat64).
 		SetAmountUint64(price.VisualPriceToDBPrice(in.AmountFloat64)).
+		SetAmountFloat64(in.AmountFloat64).
 		SetAddressFrom(in.AddressFrom).
 		SetAddressTo(in.AddressTo).
 		SetNeedManualReview(needManualReview).
-		SetSignatureUser(in.UuidSignature).
 		SetType(txType).
+		SetTransactionIDInsite(in.TransactionIdInsite).
+		SetTransactionIDChain("").
+		SetStatus(transaction.StatusPendingReview).
+		SetMutex(false).
+		SetSignatureUser(in.UuidSignature).
+		SetSignaturePlatform("test-version-direct-pass").
+		SetCreatetimeUtc(time.Now().UTC().Unix()).
+		SetUpdatetimeUtc(time.Now().UTC().Unix()).
+		SetCoin(tmpCoinInfo).
 		Save(ctxPublic)
 	return
 }
