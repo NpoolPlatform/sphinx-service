@@ -72,5 +72,10 @@ func (s *Server) ACK(ctx context.Context, in *npool.ACKRequest) (*npool.ACKRespo
 
 // ping pong
 func (s *Server) Version(ctx context.Context, in *emptypb.Empty) (*npool.VersionResponse, error) {
-	return &npool.VersionResponse{Info: "mvp"}, nil
+	resp, err := app.Version()
+	if err != nil {
+		logger.Sugar().Errorw("[Version] get service version error: %w", err)
+		return &npool.VersionResponse{}, status.Error(codes.Internal, "internal server error")
+	}
+	return resp, nil
 }

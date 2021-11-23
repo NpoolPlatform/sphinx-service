@@ -3,10 +3,12 @@ package app
 import (
 	"context"
 
+	cv "github.com/NpoolPlatform/go-service-framework/pkg/version"
 	"github.com/NpoolPlatform/message/npool/trading" //nolint
 	"github.com/NpoolPlatform/sphinx-service/pkg/crud"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
 	"github.com/gogo/status"
+	"golang.org/x/xerrors"
 	"google.golang.org/grpc/codes"
 )
 
@@ -103,4 +105,15 @@ func CreateTransaction(ctx context.Context, in *trading.CreateTransactionRequest
 func GetTransaction(ctx context.Context, in *trading.GetTransactionRequest) (resp *trading.GetTransactionResponse, err error) {
 	// MARK 交给钱包代理
 	return
+}
+
+// Version
+func Version() (*trading.VersionResponse, error) {
+	info, err := cv.GetVersion()
+	if err != nil {
+		return nil, xerrors.Errorf("get service version error: %w", err)
+	}
+	return &trading.VersionResponse{
+		Info: info,
+	}, nil
 }
