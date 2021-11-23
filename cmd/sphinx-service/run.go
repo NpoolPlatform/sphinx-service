@@ -42,7 +42,7 @@ var runCmd = &cli.Command{
 			return err
 		}
 		// TODO: REMOVE DEBUG SWITCH
-		go msglistener.Listen(true)
+		go msglistener.Listen(false)
 		go msgSender()
 
 		return grpc2.RunGRPCGateWay(rpcGatewayRegister)
