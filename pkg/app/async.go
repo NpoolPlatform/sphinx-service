@@ -155,6 +155,7 @@ func LetCreateAccount(coinName, uuid string) (address string, err error) {
 		logger.Sugar().Error("empty reply from account server")
 		err = status.Error(codes.DataLoss, "internal error, empty reply from account server")
 	} else {
+		logger.Sugar().Infof("account created, address: %v", ackResp.Address)
 		address = ackResp.Address
 	}
 	return

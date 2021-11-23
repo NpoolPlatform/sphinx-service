@@ -28,6 +28,7 @@ func listenTransactionSucceeded() {
 }
 
 func comsumeTransactionSucceeded(notification *msg.NotificationTransaction) (err error) {
+	logger.Sugar().Infof("mq consumer received %v", *notification)
 	tmpReq := &trading.ACKRequest{
 		TransactionType:     notification.TransactionType,
 		CoinTypeId:          int32(notification.CoinType),
