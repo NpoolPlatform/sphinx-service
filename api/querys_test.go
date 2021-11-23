@@ -178,8 +178,12 @@ func init() {
 	tmpCoinInfo.PreSale = false
 	tmpCoinInfo.Name = "Unknown"
 	tmpCoinInfo.Unit = "DK"
-	tmpAccountInfo.Info.CoinName = "Unknown"
-	tmpAccountInfo.Info.UUID = "6ba7b812-9dad-80b4-11d1-00c04fd430c8"
+	tmpAccountInfo = trading.CreateAccountResponse{
+		Info: &trading.EntAccount{
+			CoinName: "Unknown",
+			UUID:     "6ba7b812-9dad-80b4-11d1-00c04fd430c8",
+		},
+	}
 	tmpTransactionIDInsite = "test-tx-6ba7b812-80b4-9dad-11d1"
 	testHost = "http://localhost:50160"
 	RestyClient = resty.New()
