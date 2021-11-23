@@ -32,13 +32,13 @@ func TestWholeProcedure(t *testing.T) {
 	// test create account
 	// go MockAccountCreated()
 	address := tCreateAccount()
-	logger.Sugar().Info(address)
+	logger.Sugar().Infof("create account result: %v", address)
 	// test get balance
 	// go MockAccountBalance()
-	logger.Sugar().Info(tGetBalance(address))
+	logger.Sugar().Infof("get balance result: %v", tGetBalance(address))
 	// test create transaction
 	// go MockTransactionComplete()
-	logger.Sugar().Info(tCreateTransaction(address, address))
+	logger.Sugar().Infof("create transaction result: %v", tCreateTransaction(address, address))
 }
 
 func UnifyRestyQuery(path string, body interface{}) (resp *resty.Response) {
