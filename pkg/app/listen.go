@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"time"
 
 	"github.com/NpoolPlatform/message/npool/signproxy"
@@ -18,12 +19,12 @@ func init() {
 	mapACK = make(map[string]*trading.ACKRequest)
 }
 
-func ACK(in *trading.ACKRequest) (resp *trading.ACKResponse, err error) {
+func ACK(ctx context.Context, in *trading.ACKRequest) (resp *trading.ACKResponse, err error) {
 	resp = &trading.ACKResponse{
 		IsOkay: false,
 	}
 	if in.TransactionType == signproxy.TransactionType_TransactionNew || in.TransactionType == signproxy.TransactionType_PreSign || in.TransactionType == signproxy.TransactionType_Signature || in.TransactionType == signproxy.TransactionType_Broadcast {
-		resp.IsOkay, err = crud.UpdateTransactionStatus(in)
+		resp.IsOkay, err = crud.UpdateTransactionStatus(ctx, in)
 	} else {
 		mapACK[in.TransactionIdInsite] = in
 		resp.IsOkay = true

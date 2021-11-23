@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"io"
 	"os"
 	"strconv"
 	"testing"
@@ -150,19 +151,21 @@ func tACK(req *trading.ACKRequest) (isOkay bool, err error) {
 		SetHeader("Content-Type", "application/json").
 		SetBody(req).
 		Post(testHost + "/v1/internal/ack")
-	logger.Sugar().Warn(resp)
+	logger.Sugar().Warn(io.ReadAll(resp.RawResponse.Body))
+	logger.Sugar().Warn(io.ReadAll(resp.Request.RawRequest.Body))
 	LogError(err)
 	expectedReturn := &trading.ACKResponse{}
 	err = json.Unmarshal(resp.Body(), expectedReturn)
 	isOkay = (err == nil)
 	LogError(err)
+	logger.Sugar().Warn(resp.String())
 	logger.Sugar().Warn("debug expectedReturn:")
 	logger.Sugar().Warn(expectedReturn)
 	return
 }
 
 func MockAccountCreated() (isOkay bool) {
-	time.Sleep(200 * time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
 	isOkay = true
 	req := &trading.ACKRequest{
 		TransactionType:     signproxy.TransactionType_WalletNew,
@@ -180,7 +183,7 @@ func MockAccountCreated() (isOkay bool) {
 }
 
 func MockAccountBalance() (isOkay bool) {
-	time.Sleep(200 * time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
 	isOkay = true
 	req := &trading.ACKRequest{
 		TransactionType:     signproxy.TransactionType_Balance,
@@ -198,7 +201,7 @@ func MockAccountBalance() (isOkay bool) {
 }
 
 func MockTransactionComplete() (isOkay bool) {
-	time.Sleep(200 * time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
 	isOkay = true
 	req := &trading.ACKRequest{
 		TransactionType:     signproxy.TransactionType_TransactionNew,

@@ -1,6 +1,7 @@
 package crud
 
 import (
+	"context"
 	"time"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
@@ -58,7 +59,7 @@ func CheckRecordIfExistTransaction(in *trading.CreateTransactionRequest) (isExis
 	return
 }
 
-func UpdateTransactionStatus(in *trading.ACKRequest) (isSuccess bool, err error) {
+func UpdateTransactionStatus(ctx context.Context, in *trading.ACKRequest) (isSuccess bool, err error) {
 	isSuccess = true
 	entResp, err := db.Client().Transaction.Query().
 		Where(
@@ -66,7 +67,7 @@ func UpdateTransactionStatus(in *trading.ACKRequest) (isSuccess bool, err error)
 				transaction.TransactionIDInsite(in.TransactionIdInsite),
 			),
 		).
-		First(ctxPublic)
+		First(ctx)
 	if err != nil || entResp == nil {
 		logger.Sugar().Errorf("transaction incorrect, %v", err)
 		return
@@ -79,7 +80,7 @@ func UpdateTransactionStatus(in *trading.ACKRequest) (isSuccess bool, err error)
 		err = entResp.Update().
 			SetStatus(transaction.StatusPendingSigninfo).
 			SetMutex(false).
-			Exec(ctxPublic)
+			Exec(ctx)
 	} else if in.TransactionType == signproxy.TransactionType_PreSign {
 		if entResp.Status != transaction.StatusPendingSigninfo {
 			flagErr = 1
@@ -87,7 +88,7 @@ func UpdateTransactionStatus(in *trading.ACKRequest) (isSuccess bool, err error)
 		err = entResp.Update().
 			SetStatus(transaction.StatusPendingSign).
 			SetMutex(false).
-			Exec(ctxPublic)
+			Exec(ctx)
 	} else if in.TransactionType == signproxy.TransactionType_Signature {
 		if entResp.Status != transaction.StatusPendingSign {
 			flagErr = 1
@@ -95,7 +96,7 @@ func UpdateTransactionStatus(in *trading.ACKRequest) (isSuccess bool, err error)
 		err = entResp.Update().
 			SetStatus(transaction.StatusPendingBroadcast).
 			SetMutex(false).
-			Exec(ctxPublic)
+			Exec(ctx)
 	} else if in.TransactionType == signproxy.TransactionType_Broadcast {
 		if entResp.Status != transaction.StatusPendingBroadcast {
 			flagErr = 1
@@ -104,7 +105,7 @@ func UpdateTransactionStatus(in *trading.ACKRequest) (isSuccess bool, err error)
 			SetStatus(transaction.StatusPendingConfirm).
 			SetTransactionIDChain(in.TransactionIdChain).
 			SetMutex(false).
-			Exec(ctxPublic)
+			Exec(ctx)
 	}
 	if flagErr == 1 {
 		logger.Sugar().Errorf("failed to update transaction status, %v", err)
