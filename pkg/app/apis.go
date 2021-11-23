@@ -11,17 +11,17 @@ import (
 )
 
 // 创建账号
-func CreateAccount(ctx context.Context, coinName, uuid string) (account *trading.CreateAccountResponse, err error) {
+func CreateWallet(ctx context.Context, coinName, uuid string) (account *trading.CreateWalletResponse, err error) {
 	account = nil
 	_, err = crud.CoinName2CoinID(coinName)
 	if err != nil {
 		return
 	}
-	address, err := LetCreateAccount(coinName, uuid)
+	address, err := LetCreateWallet(coinName, uuid)
 	if err != nil {
 		return
 	}
-	account = &trading.CreateAccountResponse{
+	account = &trading.CreateWalletResponse{
 		Info: &trading.EntAccount{
 			CoinName: coinName,
 			Address:  address,
@@ -31,12 +31,12 @@ func CreateAccount(ctx context.Context, coinName, uuid string) (account *trading
 }
 
 // 余额查询
-func GetBalance(ctx context.Context, in *trading.GetBalanceRequest) (resp *trading.GetBalanceResponse, err error) {
+func GetWalletBalance(ctx context.Context, in *trading.GetWalletBalanceRequest) (resp *trading.GetWalletBalanceResponse, err error) {
 	balance, err := LetGetWalletBalance(in.Info.CoinName, in.Info.Address)
 	if err != nil {
 		return
 	}
-	resp = &trading.GetBalanceResponse{
+	resp = &trading.GetWalletBalanceResponse{
 		Info: &trading.EntAccount{
 			CoinName: in.Info.CoinName,
 			Address:  in.Info.Address,
@@ -100,7 +100,7 @@ func CreateTransaction(ctx context.Context, in *trading.CreateTransactionRequest
 }
 
 // 交易状态查询
-func GetInsiteTxStatus(ctx context.Context, in *trading.GetInsiteTxStatusRequest) (resp *trading.GetInsiteTxStatusResponse, err error) {
+func GetTransaction(ctx context.Context, in *trading.GetTransactionRequest) (resp *trading.GetTransactionResponse, err error) {
 	// MARK 交给钱包代理
 	return
 }

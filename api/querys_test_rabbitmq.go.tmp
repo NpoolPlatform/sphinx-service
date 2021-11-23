@@ -19,7 +19,7 @@ import (
 
 var (
 	tmpCoinInfo            coininfo.CoinInfo
-	tmpAccountInfo         trading.CreateAccountResponse
+	tmpAccountInfo         trading.CreateWalletResponse
 	tmpTransactionIDInsite string
 	testInitAlready        bool
 	testHost               string
@@ -32,11 +32,11 @@ func TestWholeProcedure(t *testing.T) {
 	}
 	// test create account
 	// go MockAccountCreated()
-	address := tCreateAccount()
+	address := tCreateWallet()
 	assert.NotEmpty(t, address)
 	// test get balance
 	// go MockAccountBalance()
-	assert.Zero(t, tGetBalance(address))
+	assert.Zero(t, tGetWalletBalance(address))
 	// test create transaction
 	// go MockTransactionComplete()
 	assert.NotEmpty(t, tCreateTransaction(address, address))
@@ -51,14 +51,14 @@ func UnifyRestyQuery(path string, body interface{}) (resp *resty.Response) {
 	return
 }
 
-func tCreateAccount() string {
-	body := &trading.CreateAccountRequest{
+func tCreateWallet() string {
+	body := &trading.CreateWalletRequest{
 		CoinName: tmpCoinInfo.Name,
 		Uuid:     tmpAccountInfo.Uuid,
 	}
 	path := "/v1/account/register"
 	resp := UnifyRestyQuery(path, body)
-	expectedReturn := &trading.CreateAccountResponse{}
+	expectedReturn := &trading.CreateWalletResponse{}
 	err := json.Unmarshal(resp.Body(), expectedReturn)
 	if err != nil {
 		panic(resp.String())
@@ -88,15 +88,15 @@ func tCreateTransaction(addressFrom, addressTo string) (info string) {
 	return expectedReturn.Info
 }
 
-func tGetBalance(address string) (balance float64) {
-	body := &trading.GetBalanceRequest{
+func tGetWalletBalance(address string) (balance float64) {
+	body := &trading.GetWalletBalanceRequest{
 		CoinName:     "Unknown",
 		Address:      address,
 		TimestampUtc: time.Now().UTC().Unix(),
 	}
 	path := "/v1/account/balance/get"
 	resp := UnifyRestyQuery(path, body)
-	expectedReturn := &trading.GetBalanceResponse{}
+	expectedReturn := &trading.GetWalletBalanceResponse{}
 	err := json.Unmarshal(resp.Body(), expectedReturn)
 	if err != nil {
 		panic(resp.String())

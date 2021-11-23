@@ -131,7 +131,7 @@ func LetSendTransaction(tx *ent.Transaction) {
 }
 
 // 钱包代理 创建账户 done
-func LetCreateAccount(coinName, uuid string) (address string, err error) {
+func LetCreateWallet(coinName, uuid string) (address string, err error) {
 	entResp, err := db.Client().CoinInfo.Query().Where(coininfo.Name(coinName)).Only(ctxPublic)
 	if err != nil {
 		logger.Sugar().Errorf("no corresponding coin! when creating account %v", err)

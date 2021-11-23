@@ -14,11 +14,11 @@ import (
 var errInternal = status.Error(codes.Internal, "internal server error")
 
 // 余额查询
-func (s *Server) GetBalance(ctx context.Context, in *npool.GetBalanceRequest) (resp *npool.GetBalanceResponse, err error) {
-	resp, err = app.GetBalance(ctx, in)
+func (s *Server) GetWalletBalance(ctx context.Context, in *npool.GetWalletBalanceRequest) (resp *npool.GetWalletBalanceResponse, err error) {
+	resp, err = app.GetWalletBalance(ctx, in)
 	if err != nil {
-		logger.Sugar().Errorf("getbalance error: %v", err)
-		resp = &npool.GetBalanceResponse{}
+		logger.Sugar().Errorf("GetWalletBalance error: %v", err)
+		resp = &npool.GetWalletBalanceResponse{}
 		if DebugFlag {
 			err = errInternal
 		}
@@ -40,11 +40,11 @@ func (s *Server) CreateTransaction(ctx context.Context, in *npool.CreateTransact
 }
 
 // 交易状态查询
-func (s *Server) GetInsiteTxStatus(ctx context.Context, in *npool.GetInsiteTxStatusRequest) (resp *npool.GetInsiteTxStatusResponse, err error) {
-	resp, err = app.GetInsiteTxStatus(ctx, in)
+func (s *Server) GetTransaction(ctx context.Context, in *npool.GetTransactionRequest) (resp *npool.GetTransactionResponse, err error) {
+	resp, err = app.GetTransaction(ctx, in)
 	if err != nil {
-		logger.Sugar().Errorf("getinsitetxstatus error: %v", err)
-		resp = &npool.GetInsiteTxStatusResponse{}
+		logger.Sugar().Errorf("GetTransaction error: %v", err)
+		resp = &npool.GetTransactionResponse{}
 		if DebugFlag {
 			err = errInternal
 		}
@@ -53,11 +53,11 @@ func (s *Server) GetInsiteTxStatus(ctx context.Context, in *npool.GetInsiteTxSta
 }
 
 // 创建账户
-func (s *Server) CreateAccount(ctx context.Context, in *npool.CreateAccountRequest) (resp *npool.CreateAccountResponse, err error) {
-	resp, err = app.CreateAccount(ctx, in.CoinName, in.UUID)
+func (s *Server) CreateWallet(ctx context.Context, in *npool.CreateWalletRequest) (resp *npool.CreateWalletResponse, err error) {
+	resp, err = app.CreateWallet(ctx, in.CoinName, in.UUID)
 	if err != nil {
 		logger.Sugar().Errorf("create account error: %v", err)
-		resp = &npool.CreateAccountResponse{}
+		resp = &npool.CreateWalletResponse{}
 		if DebugFlag {
 			err = errInternal
 		}

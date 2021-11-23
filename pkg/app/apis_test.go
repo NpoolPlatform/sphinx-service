@@ -43,7 +43,7 @@ func initStruct() {
 	tmpCoinInfo.Unit = "DK"
 }
 
-func TestCreateAccount(t *testing.T) {
+func TestCreateWallet(t *testing.T) {
 	if runByGithub() {
 		return
 	}
@@ -53,7 +53,7 @@ func TestCreateAccount(t *testing.T) {
 	} else {
 		panic("uuid too short!")
 	}
-	account, err := CreateAccount(ctxPublic, tmpCoinInfo.Name, tmpUUID)
+	account, err := CreateWallet(ctxPublic, tmpCoinInfo.Name, tmpUUID)
 	if err == nil {
 		assert.NotNil(t, account)
 		assert.Equal(t, tmpCoinInfo.Name, account.Info.CoinName)
@@ -63,7 +63,7 @@ func TestCreateAccount(t *testing.T) {
 	}
 }
 
-func TestGetBalance(t *testing.T) {
+func TestGetWalletBalance(t *testing.T) {
 	if runByGithub() {
 		return
 	}
@@ -73,7 +73,7 @@ func TestGetBalance(t *testing.T) {
 	} else {
 		panic("uuid too short!")
 	}
-	resp, err := GetBalance(ctxPublic, &trading.GetBalanceRequest{
+	resp, err := GetWalletBalance(ctxPublic, &trading.GetWalletBalanceRequest{
 		Info: &trading.EntAccount{
 			CoinName: tmpCoinInfo.Name,
 			Address:  tmpUUID,
