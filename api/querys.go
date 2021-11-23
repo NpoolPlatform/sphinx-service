@@ -8,6 +8,7 @@ import (
 	"github.com/NpoolPlatform/sphinx-service/pkg/app"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var errInternal = status.Error(codes.Internal, "internal server error")
@@ -67,4 +68,9 @@ func (s *Server) CreateAccount(ctx context.Context, in *npool.CreateAccountReque
 // 接收异步返回
 func (s *Server) ACK(ctx context.Context, in *npool.ACKRequest) (*npool.ACKResponse, error) {
 	return app.ACK(ctx, in)
+}
+
+// ping pong
+func (s *Server) Version(ctx context.Context, in *emptypb.Empty) (*npool.VersionResponse, error) {
+	return &npool.VersionResponse{Info: "mvp"}, nil
 }
