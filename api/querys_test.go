@@ -46,17 +46,14 @@ func TestWholeProcedure(t *testing.T) {
 		return
 	}
 	var err error
-	var flag bool
 	// test create account
-	flag = MockAccountCreated()
-	assert.True(t, flag) // mock success
+	go MockAccountCreated()
 	err = tCreateAccount()
 	LogError(err)
 	assert.Nil(t, err)
 	assert.NotEmpty(t, tmpAccountInfo.Address)
 	// test get balance
-	flag = MockAccountBalance()
-	assert.True(t, flag) // mock success
+	go MockAccountBalance()
 	resp, err := tGetBalance(tmpAccountInfo.Address)
 	LogError(err)
 	assert.Nil(t, err)
@@ -64,8 +61,7 @@ func TestWholeProcedure(t *testing.T) {
 	assert.Zero(t, resp.AmountFloat64)
 	// test create transaction
 	// transaction would fail, but err should be nil
-	flag = MockTransactionComplete()
-	assert.True(t, flag) // mock success
+	go MockTransactionComplete()
 	err = tCreateTransaction(tmpAccountInfo.Address, tmpAccountInfo.Address)
 	LogError(err)
 	assert.Nil(t, err)
@@ -172,6 +168,7 @@ func tACK(req *trading.ACKRequest) (isOkay bool, err error) {
 }
 
 func MockAccountCreated() (isOkay bool) {
+	time.Sleep(200 * time.Millisecond)
 	isOkay = true
 	req := &trading.ACKRequest{
 		TransactionType:     signproxy.TransactionType_WalletNew,
@@ -191,6 +188,7 @@ func MockAccountCreated() (isOkay bool) {
 }
 
 func MockAccountBalance() (isOkay bool) {
+	time.Sleep(200 * time.Millisecond)
 	isOkay = true
 	req := &trading.ACKRequest{
 		TransactionType:     signproxy.TransactionType_Balance,
@@ -210,6 +208,7 @@ func MockAccountBalance() (isOkay bool) {
 }
 
 func MockTransactionComplete() (isOkay bool) {
+	time.Sleep(200 * time.Millisecond)
 	isOkay = true
 	req := &trading.ACKRequest{
 		TransactionType:     signproxy.TransactionType_PreSign,
