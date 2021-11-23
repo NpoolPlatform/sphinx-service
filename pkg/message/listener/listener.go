@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
+	"github.com/NpoolPlatform/message/npool/signproxy"
 	"github.com/NpoolPlatform/message/npool/trading"
 	"github.com/NpoolPlatform/sphinx-service/pkg/app"
 	msgcli "github.com/NpoolPlatform/sphinx-service/pkg/message/client"
@@ -11,8 +12,8 @@ import (
 )
 
 func Listen() {
-	FlagDebug := true
-	if FlagDebug {
+	FlagMockTest := true
+	if FlagMockTest {
 		go listenTransactionSucceeded()
 	}
 }
@@ -28,7 +29,7 @@ func listenTransactionSucceeded() {
 }
 
 func comsumeTransactionSucceeded(notification *msg.NotificationTransaction) (err error) {
-	resp, err := app.ACK(context.Background(), &trading.ACKRequest{
+	tmpReq := &trading.ACKRequest{
 		TransactionType:     notification.TransactionType,
 		CoinTypeId:          int32(notification.CoinType),
 		TransactionIdInsite: notification.TransactionIDInsite,
@@ -37,7 +38,13 @@ func comsumeTransactionSucceeded(notification *msg.NotificationTransaction) (err
 		Balance:             notification.AmountFloat64,
 		IsOkay:              true,
 		ErrorMessage:        "",
-	})
+	}
+	if tmpReq.TransactionType == signproxy.TransactionType_Balance {
+		tmpReq.Balance = 0.00
+	} else if tmpReq.TransactionType == signproxy.TransactionType_WalletNew {
+		tmpReq.Address = "testaddresshere"
+	}
+	resp, err := app.ACK(context.Background(), tmpReq)
 	logger.Sugar().Infof("good news everyone: %+w", resp)
 	return
 }
