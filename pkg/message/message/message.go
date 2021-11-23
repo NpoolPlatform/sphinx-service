@@ -11,25 +11,11 @@ import (
 )
 
 const (
-	QueueExample      = "example"
 	QueueAdminApprove = "admin-approve"
-	QueueAgent        = "agent"
-	QueueTrading      = "trading"
 )
 
 func InitQueues() (err error) {
-	if err = msgsrv.DeclareQueue(QueueAdminApprove); err != nil {
-		return
-	}
-	if err = msgsrv.DeclareQueue(QueueAgent); err != nil {
-		return
-	}
-	if err = msgsrv.DeclareQueue(QueueTrading); err != nil {
-		return
-	}
-	if err = msgsrv.DeclareQueue(GetQueueName()); err != nil {
-		return
-	}
+	err = msgsrv.DeclareQueue(GetQueueName())
 	return
 }
 

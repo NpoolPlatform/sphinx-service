@@ -35,10 +35,6 @@ var runCmd = &cli.Command{
 			}
 		}()
 
-		if err := logger.Init(logger.DebugLevel, "/tmp/sphinx-service.log"); err != nil {
-			return err
-		}
-
 		if err := msgsrv.Init(); err != nil {
 			return err
 		}
