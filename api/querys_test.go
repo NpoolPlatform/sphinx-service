@@ -18,7 +18,7 @@ import (
 
 var (
 	tmpCoinInfo            coininfo.CoinInfo
-	tmpAccountInfo         trading.CreateAccountResponse
+	tmpAccountInfo         trading.EntAccount
 	tmpTransactionIDInsite string
 	testInitAlready        bool
 	testHost               string
@@ -57,16 +57,16 @@ func UnifyRestyQuery(path string, body interface{}) (resp *resty.Response) {
 func tCreateAccount() string {
 	body := &trading.CreateAccountRequest{
 		CoinName: tmpCoinInfo.Name,
-		UUID:     tmpAccountInfo.Info.UUID,
+		UUID:     tmpAccountInfo.UUID,
 	}
 	path := "/v1/create/wallet"
 	resp := UnifyRestyQuery(path, body)
 	expectedReturn := &trading.CreateAccountResponse{}
 	err := json.Unmarshal(resp.Body(), expectedReturn)
-	if err != nil {
+	if err != nil || expectedReturn.Info == nil {
 		panic(resp.String())
 	}
-	tmpAccountInfo.Info.Address = expectedReturn.Info.Address
+	tmpAccountInfo.Address = expectedReturn.Info.Address
 	return expectedReturn.Info.Address
 }
 
@@ -101,7 +101,7 @@ func tGetBalance(address string) (balance float64) {
 	resp := UnifyRestyQuery(path, body)
 	expectedReturn := &trading.GetBalanceResponse{}
 	err := json.Unmarshal(resp.Body(), expectedReturn)
-	if err != nil {
+	if err != nil || expectedReturn.Info == nil {
 		panic(resp.String())
 	}
 	return expectedReturn.Info.AmountFloat64
@@ -124,7 +124,7 @@ func MockAccountCreated() (isOkay bool) {
 	body := &trading.ACKRequest{
 		TransactionType:     signproxy.TransactionType_WalletNew,
 		CoinTypeId:          tmpCoinInfo.Enum,
-		TransactionIdInsite: tmpAccountInfo.Info.UUID + tmpAccountInfo.Info.CoinName,
+		TransactionIdInsite: tmpAccountInfo.UUID + tmpAccountInfo.CoinName,
 		TransactionIdChain:  "",
 		Address:             "testaddresshere",
 		Balance:             0.00,
@@ -178,12 +178,8 @@ func init() {
 	tmpCoinInfo.PreSale = false
 	tmpCoinInfo.Name = "Unknown"
 	tmpCoinInfo.Unit = "DK"
-	tmpAccountInfo = trading.CreateAccountResponse{
-		Info: &trading.EntAccount{
-			CoinName: "Unknown",
-			UUID:     "6ba7b812-9dad-80b4-11d1-00c04fd430c8",
-		},
-	}
+	tmpAccountInfo.CoinName = "Unknown"
+	tmpAccountInfo.UUID = "6ba7b812-9dad-80b4-11d1-00c04fd430c8"
 	tmpTransactionIDInsite = "test-tx-6ba7b812-80b4-9dad-11d1"
 	testHost = "http://localhost:50160"
 	RestyClient = resty.New()
