@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"io"
 	"os"
 	"strconv"
 	"testing"
@@ -24,10 +23,151 @@ var (
 	tmpTransactionIDInsite string
 	testInitAlready        bool
 	testHost               string
+	RestyClient            *resty.Client
 )
 
+func TestWholeProcedure(t *testing.T) {
+	if runByGithub() {
+		return
+	}
+	// test create account
+	go MockAccountCreated()
+	address := tCreateAccount()
+	assert.NotEmpty(t, address)
+	// test get balance
+	go MockAccountBalance()
+	assert.Zero(t, tGetBalance(address))
+	// test create transaction
+	go MockTransactionComplete()
+	assert.NotEmpty(t, tCreateTransaction(address, address))
+}
+
+func UnifyRestyQuery(path string, body interface{}) (resp *resty.Response) {
+	resp, err := RestyClient.R().
+		SetHeader("Content-Type", "application/json").
+		SetBody(body).
+		Post(testHost + path)
+	LogError(err)
+	return
+}
+
+func tCreateAccount() string {
+	body := &trading.CreateAccountRequest{
+		CoinName: tmpCoinInfo.Name,
+		Uuid:     tmpAccountInfo.Uuid,
+	}
+	path := "/v1/account/register"
+	resp := UnifyRestyQuery(path, body)
+	expectedReturn := &trading.CreateAccountResponse{}
+	err := json.Unmarshal(resp.Body(), expectedReturn)
+	if err != nil {
+		panic(resp.String())
+	}
+	tmpAccountInfo.Address = expectedReturn.Address
+	return expectedReturn.Address
+}
+
+func tCreateTransaction(addressFrom, addressTo string) (info string) {
+	body := &trading.CreateTransactionRequest{
+		CoinName:            tmpCoinInfo.Name,
+		TransactionIdInsite: tmpTransactionIDInsite,
+		AddressFrom:         addressFrom,
+		AddressTo:           addressTo,
+		AmountFloat64:       123456.789,
+		Type:                "payment",
+		UuidSignature:       "",
+		CreatetimeUtc:       time.Now().UTC().Unix(),
+	}
+	path := "/v1/transaction/create"
+	resp := UnifyRestyQuery(path, body)
+	expectedReturn := &trading.CreateTransactionResponse{}
+	err := json.Unmarshal(resp.Body(), expectedReturn)
+	if err != nil {
+		panic(resp.String())
+	}
+	return expectedReturn.Info
+}
+
+func tGetBalance(address string) (balance float64) {
+	body := trading.GetBalanceRequest{
+		CoinName:     "Unknown",
+		Address:      address,
+		TimestampUtc: time.Now().UTC().Unix(),
+	}
+	path := "/v1/account/balance/get"
+	resp := UnifyRestyQuery(path, body)
+	expectedReturn := &trading.GetBalanceResponse{}
+	err := json.Unmarshal(resp.Body(), expectedReturn)
+	if err != nil {
+		panic(resp.String())
+	}
+	return expectedReturn.AmountFloat64
+}
+
+func tACK(req *trading.ACKRequest) (isOkay bool) {
+	body := req
+	path := "/v1/internal/ack"
+	resp := UnifyRestyQuery(path, body)
+	expectedReturn := trading.ACKResponse{}
+	err := json.Unmarshal(resp.Body(), &expectedReturn)
+	if err != nil {
+		panic(resp.String())
+	}
+	return expectedReturn.IsOkay
+}
+
+func MockAccountCreated() (isOkay bool) {
+	time.Sleep(300 * time.Millisecond)
+	body := &trading.ACKRequest{
+		TransactionType:     signproxy.TransactionType_WalletNew,
+		CoinTypeId:          tmpCoinInfo.Enum,
+		TransactionIdInsite: tmpAccountInfo.Uuid + tmpAccountInfo.CoinName,
+		TransactionIdChain:  "",
+		Address:             "testaddresshere",
+		Balance:             0.00,
+		IsOkay:              true,
+		ErrorMessage:        "",
+	}
+	isOkay = tACK(body)
+	return
+}
+
+func MockAccountBalance() (isOkay bool) {
+	time.Sleep(300 * time.Millisecond)
+	body := &trading.ACKRequest{
+		TransactionType:     signproxy.TransactionType_Balance,
+		CoinTypeId:          tmpCoinInfo.Enum,
+		TransactionIdInsite: "balance-" + tmpCoinInfo.Name + "-" + "testaddresshere",
+		TransactionIdChain:  "",
+		Address:             "testaddresshere",
+		Balance:             0.00,
+		IsOkay:              true,
+		ErrorMessage:        "",
+	}
+	isOkay = tACK(body)
+	return
+}
+
+func MockTransactionComplete() (isOkay bool) {
+	time.Sleep(300 * time.Millisecond)
+	body := &trading.ACKRequest{
+		TransactionType:     signproxy.TransactionType_TransactionNew,
+		CoinTypeId:          tmpCoinInfo.Enum,
+		TransactionIdInsite: tmpTransactionIDInsite,
+		TransactionIdChain:  "testchainidhere",
+		Address:             "testaddresshere",
+		Balance:             0.00,
+		IsOkay:              true,
+		ErrorMessage:        "",
+	}
+	isOkay = tACK(body)
+	return
+}
+
 func init() {
-	if runByGithubAction, err := strconv.ParseBool(os.Getenv("RUN_BY_GITHUB_ACTION")); err == nil && runByGithubAction {
+	err := logger.Init(logger.InfoLevel, "/tmp/sphinx-service.log")
+	LogError(err)
+	if runByGithub() {
 		return
 	}
 	tmpCoinInfo.Enum = 0
@@ -39,31 +179,7 @@ func init() {
 	tmpAccountInfo.Uuid = "6ba7b812-9dad-80b4-11d1-00c04fd430c8"
 	tmpTransactionIDInsite = "test-tx-6ba7b812-80b4-9dad-11d1"
 	testHost = "http://localhost:50160"
-}
-
-func TestWholeProcedure(t *testing.T) {
-	if runByGithub() {
-		return
-	}
-	var err error
-	// test create account
-	go MockAccountCreated()
-	err = tCreateAccount()
-	assert.Nil(t, err)
-	assert.NotEmpty(t, tmpAccountInfo.Address)
-	// test get balance
-	go MockAccountBalance()
-	resp, err := tGetBalance(tmpAccountInfo.Address)
-	LogError(err)
-	assert.Nil(t, err)
-	assert.NotNil(t, resp)
-	assert.Zero(t, resp.AmountFloat64)
-	// test create transaction
-	// transaction would fail, but err should be nil
-	go MockTransactionComplete()
-	err = tCreateTransaction(tmpAccountInfo.Address, tmpAccountInfo.Address)
-	LogError(err)
-	assert.Nil(t, err)
+	RestyClient = resty.New()
 }
 
 func runByGithub() bool {
@@ -78,147 +194,6 @@ func runByGithub() bool {
 		LogError(err)
 	}
 	return false
-}
-
-func tCreateAccount() (err error) {
-	cli := resty.New()
-	resp, err := cli.R().
-		SetHeader("Content-Type", "application/json").
-		SetBody(trading.CreateAccountRequest{
-			CoinName: tmpCoinInfo.Name,
-			Uuid:     tmpAccountInfo.Uuid,
-		}).
-		Post(testHost + "/v1/account/register")
-	if err != nil {
-		LogError(err)
-		return
-	}
-	expectedReturn := &trading.CreateAccountResponse{}
-	err = json.Unmarshal(resp.Body(), expectedReturn)
-	if err != nil {
-		LogError(err)
-		return
-	}
-	tmpAccountInfo.Address = expectedReturn.Address
-	return
-}
-
-func tCreateTransaction(addressFrom, addressTo string) (err error) {
-	cli := resty.New()
-	resp, err := cli.R().
-		SetHeader("Content-Type", "application/json").
-		SetBody(trading.CreateTransactionRequest{
-			CoinName:            tmpCoinInfo.Name,
-			TransactionIdInsite: tmpTransactionIDInsite,
-			AddressFrom:         addressFrom,
-			AddressTo:           addressTo,
-			AmountFloat64:       123456.789,
-			Type:                "payment",
-			UuidSignature:       "",
-			CreatetimeUtc:       time.Now().UTC().Unix(),
-		}).
-		Post(testHost + "/v1/transaction/create")
-	if err != nil {
-		return
-	}
-	expectedReturn := &trading.CreateTransactionResponse{}
-	err = json.Unmarshal(resp.Body(), expectedReturn)
-	return
-}
-
-func tGetBalance(address string) (expectedReturn *trading.GetBalanceResponse, err error) {
-	cli := resty.New()
-	resp, err := cli.R().
-		SetHeader("Content-Type", "application/json").
-		SetBody(trading.GetBalanceRequest{
-			CoinName:     "Unknown",
-			Address:      address,
-			TimestampUtc: time.Now().UTC().Unix(),
-		}).
-		Post(testHost + "/v1/account/balance/get")
-	if err != nil {
-		return
-	}
-	expectedReturn = &trading.GetBalanceResponse{}
-	err = json.Unmarshal(resp.Body(), expectedReturn)
-	return
-}
-
-func tACK(req *trading.ACKRequest) (isOkay bool, err error) {
-	isOkay = true
-	cli := resty.New()
-	resp, err := cli.R().
-		SetHeader("Content-Type", "application/json").
-		SetBody(req).
-		Post(testHost + "/v1/internal/ack")
-	logger.Sugar().Warn(io.ReadAll(resp.RawResponse.Body))
-	logger.Sugar().Warn(io.ReadAll(resp.Request.RawRequest.Body))
-	LogError(err)
-	expectedReturn := &trading.ACKResponse{}
-	err = json.Unmarshal(resp.Body(), expectedReturn)
-	isOkay = (err == nil)
-	LogError(err)
-	logger.Sugar().Warn(resp.String())
-	logger.Sugar().Warn("debug expectedReturn:")
-	logger.Sugar().Warn(expectedReturn)
-	return
-}
-
-func MockAccountCreated() (isOkay bool) {
-	time.Sleep(500 * time.Millisecond)
-	isOkay = true
-	req := &trading.ACKRequest{
-		TransactionType:     signproxy.TransactionType_WalletNew,
-		CoinTypeId:          tmpCoinInfo.Enum,
-		TransactionIdInsite: tmpAccountInfo.Uuid + tmpAccountInfo.CoinName,
-		TransactionIdChain:  "",
-		Address:             "testaddresshere",
-		Balance:             0.00,
-		IsOkay:              true,
-		ErrorMessage:        "",
-	}
-	isOkay, err := tACK(req)
-	LogError(err)
-	return
-}
-
-func MockAccountBalance() (isOkay bool) {
-	time.Sleep(500 * time.Millisecond)
-	isOkay = true
-	req := &trading.ACKRequest{
-		TransactionType:     signproxy.TransactionType_Balance,
-		CoinTypeId:          tmpCoinInfo.Enum,
-		TransactionIdInsite: "balance-" + tmpCoinInfo.Name + "-" + "testaddresshere",
-		TransactionIdChain:  "",
-		Address:             "testaddresshere",
-		Balance:             0.00,
-		IsOkay:              true,
-		ErrorMessage:        "",
-	}
-	isOkay, err := tACK(req)
-	LogError(err)
-	return
-}
-
-func MockTransactionComplete() (isOkay bool) {
-	time.Sleep(500 * time.Millisecond)
-	isOkay = true
-	req := &trading.ACKRequest{
-		TransactionType:     signproxy.TransactionType_TransactionNew,
-		CoinTypeId:          tmpCoinInfo.Enum,
-		TransactionIdInsite: tmpTransactionIDInsite,
-		TransactionIdChain:  "testchainidhere",
-		Address:             "testaddresshere",
-		Balance:             0.00,
-		IsOkay:              true,
-		ErrorMessage:        "",
-	}
-	_, err := tACK(req)
-	LogError(err)
-	req.TransactionType = signproxy.TransactionType_PreSign
-	isOkay, err = tACK(req)
-	LogError(err)
-	return
 }
 
 func LogError(err error) {
