@@ -6,7 +6,6 @@ import (
 	"os"
 	"strconv"
 	"testing"
-	"time"
 
 	"github.com/NpoolPlatform/message/npool/coininfo" //nolint
 	"github.com/NpoolPlatform/message/npool/trading"  //nolint
@@ -59,7 +58,6 @@ func TestCreateAccount(t *testing.T) {
 		assert.NotNil(t, account)
 		assert.Equal(t, tmpCoinInfo.Name, account.Info.CoinName)
 		assert.NotEmpty(t, account.Info.Address)
-		assert.Equal(t, tmpUUID, account.Info.UUID)
 	} else {
 		assert.Nil(t, account)
 	}
@@ -76,13 +74,14 @@ func TestGetBalance(t *testing.T) {
 		panic("uuid too short!")
 	}
 	resp, err := GetBalance(ctxPublic, &trading.GetBalanceRequest{
-		CoinName:     tmpCoinInfo.Name,
-		Address:      tmpUUID,
-		TimestampUTC: time.Now().UTC().Unix(),
+		Info: &trading.EntAccount{
+			CoinName: tmpCoinInfo.Name,
+			Address:  tmpUUID,
+		},
 	})
 	if err == nil {
 		assert.NotNil(t, resp)
 		assert.Equal(t, tmpCoinInfo.Name, resp.Info.CoinName)
-		assert.Positive(t, resp.Info.AmountFloat64+0.1)
+		assert.Positive(t, resp.AmountFloat64+0.1)
 	}
 }

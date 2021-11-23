@@ -17,19 +17,19 @@ import (
 )
 
 func CreateRecordTransaction(in *trading.CreateTransactionRequest, needManualReview bool, txType transaction.Type) (info *ent.Transaction, err error) {
-	tmpCoinInfo, err := db.Client().CoinInfo.Query().Where(coininfo.Name(in.CoinName)).Only(ctxPublic)
+	tmpCoinInfo, err := db.Client().CoinInfo.Query().Where(coininfo.Name(in.Info.CoinName)).Only(ctxPublic)
 	if err != nil {
-		logger.Sugar().Warn(in.CoinName, "coin not found", err)
+		logger.Sugar().Warn(in.Info.CoinName, "coin not found", err)
 		return
 	}
 	info, err = db.Client().Transaction.Create().
-		SetAmountUint64(price.VisualPriceToDBPrice(in.AmountFloat64)).
-		SetAmountFloat64(in.AmountFloat64).
-		SetAddressFrom(in.AddressFrom).
-		SetAddressTo(in.AddressTo).
+		SetAmountUint64(price.VisualPriceToDBPrice(in.Info.AmountFloat64)).
+		SetAmountFloat64(in.Info.AmountFloat64).
+		SetAddressFrom(in.Info.AddressFrom).
+		SetAddressTo(in.Info.AddressTo).
 		SetNeedManualReview(needManualReview).
 		SetType(txType).
-		SetTransactionIDInsite(in.TransactionIDInsite).
+		SetTransactionIDInsite(in.Info.TransactionIDInsite).
 		SetTransactionIDChain("").
 		SetStatus(transaction.StatusPendingReview).
 		SetMutex(false).
@@ -47,12 +47,12 @@ func CheckRecordIfExistTransaction(in *trading.CreateTransactionRequest) (isExis
 	info, err = db.Client().Transaction.Query().
 		Where(
 			transaction.And(
-				transaction.TransactionIDInsite(in.TransactionIDInsite),
+				transaction.TransactionIDInsite(in.Info.TransactionIDInsite),
 			),
 		).All(ctxPublic)
 	if len(info) > 0 { // has record, definitely len == 1
 		isExisted = true
-		if info[0].AddressFrom != in.AddressFrom || info[0].AddressTo != info[0].AddressFrom {
+		if info[0].AddressFrom != in.Info.AddressFrom || info[0].AddressTo != info[0].AddressFrom {
 			err = status.Error(codes.AlreadyExists, "transaction id insite already exists")
 		}
 	}

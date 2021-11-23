@@ -25,7 +25,6 @@ func CreateAccount(ctx context.Context, coinName, uuid string) (account *trading
 		Info: &trading.EntAccount{
 			CoinName: coinName,
 			Address:  address,
-			UUID:     uuid,
 		},
 	}
 	return
@@ -33,16 +32,16 @@ func CreateAccount(ctx context.Context, coinName, uuid string) (account *trading
 
 // 余额查询
 func GetBalance(ctx context.Context, in *trading.GetBalanceRequest) (resp *trading.GetBalanceResponse, err error) {
-	balance, err := LetGetWalletBalance(in.CoinName, in.Address)
+	balance, err := LetGetWalletBalance(in.Info.CoinName, in.Info.Address)
 	if err != nil {
 		return
 	}
 	resp = &trading.GetBalanceResponse{
 		Info: &trading.EntAccount{
-			CoinName:      in.CoinName,
-			Address:       in.Address,
-			AmountFloat64: balance,
+			CoinName: in.Info.CoinName,
+			Address:  in.Info.Address,
 		},
+		AmountFloat64: balance,
 	}
 	return
 }
@@ -69,11 +68,11 @@ func CreateTransaction(ctx context.Context, in *trading.CreateTransactionRequest
 	needManualReview := true
 	// convert type
 	txType := transaction.TypeUnknown
-	if in.InsiteTxType == "withdraw" {
+	if in.Info.InsiteTxType == "withdraw" {
 		txType = transaction.TypeWithdraw
-	} else if in.InsiteTxType == "recharge" {
+	} else if in.Info.InsiteTxType == "recharge" {
 		txType = transaction.TypeRecharge
-	} else if in.InsiteTxType == "payment" {
+	} else if in.Info.InsiteTxType == "payment" {
 		txType = transaction.TypePayment
 	}
 	// insert sql record
@@ -101,11 +100,6 @@ func CreateTransaction(ctx context.Context, in *trading.CreateTransactionRequest
 	}
 	// done
 	return resp, err
-}
-
-// TODO: 账户交易查询
-func GetTxJSON(ctx context.Context, in *trading.GetTxJSONRequest) (resp *trading.AccountTxJSON, err error) {
-	return
 }
 
 // 交易状态查询

@@ -38,19 +38,6 @@ func (s *Server) CreateTransaction(ctx context.Context, in *npool.CreateTransact
 	return
 }
 
-// TODO: 账户交易查询
-func (s *Server) GetTxJSON(ctx context.Context, in *npool.GetTxJSONRequest) (resp *npool.AccountTxJSON, err error) {
-	resp, err = app.GetTxJSON(ctx, in)
-	if err != nil {
-		logger.Sugar().Errorf("gettxjson error: %v", err)
-		resp = &npool.AccountTxJSON{}
-		if DebugFlag {
-			err = errInternal
-		}
-	}
-	return
-}
-
 // 交易状态查询
 func (s *Server) GetInsiteTxStatus(ctx context.Context, in *npool.GetInsiteTxStatusRequest) (resp *npool.GetInsiteTxStatusResponse, err error) {
 	resp, err = app.GetInsiteTxStatus(ctx, in)
