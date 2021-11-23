@@ -11,9 +11,8 @@ import (
 	msg "github.com/NpoolPlatform/sphinx-service/pkg/message/message"
 )
 
-func Listen() {
-	FlagMockTest := true
-	if FlagMockTest {
+func Listen(flagMock bool) {
+	if flagMock {
 		go listenTransactionSucceeded()
 	}
 }

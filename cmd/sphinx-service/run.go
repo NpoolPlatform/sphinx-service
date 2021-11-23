@@ -46,7 +46,7 @@ var runCmd = &cli.Command{
 			return err
 		}
 
-		go msglistener.Listen()
+		go msglistener.Listen(false)
 		go msgSender()
 
 		return grpc2.RunGRPCGateWay(rpcGatewayRegister)
