@@ -31,14 +31,14 @@ func TestWholeProcedure(t *testing.T) {
 		return
 	}
 	// test create account
-	go MockAccountCreated()
+	// go MockAccountCreated()
 	address := tCreateAccount()
 	assert.NotEmpty(t, address)
 	// test get balance
-	go MockAccountBalance()
+	// go MockAccountBalance()
 	assert.Zero(t, tGetBalance(address))
 	// test create transaction
-	go MockTransactionComplete()
+	// go MockTransactionComplete()
 	assert.NotEmpty(t, tCreateTransaction(address, address))
 }
 
