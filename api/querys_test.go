@@ -55,7 +55,7 @@ func tCreateAccount() string {
 		CoinName: tmpCoinInfo.Name,
 		Uuid:     tmpAccountInfo.Uuid,
 	}
-	path := "/v1/account/register"
+	path := "/v1/create/wallet"
 	resp := UnifyRestyQuery(path, body)
 	expectedReturn := &trading.CreateAccountResponse{}
 	err := json.Unmarshal(resp.Body(), expectedReturn)
@@ -77,7 +77,7 @@ func tCreateTransaction(addressFrom, addressTo string) (info string) {
 		UuidSignature:       "",
 		CreatetimeUtc:       time.Now().UTC().Unix(),
 	}
-	path := "/v1/transaction/create"
+	path := "/v1/create/transaction"
 	resp := UnifyRestyQuery(path, body)
 	expectedReturn := &trading.CreateTransactionResponse{}
 	err := json.Unmarshal(resp.Body(), expectedReturn)
@@ -93,7 +93,7 @@ func tGetBalance(address string) (balance float64) {
 		Address:      address,
 		TimestampUtc: time.Now().UTC().Unix(),
 	}
-	path := "/v1/account/balance/get"
+	path := "/v1/get/wallet/balance"
 	resp := UnifyRestyQuery(path, body)
 	expectedReturn := &trading.GetBalanceResponse{}
 	err := json.Unmarshal(resp.Body(), expectedReturn)
