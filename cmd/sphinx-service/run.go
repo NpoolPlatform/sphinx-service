@@ -5,7 +5,6 @@ import (
 
 	"github.com/NpoolPlatform/sphinx-service/api"
 	db "github.com/NpoolPlatform/sphinx-service/pkg/db"
-	msgcli "github.com/NpoolPlatform/sphinx-service/pkg/message/client"
 	msglistener "github.com/NpoolPlatform/sphinx-service/pkg/message/listener"
 	msg "github.com/NpoolPlatform/sphinx-service/pkg/message/message"
 	msgsrv "github.com/NpoolPlatform/sphinx-service/pkg/message/server"
@@ -38,11 +37,11 @@ var runCmd = &cli.Command{
 		if err := msgsrv.Init(); err != nil {
 			return err
 		}
-		if err := msgcli.Init(); err != nil {
-			return err
-		}
+		// if err := msgcli.Init(); err != nil {
+		// return err
+		// }
 		// TODO: REMOVE DEBUG SWITCH
-		go msglistener.Listen(false)
+		go msglistener.Listen()
 		go msgSender()
 
 		return grpc2.RunGRPCGateWay(rpcGatewayRegister)
