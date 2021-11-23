@@ -89,7 +89,7 @@ func tCreateTransaction(addressFrom, addressTo string) (info string) {
 }
 
 func tGetBalance(address string) (balance float64) {
-	body := trading.GetBalanceRequest{
+	body := &trading.GetBalanceRequest{
 		CoinName:     "Unknown",
 		Address:      address,
 		TimestampUtc: time.Now().UTC().Unix(),
