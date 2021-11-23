@@ -50,13 +50,10 @@ func GetBalance(ctx context.Context, in *trading.GetBalanceRequest) (resp *tradi
 func CreateTransaction(ctx context.Context, in *trading.CreateTransactionRequest) (resp *trading.CreateTransactionResponse, err error) {
 	// preset
 	resp = &trading.CreateTransactionResponse{
-		Info: "aborted",
+		Info: in.Info,
 	}
-	isExisted, err := crud.CheckRecordIfExistTransaction(in)
+	_, err = crud.CheckRecordIfExistTransaction(in)
 	if err != nil {
-		return
-	} else if isExisted {
-		resp.Info = "success"
 		return
 	}
 	// check uuid signature

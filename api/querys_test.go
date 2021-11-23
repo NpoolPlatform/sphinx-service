@@ -98,11 +98,16 @@ func tCreateTransaction(addressFrom, addressTo string) (info string) {
 		return
 	}
 	expectedReturn := &trading.CreateTransactionResponse{}
+	if resp.StatusCode() != 200 {
+		err := xerrors.New(resp.String())
+		logger.Sugar().Error(err)
+		return ""
+	}
 	err := json.Unmarshal(resp.Body(), expectedReturn)
 	if err != nil {
 		panic(resp.String())
 	}
-	return expectedReturn.Info
+	return expectedReturn.Info.TransactionIDInsite
 }
 
 func tGetBalance(address string) (balance float64) {
