@@ -14,6 +14,7 @@ import (
 	"github.com/NpoolPlatform/message/npool/trading"
 	testinit "github.com/NpoolPlatform/sphinx-service/pkg/test-init"
 	resty "github.com/go-resty/resty/v2"
+	"golang.org/x/xerrors"
 )
 
 var (
@@ -63,6 +64,11 @@ func tCreateAccount() string {
 	resp := UnifyRestyQuery(path, body)
 	expectedReturn := &trading.CreateAccountResponse{}
 	err := json.Unmarshal(resp.Body(), expectedReturn)
+	if resp.StatusCode() != 200 {
+		err := xerrors.New(resp.String())
+		logger.Sugar().Error(err)
+		return ""
+	}
 	if err != nil || expectedReturn.Info == nil {
 		panic(resp.String())
 	}
@@ -83,6 +89,11 @@ func tCreateTransaction(addressFrom, addressTo string) (info string) {
 	}
 	path := "/v1/create/transaction"
 	resp := UnifyRestyQuery(path, body)
+	if resp.StatusCode() != 200 {
+		err := xerrors.New(resp.String())
+		logger.Sugar().Error(err)
+		return
+	}
 	expectedReturn := &trading.CreateTransactionResponse{}
 	err := json.Unmarshal(resp.Body(), expectedReturn)
 	if err != nil {
@@ -101,6 +112,11 @@ func tGetBalance(address string) (balance float64) {
 	resp := UnifyRestyQuery(path, body)
 	expectedReturn := &trading.GetBalanceResponse{}
 	err := json.Unmarshal(resp.Body(), expectedReturn)
+	if resp.StatusCode() != 200 {
+		err := xerrors.New(resp.String())
+		logger.Sugar().Error(err)
+		return
+	}
 	if err != nil || expectedReturn.Info == nil {
 		panic(resp.String())
 	}
@@ -113,6 +129,11 @@ func tACK(req *trading.ACKRequest) (isOkay bool) {
 	resp := UnifyRestyQuery(path, body)
 	expectedReturn := trading.ACKResponse{}
 	err := json.Unmarshal(resp.Body(), &expectedReturn)
+	if resp.StatusCode() != 200 {
+		err := xerrors.New(resp.String())
+		logger.Sugar().Error(err)
+		return
+	}
 	if err != nil {
 		panic(resp.String())
 	}
