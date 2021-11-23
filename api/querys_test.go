@@ -48,7 +48,6 @@ func TestWholeProcedure(t *testing.T) {
 	// test create account
 	go MockAccountCreated()
 	err = tCreateAccount()
-	LogError(err)
 	assert.Nil(t, err)
 	assert.NotEmpty(t, tmpAccountInfo.Address)
 	// test get balance
@@ -90,11 +89,13 @@ func tCreateAccount() (err error) {
 		}).
 		Post(testHost + "/v1/account/register")
 	if err != nil {
+		LogError(err)
 		return
 	}
 	expectedReturn := &trading.CreateAccountResponse{}
 	err = json.Unmarshal(resp.Body(), expectedReturn)
 	if err != nil {
+		LogError(err)
 		return
 	}
 	tmpAccountInfo.Address = expectedReturn.Address

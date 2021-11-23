@@ -7,7 +7,9 @@ import (
 )
 
 func Listen() {
-	go listenTransactionSucceeded()
+	if false {
+		go listenTransactionSucceeded()
+	}
 }
 
 func listenTransactionSucceeded() {
