@@ -10,6 +10,7 @@ import (
 	"time"
 
 	//nolint
+	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	"github.com/NpoolPlatform/message/npool/coininfo" //nolint
 	"github.com/NpoolPlatform/message/npool/signproxy"
 	"github.com/NpoolPlatform/message/npool/trading"
@@ -152,7 +153,7 @@ func tACK(req *trading.ACKRequest) (isOkay bool, err error) {
 		SetHeader("Content-Type", "application/json").
 		SetBody(req).
 		Post(testHost + "/v1/internal/ack")
-	fmt.Println(resp)
+	logger.Sugar().Warn(resp)
 	if err != nil {
 		panic(err)
 	}
@@ -162,8 +163,8 @@ func tACK(req *trading.ACKRequest) (isOkay bool, err error) {
 		isOkay = false
 		panic(err)
 	}
-	fmt.Println("debug expectedReturn:")
-	fmt.Println(expectedReturn)
+	logger.Sugar().Warn("debug expectedReturn:")
+	logger.Sugar().Warn(expectedReturn)
 	return
 }
 
@@ -229,7 +230,7 @@ func MockTransactionComplete() (isOkay bool) {
 
 func LogError(err error) {
 	if err != nil {
-		fmt.Println(err)
+		logger.Sugar().Warn(err)
 		err2 := os.WriteFile("/tmp/sphinx-test-log.txt", []byte(fmt.Sprintf("%s \n", err)), fs.ModeAppend)
 		if err2 != nil {
 			panic(err)
