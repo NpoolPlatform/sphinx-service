@@ -212,7 +212,7 @@ func MockTransactionComplete() (isOkay bool) {
 	time.Sleep(200 * time.Millisecond)
 	isOkay = true
 	req := &trading.ACKRequest{
-		TransactionType:     signproxy.TransactionType_PreSign,
+		TransactionType:     signproxy.TransactionType_TransactionNew,
 		CoinTypeId:          tmpCoinInfo.Enum,
 		TransactionIdInsite: tmpTransactionIDInsite,
 		TransactionIdChain:  "testchainidhere",
@@ -222,6 +222,11 @@ func MockTransactionComplete() (isOkay bool) {
 		ErrorMessage:        "",
 	}
 	isOkay, err := tACK(req)
+	if err != nil {
+		panic(err)
+	}
+	req.TransactionType = signproxy.TransactionType_PreSign
+	isOkay, err = tACK(req)
 	if err != nil {
 		panic(err)
 	}
