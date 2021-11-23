@@ -25,7 +25,7 @@ func Init() error {
 		return err
 	}
 
-	err = _myClient.DeclareQueue(msg.QueueExample)
+	err = _myClient.DeclareQueue(msg.GetQueueName())
 	if err != nil {
 		return err
 	}
@@ -34,77 +34,31 @@ func Init() error {
 		Client:    _myClient,
 		consumers: map[string]<-chan amqp.Delivery{},
 	}
-	examples, err := _myClient.Consume(msg.QueueExample)
+	examples, err := _myClient.Consume(msg.GetQueueName())
 	if err != nil {
-		return xerrors.Errorf("fail to construct example consume: %v", err)
+		return xerrors.Errorf("fail to construct initial default consume: %v", err)
 	}
-	sampleClient.consumers[msg.QueueExample] = examples
+	sampleClient.consumers[msg.GetQueueName()] = examples
 
 	myClients[constant.ServiceName] = sampleClient
 
 	return nil
 }
 
-func ConsumeExample(h func(*msg.Example) error) error {
-	examples, ok := myClients[constant.ServiceName].consumers[msg.QueueExample]
-	if !ok {
-		return xerrors.Errorf("consumer is not constructed")
-	}
-
-	for d := range examples {
-		example := msg.Example{}
-		err := json.Unmarshal(d.Body, &example)
-		if err != nil {
-			return xerrors.Errorf("parse message example error: %v", err)
-		}
-
-		if h != nil {
-			err = h(&example)
-			if err != nil {
-				return err
-			}
-		}
-	}
-
-	return xerrors.Errorf("WE SHOULD NOT BE HERE")
-}
-
 // Accept transaction status (success/failed) message
 func ComsumerOfAgent(h func(*msg.NotificationTransaction) error) error {
-	successTxs, ok := myClients[constant.ServiceName].consumers[msg.QueueAgent]
+	successTxs, ok := myClients[constant.ServiceName].consumers[msg.GetQueueName()]
 	if !ok {
-		return xerrors.Errorf("consumer is not constructed")
+		return xerrors.Errorf("agent consumer is not constructed")
 	}
 
 	for d := range successTxs {
 		tx := msg.NotificationTransaction{}
 		err := json.Unmarshal(d.Body, &tx)
 		if err != nil {
-			return xerrors.Errorf("parse message example error: %v", err)
+			return xerrors.Errorf("parse agent message error: %v", err)
 		}
 
-		if h != nil {
-			err = h(&tx)
-			if err != nil {
-				return err
-			}
-		}
-	}
-
-	return xerrors.Errorf("WE SHOULD NOT BE HERE")
-}
-
-func ComsumerOfTradingForApproval(h func(*msg.NotificationTransaction) error) error {
-	successTxs, ok := myClients[constant.ServiceName].consumers[msg.QueueAdminApprove]
-	if !ok {
-		return xerrors.Errorf("consumer is not constructed")
-	}
-	for d := range successTxs {
-		tx := msg.NotificationTransaction{}
-		err := json.Unmarshal(d.Body, &tx)
-		if err != nil {
-			return xerrors.Errorf("parse message example error: %v", err)
-		}
 		if h != nil {
 			err = h(&tx)
 			if err != nil {

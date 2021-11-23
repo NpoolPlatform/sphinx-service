@@ -18,9 +18,6 @@ const (
 )
 
 func InitQueues() (err error) {
-	if err = msgsrv.DeclareQueue(QueueExample); err != nil {
-		return
-	}
 	if err = msgsrv.DeclareQueue(QueueAdminApprove); err != nil {
 		return
 	}
