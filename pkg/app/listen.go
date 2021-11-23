@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	"github.com/NpoolPlatform/message/npool/signproxy"
 	"github.com/NpoolPlatform/message/npool/trading" //nolint
 	"github.com/NpoolPlatform/sphinx-service/pkg/crud"
@@ -23,7 +24,12 @@ func ACK(ctx context.Context, in *trading.ACKRequest) (resp *trading.ACKResponse
 	resp = &trading.ACKResponse{
 		IsOkay: false,
 	}
-	if in.TransactionType == signproxy.TransactionType_TransactionNew || in.TransactionType == signproxy.TransactionType_PreSign || in.TransactionType == signproxy.TransactionType_Signature || in.TransactionType == signproxy.TransactionType_Broadcast {
+	logger.Sugar().Warn(in)
+	logger.Sugar().Warn(in.TransactionType)
+	if in.TransactionType == signproxy.TransactionType_TransactionNew ||
+		in.TransactionType == signproxy.TransactionType_PreSign ||
+		in.TransactionType == signproxy.TransactionType_Signature ||
+		in.TransactionType == signproxy.TransactionType_Broadcast {
 		resp.IsOkay, err = crud.UpdateTransactionStatus(ctx, in)
 	} else {
 		mapACK[in.TransactionIdInsite] = in
@@ -44,6 +50,16 @@ func ListenTillSucceeded(transactionIDInsite string) (val *trading.ACKRequest, e
 	if val != nil {
 		if !val.IsOkay {
 			err = status.Error(codes.Internal, val.ErrorMessage)
+		}
+		val = &trading.ACKRequest{
+			TransactionType:     val.TransactionType,
+			CoinTypeId:          val.CoinTypeId,
+			TransactionIdInsite: val.TransactionIdInsite,
+			TransactionIdChain:  val.TransactionIdChain,
+			Address:             val.Address,
+			Balance:             val.Balance,
+			IsOkay:              val.IsOkay,
+			ErrorMessage:        val.ErrorMessage,
 		}
 		mapACK[transactionIDInsite] = nil
 	} else {

@@ -64,11 +64,22 @@ func rpcGatewayRegister(mux *runtime.ServeMux, endpoint string, opts []grpc.Dial
 
 func msgSender() {
 	id := 0
-	for {
+	for false {
 		logger.Sugar().Infof("send example")
-		err := msgsrv.PublishExample(&msg.Example{
-			ID:      id,
-			Example: "hello world",
+		err := msgsrv.PublishDefaultNotification(&msg.NotificationTransaction{
+			CoinType:            0,
+			TransactionType:     0,
+			TransactionIDInsite: "",
+			AmountFloat64:       0,
+			AddressFrom:         "",
+			AddressTo:           "",
+			TransactionIDChain:  "",
+			SignatureUser:       "",
+			SignaturePlatform:   "",
+			CreatetimeUtc:       0,
+			UpdatetimeUtc:       0,
+			IsSuccess:           false,
+			IsFailed:            false,
 		})
 		if err != nil {
 			logger.Sugar().Errorf("fail to send example: %v", err)
