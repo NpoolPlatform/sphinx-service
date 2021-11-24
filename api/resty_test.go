@@ -180,15 +180,6 @@ func init() {
 	if testaio.RunByGithub() {
 		return
 	}
-	testaio.CoinInfo.Enum = 0
-	testaio.CoinInfo.ID = "6ba7b812-9dad-11d1-80b4-00c04fd430c8"
-	testaio.CoinInfo.PreSale = false
-	testaio.CoinInfo.Name = "Unknown"
-	testaio.CoinInfo.Unit = "DK"
-	testaio.AccountInfo.CoinName = "Unknown"
-	testaio.AccountUUID = "6ba7b812-9dad-80b4-11d1-00c04fd430c8"
-	testaio.TransactionIDInsite = "test-tx-6ba7b812-80b4-9dad-11d1"
-	testaio.Host = "http://localhost:50160"
 	testaio.RestyClient = resty.New()
 	if testaio.InitAlready == false {
 		err = testinit.Init()

@@ -117,3 +117,10 @@ func UpdateTransactionStatus(ctx context.Context, in *trading.ACKRequest) (isSuc
 	}
 	return isSuccess, err
 }
+
+func GetTransaction(ctx context.Context, in *trading.GetTransactionRequest) (resp *ent.Transaction, err error) {
+	resp, err = db.Client().Transaction.Query().Where(
+		transaction.TransactionIDInsite(in.TransactionIDInsite),
+	).Only(ctx)
+	return
+}

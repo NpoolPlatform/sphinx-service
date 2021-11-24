@@ -8,8 +8,7 @@ import (
 	"github.com/NpoolPlatform/message/npool/signproxy"
 	"github.com/NpoolPlatform/message/npool/trading" //nolint
 	"github.com/NpoolPlatform/sphinx-service/pkg/crud"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"golang.org/x/xerrors"
 )
 
 // MARK: optimization can be made, use channel (maybe) to improve performance under high qps payload
@@ -49,7 +48,7 @@ func ListenTillSucceeded(transactionIDInsite string) (val *trading.ACKRequest, e
 	}
 	if val != nil {
 		if !val.IsOkay {
-			err = status.Error(codes.Internal, val.ErrorMessage)
+			err = xerrors.New("tx rejected by proxy")
 		}
 		val = &trading.ACKRequest{
 			TransactionType:     val.TransactionType,
@@ -63,7 +62,7 @@ func ListenTillSucceeded(transactionIDInsite string) (val *trading.ACKRequest, e
 		}
 		mapACK[transactionIDInsite] = nil
 	} else {
-		err = status.Error(codes.Unavailable, "request timeout, please try again later")
+		err = xerrors.New("request timeout, please try again later")
 	}
 	return
 }

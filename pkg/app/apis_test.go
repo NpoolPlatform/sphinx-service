@@ -2,49 +2,16 @@ package app
 
 import (
 	"context"
-	"fmt"
-	"os"
-	"strconv"
 	"testing"
 
-	"github.com/NpoolPlatform/message/npool/coininfo" //nolint
-	"github.com/NpoolPlatform/message/npool/trading"  //nolint
-	testinit "github.com/NpoolPlatform/sphinx-service/pkg/test-init"
+	"github.com/NpoolPlatform/message/npool/trading" //nolint
+	"github.com/NpoolPlatform/sphinx-service/pkg/testaio"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
-var (
-	testInitAlready bool
-	tmpCoinInfo     coininfo.CoinInfo
-)
-
-func runByGithub() bool {
-	runByGithubAction, err := strconv.ParseBool(os.Getenv("RUN_BY_GITHUB_ACTION"))
-	if err == nil && runByGithubAction {
-		return true
-	}
-	if testInitAlready == false {
-		testInitAlready = true
-		err = testinit.Init()
-		initStruct()
-		if err != nil {
-			fmt.Printf("test init failed: %v", err)
-		}
-	}
-	return err == nil
-}
-
-func initStruct() {
-	ctxPublic = context.Background()
-	tmpCoinInfo.Enum = 0
-	tmpCoinInfo.PreSale = false
-	tmpCoinInfo.Name = "Unknown"
-	tmpCoinInfo.Unit = "DK"
-}
-
 func TestCreateWallet(t *testing.T) {
-	if runByGithub() {
+	if testaio.RunByGithub() {
 		return
 	}
 	tmpUUID := uuid.NewString()
@@ -53,10 +20,10 @@ func TestCreateWallet(t *testing.T) {
 	} else {
 		panic("uuid too short!")
 	}
-	account, err := CreateWallet(ctxPublic, tmpCoinInfo.Name, tmpUUID)
+	account, err := CreateWallet(context.Background(), testaio.CoinInfo.Name, tmpUUID)
 	if err == nil {
 		assert.NotNil(t, account)
-		assert.Equal(t, tmpCoinInfo.Name, account.Info.CoinName)
+		assert.Equal(t, testaio.CoinInfo.Name, account.Info.CoinName)
 		assert.NotEmpty(t, account.Info.Address)
 	} else {
 		assert.Nil(t, account)
@@ -64,7 +31,7 @@ func TestCreateWallet(t *testing.T) {
 }
 
 func TestGetWalletBalance(t *testing.T) {
-	if runByGithub() {
+	if testaio.RunByGithub() {
 		return
 	}
 	tmpUUID := uuid.NewString()
@@ -73,15 +40,15 @@ func TestGetWalletBalance(t *testing.T) {
 	} else {
 		panic("uuid too short!")
 	}
-	resp, err := GetWalletBalance(ctxPublic, &trading.GetWalletBalanceRequest{
+	resp, err := GetWalletBalance(context.Background(), &trading.GetWalletBalanceRequest{
 		Info: &trading.EntAccount{
-			CoinName: tmpCoinInfo.Name,
+			CoinName: testaio.CoinInfo.Name,
 			Address:  tmpUUID,
 		},
 	})
 	if err == nil {
 		assert.NotNil(t, resp)
-		assert.Equal(t, tmpCoinInfo.Name, resp.Info.CoinName)
+		assert.Equal(t, testaio.CoinInfo.Name, resp.Info.CoinName)
 		assert.Positive(t, resp.AmountFloat64+0.1)
 	}
 }
