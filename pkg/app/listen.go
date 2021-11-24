@@ -48,6 +48,7 @@ func ACK(ctx context.Context, in *trading.ACKRequest) (resp *trading.ACKResponse
 }
 
 func ListenTillSucceeded(transactionIDInsite string) (val *trading.ACKRequest, err error) {
+	logger.Sugar().Infof("listening on TID: %v", transactionIDInsite)
 	var ok bool
 	ackListenTimeoutMsLoop := ackListenTimeoutMs
 	for !ok && ackListenTimeoutMsLoop > 0 {
@@ -59,17 +60,8 @@ func ListenTillSucceeded(transactionIDInsite string) (val *trading.ACKRequest, e
 		if !val.IsOkay {
 			err = xerrors.New("tx rejected by proxy")
 		}
-		val = &trading.ACKRequest{
-			TransactionType:     val.TransactionType,
-			CoinTypeId:          val.CoinTypeId,
-			TransactionIdInsite: val.TransactionIdInsite,
-			TransactionIdChain:  val.TransactionIdChain,
-			Address:             val.Address,
-			Balance:             val.Balance,
-			IsOkay:              val.IsOkay,
-			ErrorMessage:        val.ErrorMessage,
-		}
-		mapACK[transactionIDInsite] = nil
+		delete(mapACK, transactionIDInsite)
+		logger.Sugar().Infof("got resp and return %+v", val)
 	} else {
 		err = xerrors.New("request timeout, please try again later")
 	}
