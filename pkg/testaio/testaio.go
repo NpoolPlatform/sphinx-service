@@ -10,26 +10,24 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
-func init() {
-	CoinInfo.Enum = 0
-	CoinInfo.ID = "6ba7b812-9dad-11d1-80b4-00c04fd430c8"
-	CoinInfo.PreSale = false
-	CoinInfo.Name = "Unknown"
-	CoinInfo.Unit = "DK"
-	AccountInfo.CoinName = "Unknown"
-	AccountUUID = "6ba7b812-9dad-80b4-11d1-00c04fd430c8"
-	TransactionIDInsite = "test-tx-6ba7b812-80b4-9dad-11d1"
-	Host = "http://localhost:50160"
-}
-
 var (
-	CoinInfo            coininfo.CoinInfo
-	AccountInfo         trading.EntAccount
-	AccountUUID         string
-	TransactionIDInsite string
-	InitAlready         bool
-	Host                string
-	RestyClient         *resty.Client
+	InitAlready bool
+	Host        string
+	RestyClient *resty.Client
+	AccountInfo = trading.EntAccount{
+		CoinName: "Unknown",
+		Address:  "testaddresshere",
+	}
+	CoinInfo = coininfo.CoinInfo{
+		ID:        "6ba7b812-9dad-11d1-80b4-00c04fd430c8",
+		Enum:      0,
+		PreSale:   false,
+		Name:      "Unknown",
+		Unit:      "DK",
+		LogoImage: "",
+	}
+	AccountUUID         = "6ba7b812-9dad-80b4-11d1-00c04fd430c8"
+	TransactionIDInsite = "test-tx-6ba7b812-80b4-9dad-11d1"
 )
 
 func UnifyRestyQuery(path string, body interface{}) (resp *resty.Response) {

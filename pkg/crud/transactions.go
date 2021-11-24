@@ -15,6 +15,12 @@ import (
 	"golang.org/x/xerrors"
 )
 
+var ctxPublic context.Context
+
+func init() {
+	ctxPublic = context.Background()
+}
+
 func CreateRecordTransaction(in *trading.CreateTransactionRequest, needManualReview bool, txType transaction.Type) (info *ent.Transaction, err error) {
 	// get coin info
 	coinInfo, err := db.Client().CoinInfo.Query().Where(coininfo.Name(in.Info.CoinName)).Only(ctxPublic)
