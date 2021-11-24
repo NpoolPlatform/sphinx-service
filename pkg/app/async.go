@@ -2,12 +2,9 @@ package app
 
 import (
 	"context"
-	"fmt"
-	"math/big"
 	"time"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
-	"github.com/NpoolPlatform/go-service-framework/pkg/price"
 	"github.com/NpoolPlatform/message/npool/signproxy"    //nolint
 	"github.com/NpoolPlatform/message/npool/sphinxplugin" //nolint
 	"github.com/NpoolPlatform/sphinx-service/pkg/db"
@@ -25,24 +22,6 @@ var ctxPublic context.Context
 
 func init() {
 	ctxPublic = context.Background()
-}
-
-// 金额转换函数
-func UntestedDecomposeStringAmount(str string) (amountUint64 uint64, amountString string, amountFloat64 float64) {
-	// get value
-	// for initial result: str == target_x_fil*10^18
-	bi, _ := new(big.Int).SetString(str, 10)
-	// prepare for division
-	filExp := new(big.Int)
-	filExp.Exp(big.NewInt(10), big.NewInt(9), nil)
-	// make a float copy
-	bf := new(big.Float).SetInt(bi)
-	// divide
-	bf.Quo(bf, new(big.Float).SetInt(filExp))
-	amountString = fmt.Sprintf("%f", bf)
-	amountFloat64, _ = bf.Float64()
-	amountUint64 = price.VisualPriceToDBPrice(amountFloat64)
-	return
 }
 
 // 审核服务 进行审核 TODO
@@ -64,14 +43,14 @@ func LetApproveTransaction(tx *ent.Transaction) (err error) {
 
 // 钱包代理 余额查询
 func LetGetWalletBalance(coinName, address string) (balance float64, err error) {
-	entResp, err := db.Client().CoinInfo.Query().Where(coininfo.Name(coinName)).Only(ctxPublic)
+	entRespCoin, err := db.Client().CoinInfo.Query().Where(coininfo.Name(coinName)).Only(ctxPublic)
 	if err != nil {
 		logger.Sugar().Errorf("no corresponding coin! when creating account %v", err)
 		return
 	}
-	tmpTID := "balance-" + entResp.Name + "-" + address
+	tmpTID := "balance-" + entRespCoin.Name + "-" + address
 	err = server.PublishDefaultNotification(&message.NotificationTransaction{
-		CoinType:            sphinxplugin.CoinType(entResp.CoinTypeID),
+		CoinType:            sphinxplugin.CoinType(entRespCoin.CoinTypeID),
 		TransactionType:     signproxy.TransactionType_Balance,
 		TransactionIDInsite: tmpTID,
 		AddressFrom:         address,
