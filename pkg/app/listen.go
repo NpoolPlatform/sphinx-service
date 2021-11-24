@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
@@ -15,6 +16,7 @@ import (
 
 var (
 	mapACK              map[string]*trading.ACKRequest
+	ackMutex            sync.Mutex
 	ackListenIntervalMs int
 	ackListenTimeoutMs  int
 )
@@ -41,7 +43,9 @@ func ACK(ctx context.Context, in *trading.ACKRequest) (resp *trading.ACKResponse
 		in.TransactionType == signproxy.TransactionType_Broadcast {
 		resp.IsOkay, err = crud.UpdateTransactionStatus(ctx, in)
 	} else {
+		ackMutex.Lock()
 		mapACK[in.TransactionIdInsite] = in
+		ackMutex.Unlock()
 		resp.IsOkay = true
 	}
 	return
@@ -53,7 +57,9 @@ func ListenTillSucceeded(transactionIDInsite string) (val *trading.ACKRequest, e
 	for !ok && ackListenTimeoutMsLoop > 0 {
 		time.Sleep(time.Duration(ackListenIntervalMs) * time.Millisecond)
 		ackListenTimeoutMsLoop -= ackListenIntervalMs
+		ackMutex.Lock()
 		val, ok = mapACK[transactionIDInsite]
+		ackMutex.Unlock()
 	}
 	if val != nil {
 		if !val.IsOkay {
