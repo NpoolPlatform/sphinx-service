@@ -18,16 +18,17 @@ import (
 	"google.golang.org/grpc/codes"
 )
 
-// 创建账号 done
 func CreateWallet(ctx context.Context, coinName, uuid string) (resp *trading.CreateWalletResponse, err error) {
-	// check coin
+	// Check if coin exists
 	coinInfo, err := crud.CoinName2Coin(ctx, coinName)
 	if err != nil {
 		return
 	}
-	// gen one-time ID
+
+	// Gen one-time ID
 	tmpTxID := rules.GenerateTID4CreateWallet(coinInfo, uuid)
-	// push through rabbitmq to signproxy
+
+	// Push through rabbitmq to signproxy
 	err = server.PublishDefaultNotification(&message.NotificationTransaction{
 		CoinType:            sphinxplugin.CoinType(coinInfo.CoinTypeID),
 		TransactionType:     signproxy.TransactionType_WalletNew,
@@ -47,13 +48,15 @@ func CreateWallet(ctx context.Context, coinName, uuid string) (resp *trading.Cre
 		err = xerrors.Errorf("message publish error: %v", err)
 		return
 	}
-	// wait for signproxy reply
+
+	// Wait for signproxy reply (or auto-timeout)
 	ackResp, err := ListenTillSucceeded(tmpTxID)
 	if err != nil {
 		err = xerrors.Errorf("listener error: %v", err)
 		return
 	}
-	// struct return
+
+	// Struct return
 	if ackResp.Address == "" {
 		err = xerrors.New("empty reply from server when creating account")
 	} else {
@@ -64,19 +67,21 @@ func CreateWallet(ctx context.Context, coinName, uuid string) (resp *trading.Cre
 			},
 		}
 	}
+
 	return resp, err
 }
 
-// 余额查询 done
 func GetWalletBalance(ctx context.Context, in *trading.GetWalletBalanceRequest) (resp *trading.GetWalletBalanceResponse, err error) {
-	// check coin
+	// Check coin
 	coinInfo, err := crud.CoinName2Coin(ctx, in.Info.CoinName)
 	if err != nil {
 		return
 	}
-	// gen one-time id
+
+	// Gen one-time id
 	tmpTxID := rules.GenerateTID4GetWalletBalance(coinInfo, in.Info.Address)
-	// push through rabbitmq to signproxy
+
+	// Push through rabbitmq to signproxy
 	err = server.PublishDefaultNotification(&message.NotificationTransaction{
 		CoinType:            sphinxplugin.CoinType(coinInfo.CoinTypeID),
 		TransactionType:     signproxy.TransactionType_Balance,
@@ -96,13 +101,15 @@ func GetWalletBalance(ctx context.Context, in *trading.GetWalletBalanceRequest) 
 		err = xerrors.Errorf("message publish error: %v", err)
 		return
 	}
-	// wait for signproxy reply
+
+	// Wait for signproxy reply
 	ackResp, err := ListenTillSucceeded(tmpTxID)
 	if err != nil {
 		err = xerrors.Errorf("listener error: %v", err)
 		return
 	}
-	// struct return
+
+	// Struct return
 	resp = &trading.GetWalletBalanceResponse{
 		Info: &trading.EntAccount{
 			CoinName: in.Info.CoinName,
@@ -113,17 +120,20 @@ func GetWalletBalance(ctx context.Context, in *trading.GetWalletBalanceRequest) 
 	return resp, err
 }
 
-// 转账/提现 done
 func CreateTransaction(ctx context.Context, in *trading.CreateTransactionRequest) (resp *trading.CreateTransactionResponse, err error) {
-	// check uuid signature next-version
+	// Check uuid signature next-version
 	if in.UUIDSignature == "forbidden" {
 		err = status.Error(codes.Canceled, "user signature invalid")
 		return
 	}
-	// mocked auto-review logic
-	// next-version: set this field by amount, login_ip, etc.
+
+	// Mocked auto-review logic
+	/*
+		next-version: set this field by amount, login_ip, etc.
+	*/
 	needManualReview := true
-	// convert type
+
+	// Convert type
 	txType := transaction.TypeUnknown
 	if in.Info.InsiteTxType == "withdraw" {
 		txType = transaction.TypeWithdraw
@@ -132,14 +142,16 @@ func CreateTransaction(ctx context.Context, in *trading.CreateTransactionRequest
 	} else if in.Info.InsiteTxType == "payment" {
 		txType = transaction.TypePayment
 	}
-	// insert sql record
-	// if TID exists, err happens here;
-	// if same transaction(and uuid), return old record.
+
+	// Insert sql record
 	info, err := crud.CreateRecordTransaction(in, needManualReview, txType)
 	if err != nil {
+		// if same transaction(and uuid), err == nil, return old record.
+		// if TID exists but not same, err happens here;
 		return
 	}
-	// grpc call approval service
+
+	// Grpc call approval service
 	err = MockApproveTransaction(info)
 	if err != nil {
 		err = status.Errorf(codes.Internal, "cannot notify transaction approval service, error: %v", err)
@@ -148,11 +160,18 @@ func CreateTransaction(ctx context.Context, in *trading.CreateTransactionRequest
 	return resp, err
 }
 
-// 交易状态查询 next-version
 func GetTransaction(ctx context.Context, in *trading.GetTransactionRequest) (resp *trading.GetTransactionResponse, err error) {
 	transactionRow, err := crud.GetTransaction(ctx, in)
-	// TODO: Implement succeeded and failed judgement
 	if err == nil {
+		// Judge success/fail from transaction current status
+		var flagFailed, flagSucceeded bool
+		if transactionRow.Status == transaction.StatusDone {
+			flagSucceeded = true
+		} else if transactionRow.Status == transaction.StatusRejected ||
+			transactionRow.Status == transaction.StatusError ||
+			transactionRow.Status == transaction.StatusErrorExpected {
+			flagFailed = true
+		}
 		coinName := transactionRow.Edges.Coin
 		resp = &trading.GetTransactionResponse{
 			Info: &trading.BaseTx{
@@ -165,8 +184,8 @@ func GetTransaction(ctx context.Context, in *trading.GetTransactionRequest) (res
 				CreatetimeUTC:       transactionRow.CreatetimeUtc,
 			},
 			UpdatetimeUTC:      transactionRow.UpdatetimeUtc,
-			Succeeded:          false,
-			Failed:             false,
+			Succeeded:          flagSucceeded,
+			Failed:             flagFailed,
 			TransactionIDChain: transactionRow.TransactionIDChain,
 			Status:             string(transactionRow.Status),
 		}

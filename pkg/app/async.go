@@ -15,9 +15,9 @@ import (
 	"golang.org/x/xerrors"
 )
 
-// 进行审核 next-version
+// next-version TODO send transaction when it be approved
 func MockApproveTransaction(tx *ent.Transaction) (err error) {
-	// approve result override
+	// Approve result override
 	_, err = db.Client().Transaction.Update().
 		SetMutex(false).
 		SetStatus(transaction.StatusPendingProcess).
@@ -28,21 +28,19 @@ func MockApproveTransaction(tx *ent.Transaction) (err error) {
 		err = xerrors.Errorf("approval err %v", err)
 		return
 	}
-	// TODO
-	// send transaction when it be approved
 	_, err = LetSendTransaction(tx)
 	return
 }
 
-// 钱包代理 进行转账 done
 func LetSendTransaction(tx *ent.Transaction) (txNew *ent.Transaction, err error) {
-	// get coin info
+	// Get coin info
 	coinInfo, err := tx.QueryCoin().Only(context.Background())
 	if err != nil {
 		err = xerrors.Errorf("tx coin data invalid: %v", err)
 		return
 	}
-	// send through rabbitmq to signproxy
+
+	// Send through rabbitmq to signproxy
 	err = server.PublishDefaultNotification(&message.NotificationTransaction{
 		CoinType:            sphinxplugin.CoinType(coinInfo.CoinTypeID),
 		TransactionType:     signproxy.TransactionType_TransactionNew,
@@ -62,7 +60,8 @@ func LetSendTransaction(tx *ent.Transaction) (txNew *ent.Transaction, err error)
 		err = xerrors.Errorf("failed to send transaction to proxy: %v", err)
 		return
 	}
-	// update db status
+
+	// Update db status
 	txNew, err = tx.Update().
 		SetMutex(true).
 		SetUpdatetimeUtc(time.Now().UTC().Unix()).
