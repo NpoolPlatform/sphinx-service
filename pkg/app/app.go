@@ -190,7 +190,7 @@ func GetTransaction(ctx context.Context, in *trading.GetTransactionRequest) (res
 			Status:             string(transactionRow.Status),
 		}
 	}
-	return
+	return resp, err
 }
 
 // Version (original code)
