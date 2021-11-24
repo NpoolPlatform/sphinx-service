@@ -13,7 +13,7 @@ const FlagPrintError = true
 func PatchGRPCError(errOri error, msg string) (err error) {
 	if err != nil {
 		logger.Sugar().Warn(msg, errOri)
-		if FlagPrintError {
+		if !FlagPrintError {
 			err = status.Error(codes.Internal, "internal server error")
 		} else {
 			err = status.Errorf(codes.Internal, "%v, err: %v", msg, errOri)
