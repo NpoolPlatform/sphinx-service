@@ -16,6 +16,5 @@ func (s *Server) ACK(ctx context.Context, in *trading.ACKRequest) (resp *trading
 		resp = &trading.ACKResponse{}
 	}
 	logger.Sugar().Infof("[ack] received req: %+w", in)
-	logger.Sugar().Infof("[ack] response: %+w", resp)
 	return
 }

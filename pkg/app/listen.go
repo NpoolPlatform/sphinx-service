@@ -4,10 +4,12 @@ import (
 	"context"
 	"time"
 
+	"github.com/NpoolPlatform/go-service-framework/pkg/config"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	"github.com/NpoolPlatform/message/npool/signproxy"
 	"github.com/NpoolPlatform/message/npool/trading" //nolint
 	"github.com/NpoolPlatform/sphinx-service/pkg/crud"
+	constant "github.com/NpoolPlatform/sphinx-service/pkg/message/const"
 	"golang.org/x/xerrors"
 )
 
@@ -21,8 +23,10 @@ var (
 
 func init() {
 	mapACK = make(map[string]*trading.ACKRequest)
+	ackListenIntervalMs = config.GetIntValueWithNameSpace(constant.ServiceName, "ack_listen_interval_ms")
+	ackListenTimeoutMs = config.GetIntValueWithNameSpace(constant.ServiceName, "ack_listen_timeout_ms")
 	if ackListenIntervalMs <= 0 {
-		ackListenIntervalMs = 50
+		ackListenIntervalMs = 80
 	}
 	if ackListenTimeoutMs <= 0 {
 		ackListenTimeoutMs = 6000
@@ -33,8 +37,6 @@ func ACK(ctx context.Context, in *trading.ACKRequest) (resp *trading.ACKResponse
 	resp = &trading.ACKResponse{
 		IsOkay: false,
 	}
-	logger.Sugar().Infof("ack received: %v", in)
-	logger.Sugar().Infof("ack type: %v", in.TransactionType)
 	if in.TransactionType == signproxy.TransactionType_TransactionNew ||
 		in.TransactionType == signproxy.TransactionType_PreSign ||
 		in.TransactionType == signproxy.TransactionType_Signature ||
@@ -48,7 +50,7 @@ func ACK(ctx context.Context, in *trading.ACKRequest) (resp *trading.ACKResponse
 }
 
 func ListenTillSucceeded(transactionIDInsite string) (val *trading.ACKRequest, err error) {
-	logger.Sugar().Infof("listening on TID: %v", transactionIDInsite)
+	logger.Sugar().Infof("[listener] listening on TID: %v", transactionIDInsite)
 	var ok bool
 	ackListenTimeoutMsLoop := ackListenTimeoutMs
 	for !ok && ackListenTimeoutMsLoop > 0 {
@@ -61,7 +63,7 @@ func ListenTillSucceeded(transactionIDInsite string) (val *trading.ACKRequest, e
 			err = xerrors.New("tx rejected by proxy")
 		}
 		delete(mapACK, transactionIDInsite)
-		logger.Sugar().Infof("got resp and return %+v", val)
+		logger.Sugar().Infof("[listener] %v got resp and return %+v", transactionIDInsite, val)
 	} else {
 		err = xerrors.New("request timeout, please try again later")
 	}
