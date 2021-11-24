@@ -23,14 +23,13 @@ func TestWholeProcedure(t *testing.T) {
 	// test create account
 	address := tCreateWallet()
 	logger.Sugar().Infof("create account result: %v", address)
+	if address == "" {
+		return
+	}
 	// test get balance
-	if false {
-		logger.Sugar().Infof("get balance result: %v", tGetWalletBalance(address))
-	}
+	logger.Sugar().Infof("get balance result: %v", tGetWalletBalance(address))
 	// test create transaction
-	if false {
-		logger.Sugar().Infof("create transaction result: %v", tCreateTransaction(address, address))
-	}
+	logger.Sugar().Infof("create transaction result: %v", tCreateTransaction(address, address))
 }
 
 func tCreateWallet() string {
@@ -48,7 +47,8 @@ func tCreateWallet() string {
 		return ""
 	}
 	if err != nil || expectedReturn.Info == nil {
-		panic(resp.String())
+		logger.Sugar().Errorf("unexpected response from proxy, %v %v", err, resp.String())
+		return ""
 	}
 	testaio.AccountInfo.Address = expectedReturn.Info.Address
 	return expectedReturn.Info.Address
@@ -82,7 +82,7 @@ func tCreateTransaction(addressFrom, addressTo string) (info string) {
 	}
 	err := json.Unmarshal(resp.Body(), expectedReturn)
 	if err != nil {
-		panic(resp.String())
+		logger.Sugar().Errorf("unexpected response from proxy, %v %v", err, resp.String())
 	}
 	return expectedReturn.Info.TransactionIDInsite
 }
@@ -104,7 +104,7 @@ func tGetWalletBalance(address string) (balance float64) {
 		return
 	}
 	if err != nil || expectedReturn.Info == nil {
-		panic(resp.String())
+		logger.Sugar().Errorf("unexpected response from proxy, %v %v", err, resp.String())
 	}
 	return expectedReturn.AmountFloat64
 }
@@ -121,7 +121,7 @@ func tACK(req *trading.ACKRequest) (isOkay bool) {
 		return
 	}
 	if err != nil {
-		panic(resp.String())
+		logger.Sugar().Errorf("unexpected response from proxy, %v %v", err, resp.String())
 	}
 	return expectedReturn.IsOkay
 }
