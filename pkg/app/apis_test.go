@@ -5,12 +5,22 @@ import (
 	"testing"
 
 	"github.com/NpoolPlatform/message/npool/trading" //nolint
+	testinit "github.com/NpoolPlatform/sphinx-service/pkg/test-init"
 	"github.com/NpoolPlatform/sphinx-service/pkg/testaio"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
+var initAlready bool
+
 func TestCreateWallet(t *testing.T) {
+	if !initAlready {
+		err := testinit.Init()
+		if err != nil {
+			testaio.LogWhenError(err)
+			panic("testinit failed")
+		}
+	}
 	if testaio.RunByGithub() {
 		return
 	}
@@ -31,6 +41,13 @@ func TestCreateWallet(t *testing.T) {
 }
 
 func TestGetWalletBalance(t *testing.T) {
+	if !initAlready {
+		err := testinit.Init()
+		if err != nil {
+			testaio.LogWhenError(err)
+			panic("testinit failed")
+		}
+	}
 	if testaio.RunByGithub() {
 		return
 	}
