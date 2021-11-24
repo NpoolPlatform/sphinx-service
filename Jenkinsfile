@@ -84,6 +84,8 @@ pipeline {
             cd .apollo-base-config
             ./apollo-base-config.sh $APP_ID $TARGET_ENV $vhost
             ./apollo-item-config.sh $APP_ID $TARGET_ENV $vhost database_name sphinx_service
+            ./apollo-item-config.sh $APP_ID $TARGET_ENV $vhost ack_listen_interval_ms 50
+            ./apollo-item-config.sh $APP_ID $TARGET_ENV $vhost ack_listen_timeout_ms 6000
             cd -
           done
 
