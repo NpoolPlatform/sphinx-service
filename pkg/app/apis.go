@@ -81,10 +81,16 @@ func GetWalletBalance(ctx context.Context, in *trading.GetWalletBalanceRequest) 
 		CoinType:            sphinxplugin.CoinType(coinInfo.CoinTypeID),
 		TransactionType:     signproxy.TransactionType_Balance,
 		TransactionIDInsite: tmpTxID,
+		AmountFloat64:       0, // no need
 		AddressFrom:         in.Info.Address,
 		AddressTo:           in.Info.Address,
-		CreatetimeUtc:       time.Now().UTC().Unix(),
-		UpdatetimeUtc:       time.Now().UTC().Unix(),
+		TransactionIDChain:  "",                      // no need
+		SignatureUser:       "",                      // no need
+		SignaturePlatform:   "",                      // no need
+		CreatetimeUtc:       time.Now().UTC().Unix(), // no need
+		UpdatetimeUtc:       time.Now().UTC().Unix(), // no need
+		IsSuccess:           false,                   // no need
+		IsFailed:            false,                   // no need
 	})
 	if err != nil {
 		err = xerrors.Errorf("message publish error: %v", err)
@@ -107,22 +113,15 @@ func GetWalletBalance(ctx context.Context, in *trading.GetWalletBalanceRequest) 
 	return resp, err
 }
 
-// 转账 / 提现 pending
+// 转账/提现 done
 func CreateTransaction(ctx context.Context, in *trading.CreateTransactionRequest) (resp *trading.CreateTransactionResponse, err error) {
-	// preset
-	resp = &trading.CreateTransactionResponse{
-		Info: in.Info,
-	}
-	_, err = crud.CheckRecordIfExistTransaction(in)
-	if err != nil {
-		return
-	}
-	// check uuid signature
+	// check uuid signature next-version
 	if in.UUIDSignature == "forbidden" {
 		err = status.Error(codes.Canceled, "user signature invalid")
 		return
 	}
-	// if amount > xxx, needManualReview => true, and etc.
+	// mocked auto-review logic
+	// next-version: set this field by amount, login_ip, etc.
 	needManualReview := true
 	// convert type
 	txType := transaction.TypeUnknown
@@ -134,6 +133,8 @@ func CreateTransaction(ctx context.Context, in *trading.CreateTransactionRequest
 		txType = transaction.TypePayment
 	}
 	// insert sql record
+	// if TID exists, err happens here;
+	// if same transaction(and uuid), return old record.
 	info, err := crud.CreateRecordTransaction(in, needManualReview, txType)
 	if err != nil {
 		return
@@ -144,11 +145,10 @@ func CreateTransaction(ctx context.Context, in *trading.CreateTransactionRequest
 		err = status.Errorf(codes.Internal, "cannot notify transaction approval service, error: %v", err)
 		return
 	}
-	// done
 	return resp, err
 }
 
-// 交易状态查询 next-version done for now
+// 交易状态查询 next-version
 func GetTransaction(ctx context.Context, in *trading.GetTransactionRequest) (resp *trading.GetTransactionResponse, err error) {
 	transactionRow, err := crud.GetTransaction(ctx, in)
 	// TODO: Implement succeeded and failed judgement

@@ -15,7 +15,7 @@ import (
 	"golang.org/x/xerrors"
 )
 
-// 进行审核
+// 进行审核 next-version
 func MockApproveTransaction(tx *ent.Transaction) (err error) {
 	// approve result override
 	_, err = db.Client().Transaction.Update().

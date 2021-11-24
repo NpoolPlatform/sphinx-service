@@ -12,16 +12,26 @@ import (
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
-	"github.com/gogo/status"
-	"google.golang.org/grpc/codes"
+	"golang.org/x/xerrors"
 )
 
 func CreateRecordTransaction(in *trading.CreateTransactionRequest, needManualReview bool, txType transaction.Type) (info *ent.Transaction, err error) {
-	tmpCoinInfo, err := db.Client().CoinInfo.Query().Where(coininfo.Name(in.Info.CoinName)).Only(ctxPublic)
+	// get coin info
+	coinInfo, err := db.Client().CoinInfo.Query().Where(coininfo.Name(in.Info.CoinName)).Only(ctxPublic)
 	if err != nil {
-		logger.Sugar().Warn(in.Info.CoinName, "coin not found", err)
+		err = xerrors.Errorf(in.Info.CoinName+" coin not found %v", err)
 		return
 	}
+	// check if exists
+	info, err = GetTransactionOrNil(in)
+	if info != nil {
+		err = xerrors.Errorf("tx already exists: %v", info)
+		return
+	} else if err != nil {
+		err = xerrors.Errorf("db error: %v", err)
+		return
+	}
+	// do create
 	info, err = db.Client().Transaction.Create().
 		SetAmountUint64(price.VisualPriceToDBPrice(in.Info.AmountFloat64)).
 		SetAmountFloat64(in.Info.AmountFloat64).
@@ -37,12 +47,12 @@ func CreateRecordTransaction(in *trading.CreateTransactionRequest, needManualRev
 		SetSignaturePlatform("test-version-direct-pass").
 		SetCreatetimeUtc(time.Now().UTC().Unix()).
 		SetUpdatetimeUtc(time.Now().UTC().Unix()).
-		SetCoin(tmpCoinInfo).
+		SetCoin(coinInfo).
 		Save(ctxPublic)
-	return
+	return info, err
 }
 
-func CheckRecordIfExistTransaction(in *trading.CreateTransactionRequest) (isExisted bool, err error) {
+func GetTransactionOrNil(in *trading.CreateTransactionRequest) (record *ent.Transaction, err error) {
 	var info []*ent.Transaction
 	info, err = db.Client().Transaction.Query().
 		Where(
@@ -50,13 +60,21 @@ func CheckRecordIfExistTransaction(in *trading.CreateTransactionRequest) (isExis
 				transaction.TransactionIDInsite(in.Info.TransactionIDInsite),
 			),
 		).All(ctxPublic)
-	if len(info) > 0 { // has record, definitely len == 1
-		isExisted = true
-		if info[0].AddressFrom != in.Info.AddressFrom || info[0].AddressTo != info[0].AddressFrom {
-			err = status.Error(codes.AlreadyExists, "transaction id insite already exists")
+	if err != nil {
+		return
+	}
+	if len(info) > 0 {
+		if len(info) > 1 {
+			err = xerrors.New("impossible")
+		}
+		if info[0].AddressFrom == in.Info.AddressFrom &&
+			info[0].AddressTo == in.Info.AddressTo &&
+			info[0].AmountFloat64 == in.Info.AmountFloat64 &&
+			info[0].Edges.Coin.Name == in.Info.CoinName {
+			record = info[0]
 		}
 	}
-	return
+	return record, err
 }
 
 func UpdateTransactionStatus(ctx context.Context, in *trading.ACKRequest) (isSuccess bool, err error) {
