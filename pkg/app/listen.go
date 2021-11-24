@@ -4,12 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/NpoolPlatform/go-service-framework/pkg/config"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	"github.com/NpoolPlatform/message/npool/signproxy"
 	"github.com/NpoolPlatform/message/npool/trading" //nolint
 	"github.com/NpoolPlatform/sphinx-service/pkg/crud"
-	constant "github.com/NpoolPlatform/sphinx-service/pkg/message/const"
 	"golang.org/x/xerrors"
 )
 
@@ -23,8 +21,6 @@ var (
 
 func init() {
 	mapACK = make(map[string]*trading.ACKRequest)
-	ackListenIntervalMs = config.GetIntValueWithNameSpace(constant.ServiceName, "ack_listen_interval_ms")
-	ackListenTimeoutMs = config.GetIntValueWithNameSpace(constant.ServiceName, "ack_listen_timeout_ms")
 	if ackListenIntervalMs <= 0 {
 		ackListenIntervalMs = 80
 	}
