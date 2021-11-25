@@ -73,10 +73,15 @@ func GetTransactionOrNil(in *trading.CreateTransactionRequest) (record *ent.Tran
 		if len(info) > 1 {
 			err = xerrors.New("impossible")
 		}
+		coinInfo, err := info[0].QueryCoin().Only(ctxPublic)
+		if err != nil {
+			err = xerrors.Errorf("transaction no coininfo %v", err)
+			return record, err
+		}
 		if info[0].AddressFrom == in.Info.AddressFrom &&
 			info[0].AddressTo == in.Info.AddressTo &&
 			info[0].AmountFloat64 == in.Info.AmountFloat64 &&
-			info[0].Edges.Coin.Name == in.Info.CoinName {
+			coinInfo.Name == in.Info.CoinName {
 			record = info[0]
 		}
 	}
