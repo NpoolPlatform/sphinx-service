@@ -130,6 +130,7 @@ func CreateTransaction(ctx context.Context, in *trading.CreateTransactionRequest
 	// Mocked auto-review logic
 	/*
 		next-version: set this field by amount, login_ip, etc.
+		or let this be done by review service
 	*/
 	needManualReview := true
 
@@ -146,7 +147,7 @@ func CreateTransaction(ctx context.Context, in *trading.CreateTransactionRequest
 	// Insert sql record
 	info, err := crud.CreateRecordTransaction(in, needManualReview, txType)
 	if err != nil {
-		// if same transaction(and uuid), err == nil, return old record.
+		// if same transaction(and signature), err == nil, return old record.
 		// if TID exists but not same, err happens here;
 		return
 	}
@@ -163,7 +164,7 @@ func CreateTransaction(ctx context.Context, in *trading.CreateTransactionRequest
 func GetTransaction(ctx context.Context, in *trading.GetTransactionRequest) (resp *trading.GetTransactionResponse, err error) {
 	transactionRow, err := crud.GetTransaction(ctx, in)
 	if err == nil {
-		// Judge success/fail from transaction current status
+		// Judge transaction status
 		var flagFailed, flagSucceeded bool
 		if transactionRow.Status == transaction.StatusDone {
 			flagSucceeded = true
