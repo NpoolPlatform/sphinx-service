@@ -69,15 +69,19 @@ func (wnc *WalletNodeCreate) SetID(i int32) *WalletNodeCreate {
 	return wnc
 }
 
-// SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (wnc *WalletNodeCreate) SetCoinID(id uuid.UUID) *WalletNodeCreate {
-	wnc.mutation.SetCoinID(id)
+// AddCoinIDs adds the "coin" edge to the CoinInfo entity by IDs.
+func (wnc *WalletNodeCreate) AddCoinIDs(ids ...uuid.UUID) *WalletNodeCreate {
+	wnc.mutation.AddCoinIDs(ids...)
 	return wnc
 }
 
-// SetCoin sets the "coin" edge to the CoinInfo entity.
-func (wnc *WalletNodeCreate) SetCoin(c *CoinInfo) *WalletNodeCreate {
-	return wnc.SetCoinID(c.ID)
+// AddCoin adds the "coin" edges to the CoinInfo entity.
+func (wnc *WalletNodeCreate) AddCoin(c ...*CoinInfo) *WalletNodeCreate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return wnc.AddCoinIDs(ids...)
 }
 
 // Mutation returns the WalletNodeMutation object of the builder.
@@ -171,9 +175,6 @@ func (wnc *WalletNodeCreate) check() error {
 	if _, ok := wnc.mutation.LastOnlineTimeUtc(); !ok {
 		return &ValidationError{Name: "last_online_time_utc", err: errors.New(`ent: missing required field "last_online_time_utc"`)}
 	}
-	if _, ok := wnc.mutation.CoinID(); !ok {
-		return &ValidationError{Name: "coin", err: errors.New("ent: missing required edge \"coin\"")}
-	}
 	return nil
 }
 
@@ -265,10 +266,10 @@ func (wnc *WalletNodeCreate) createSpec() (*WalletNode, *sqlgraph.CreateSpec) {
 	}
 	if nodes := wnc.mutation.CoinIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   walletnode.CoinTable,
-			Columns: []string{walletnode.CoinColumn},
+			Columns: walletnode.CoinPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -280,7 +281,6 @@ func (wnc *WalletNodeCreate) createSpec() (*WalletNode, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.coin_info_wallet_nodes = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

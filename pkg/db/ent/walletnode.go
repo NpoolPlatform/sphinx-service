@@ -7,9 +7,7 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/walletnode"
-	"github.com/google/uuid"
 )
 
 // WalletNode is the model entity for the WalletNode schema.
@@ -33,28 +31,22 @@ type WalletNode struct {
 	LastOnlineTimeUtc int64 `json:"last_online_time_utc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the WalletNodeQuery when eager-loading is set.
-	Edges                  WalletNodeEdges `json:"edges"`
-	coin_info_wallet_nodes *uuid.UUID
+	Edges WalletNodeEdges `json:"edges"`
 }
 
 // WalletNodeEdges holds the relations/edges for other nodes in the graph.
 type WalletNodeEdges struct {
 	// Coin holds the value of the coin edge.
-	Coin *CoinInfo `json:"coin,omitempty"`
+	Coin []*CoinInfo `json:"coin,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
 // CoinOrErr returns the Coin value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e WalletNodeEdges) CoinOrErr() (*CoinInfo, error) {
+// was not loaded in eager-loading.
+func (e WalletNodeEdges) CoinOrErr() ([]*CoinInfo, error) {
 	if e.loadedTypes[0] {
-		if e.Coin == nil {
-			// The edge coin was loaded in eager-loading,
-			// but was not found.
-			return nil, &NotFoundError{label: coininfo.Label}
-		}
 		return e.Coin, nil
 	}
 	return nil, &NotLoadedError{edge: "coin"}
@@ -69,8 +61,6 @@ func (*WalletNode) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullInt64)
 		case walletnode.FieldUUID, walletnode.FieldLocation, walletnode.FieldHostVendor, walletnode.FieldPublicIP, walletnode.FieldLocalIP:
 			values[i] = new(sql.NullString)
-		case walletnode.ForeignKeys[0]: // coin_info_wallet_nodes
-			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type WalletNode", columns[i])
 		}
@@ -133,13 +123,6 @@ func (wn *WalletNode) assignValues(columns []string, values []interface{}) error
 				return fmt.Errorf("unexpected type %T for field last_online_time_utc", values[i])
 			} else if value.Valid {
 				wn.LastOnlineTimeUtc = value.Int64
-			}
-		case walletnode.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullScanner); !ok {
-				return fmt.Errorf("unexpected type %T for field coin_info_wallet_nodes", values[i])
-			} else if value.Valid {
-				wn.coin_info_wallet_nodes = new(uuid.UUID)
-				*wn.coin_info_wallet_nodes = *value.S.(*uuid.UUID)
 			}
 		}
 	}

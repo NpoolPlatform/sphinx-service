@@ -36,20 +36,16 @@ const (
 	TransactionsInverseTable = "transactions"
 	// TransactionsColumn is the table column denoting the transactions relation/edge.
 	TransactionsColumn = "coin_info_transactions"
-	// ReviewsTable is the table that holds the reviews relation/edge.
-	ReviewsTable = "reviews"
+	// ReviewsTable is the table that holds the reviews relation/edge. The primary key declared below.
+	ReviewsTable = "coin_info_reviews"
 	// ReviewsInverseTable is the table name for the Review entity.
 	// It exists in this package in order to avoid circular dependency with the "review" package.
 	ReviewsInverseTable = "reviews"
-	// ReviewsColumn is the table column denoting the reviews relation/edge.
-	ReviewsColumn = "coin_info_reviews"
-	// WalletNodesTable is the table that holds the wallet_nodes relation/edge.
-	WalletNodesTable = "wallet_nodes"
+	// WalletNodesTable is the table that holds the wallet_nodes relation/edge. The primary key declared below.
+	WalletNodesTable = "coin_info_wallet_nodes"
 	// WalletNodesInverseTable is the table name for the WalletNode entity.
 	// It exists in this package in order to avoid circular dependency with the "walletnode" package.
 	WalletNodesInverseTable = "wallet_nodes"
-	// WalletNodesColumn is the table column denoting the wallet_nodes relation/edge.
-	WalletNodesColumn = "coin_info_wallet_nodes"
 )
 
 // Columns holds all SQL columns for coininfo fields.
@@ -61,6 +57,15 @@ var Columns = []string{
 	FieldIsPresale,
 	FieldLogoImage,
 }
+
+var (
+	// ReviewsPrimaryKey and ReviewsColumn2 are the table columns denoting the
+	// primary key for the reviews relation (M2M).
+	ReviewsPrimaryKey = []string{"coin_info_id", "review_id"}
+	// WalletNodesPrimaryKey and WalletNodesColumn2 are the table columns denoting the
+	// primary key for the wallet_nodes relation (M2M).
+	WalletNodesPrimaryKey = []string{"coin_info_id", "wallet_node_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {

@@ -60,26 +60,34 @@ func (rc *ReviewCreate) SetID(i int32) *ReviewCreate {
 	return rc
 }
 
-// SetTransactionID sets the "transaction" edge to the Transaction entity by ID.
-func (rc *ReviewCreate) SetTransactionID(id int32) *ReviewCreate {
-	rc.mutation.SetTransactionID(id)
+// AddTransactionIDs adds the "transaction" edge to the Transaction entity by IDs.
+func (rc *ReviewCreate) AddTransactionIDs(ids ...int32) *ReviewCreate {
+	rc.mutation.AddTransactionIDs(ids...)
 	return rc
 }
 
-// SetTransaction sets the "transaction" edge to the Transaction entity.
-func (rc *ReviewCreate) SetTransaction(t *Transaction) *ReviewCreate {
-	return rc.SetTransactionID(t.ID)
+// AddTransaction adds the "transaction" edges to the Transaction entity.
+func (rc *ReviewCreate) AddTransaction(t ...*Transaction) *ReviewCreate {
+	ids := make([]int32, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return rc.AddTransactionIDs(ids...)
 }
 
-// SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (rc *ReviewCreate) SetCoinID(id uuid.UUID) *ReviewCreate {
-	rc.mutation.SetCoinID(id)
+// AddCoinIDs adds the "coin" edge to the CoinInfo entity by IDs.
+func (rc *ReviewCreate) AddCoinIDs(ids ...uuid.UUID) *ReviewCreate {
+	rc.mutation.AddCoinIDs(ids...)
 	return rc
 }
 
-// SetCoin sets the "coin" edge to the CoinInfo entity.
-func (rc *ReviewCreate) SetCoin(c *CoinInfo) *ReviewCreate {
-	return rc.SetCoinID(c.ID)
+// AddCoin adds the "coin" edges to the CoinInfo entity.
+func (rc *ReviewCreate) AddCoin(c ...*CoinInfo) *ReviewCreate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return rc.AddCoinIDs(ids...)
 }
 
 // Mutation returns the ReviewMutation object of the builder.
@@ -178,12 +186,6 @@ func (rc *ReviewCreate) check() error {
 	if _, ok := rc.mutation.UpdatetimeUtc(); !ok {
 		return &ValidationError{Name: "updatetime_utc", err: errors.New(`ent: missing required field "updatetime_utc"`)}
 	}
-	if _, ok := rc.mutation.TransactionID(); !ok {
-		return &ValidationError{Name: "transaction", err: errors.New("ent: missing required edge \"transaction\"")}
-	}
-	if _, ok := rc.mutation.CoinID(); !ok {
-		return &ValidationError{Name: "coin", err: errors.New("ent: missing required edge \"coin\"")}
-	}
 	return nil
 }
 
@@ -251,10 +253,10 @@ func (rc *ReviewCreate) createSpec() (*Review, *sqlgraph.CreateSpec) {
 	}
 	if nodes := rc.mutation.TransactionIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   review.TransactionTable,
-			Columns: []string{review.TransactionColumn},
+			Columns: review.TransactionPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -266,15 +268,14 @@ func (rc *ReviewCreate) createSpec() (*Review, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.transaction_review = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := rc.mutation.CoinIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   review.CoinTable,
-			Columns: []string{review.CoinColumn},
+			Columns: review.CoinPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -286,7 +287,6 @@ func (rc *ReviewCreate) createSpec() (*Review, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.coin_info_reviews = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

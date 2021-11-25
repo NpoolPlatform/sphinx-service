@@ -26,8 +26,7 @@ func (WalletNode) Fields() []ent.Field {
 
 func (WalletNode) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("coin", CoinInfo.Type).Ref("wallet_nodes").
-			Unique().Required(),
+		edge.From("coin", CoinInfo.Type).Ref("wallet_nodes"),
 	}
 }
 

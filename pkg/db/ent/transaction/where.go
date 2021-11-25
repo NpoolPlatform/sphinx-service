@@ -1303,7 +1303,7 @@ func HasReview() predicate.Transaction {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(ReviewTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, ReviewTable, ReviewColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, ReviewTable, ReviewPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -1315,7 +1315,7 @@ func HasReviewWith(preds ...predicate.Review) predicate.Transaction {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(ReviewInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, ReviewTable, ReviewColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, ReviewTable, ReviewPrimaryKey...),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

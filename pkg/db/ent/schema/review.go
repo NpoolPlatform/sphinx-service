@@ -23,10 +23,8 @@ func (Review) Fields() []ent.Field {
 
 func (Review) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("transaction", Transaction.Type).
-			Ref("review").Unique().Required(),
-		edge.From("coin", CoinInfo.Type).Ref("reviews").
-			Unique().Required(),
+		edge.From("transaction", Transaction.Type).Ref("review"),
+		edge.From("coin", CoinInfo.Type).Ref("reviews"),
 	}
 }
 

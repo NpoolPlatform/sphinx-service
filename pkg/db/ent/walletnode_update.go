@@ -4,7 +4,6 @@ package ent
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"entgo.io/ent/dialect/sql"
@@ -85,15 +84,19 @@ func (wnu *WalletNodeUpdate) AddLastOnlineTimeUtc(i int64) *WalletNodeUpdate {
 	return wnu
 }
 
-// SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (wnu *WalletNodeUpdate) SetCoinID(id uuid.UUID) *WalletNodeUpdate {
-	wnu.mutation.SetCoinID(id)
+// AddCoinIDs adds the "coin" edge to the CoinInfo entity by IDs.
+func (wnu *WalletNodeUpdate) AddCoinIDs(ids ...uuid.UUID) *WalletNodeUpdate {
+	wnu.mutation.AddCoinIDs(ids...)
 	return wnu
 }
 
-// SetCoin sets the "coin" edge to the CoinInfo entity.
-func (wnu *WalletNodeUpdate) SetCoin(c *CoinInfo) *WalletNodeUpdate {
-	return wnu.SetCoinID(c.ID)
+// AddCoin adds the "coin" edges to the CoinInfo entity.
+func (wnu *WalletNodeUpdate) AddCoin(c ...*CoinInfo) *WalletNodeUpdate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return wnu.AddCoinIDs(ids...)
 }
 
 // Mutation returns the WalletNodeMutation object of the builder.
@@ -101,10 +104,25 @@ func (wnu *WalletNodeUpdate) Mutation() *WalletNodeMutation {
 	return wnu.mutation
 }
 
-// ClearCoin clears the "coin" edge to the CoinInfo entity.
+// ClearCoin clears all "coin" edges to the CoinInfo entity.
 func (wnu *WalletNodeUpdate) ClearCoin() *WalletNodeUpdate {
 	wnu.mutation.ClearCoin()
 	return wnu
+}
+
+// RemoveCoinIDs removes the "coin" edge to CoinInfo entities by IDs.
+func (wnu *WalletNodeUpdate) RemoveCoinIDs(ids ...uuid.UUID) *WalletNodeUpdate {
+	wnu.mutation.RemoveCoinIDs(ids...)
+	return wnu
+}
+
+// RemoveCoin removes "coin" edges to CoinInfo entities.
+func (wnu *WalletNodeUpdate) RemoveCoin(c ...*CoinInfo) *WalletNodeUpdate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return wnu.RemoveCoinIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -114,18 +132,12 @@ func (wnu *WalletNodeUpdate) Save(ctx context.Context) (int, error) {
 		affected int
 	)
 	if len(wnu.hooks) == 0 {
-		if err = wnu.check(); err != nil {
-			return 0, err
-		}
 		affected, err = wnu.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*WalletNodeMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = wnu.check(); err != nil {
-				return 0, err
 			}
 			wnu.mutation = mutation
 			affected, err = wnu.sqlSave(ctx)
@@ -165,14 +177,6 @@ func (wnu *WalletNodeUpdate) ExecX(ctx context.Context) {
 	if err := wnu.Exec(ctx); err != nil {
 		panic(err)
 	}
-}
-
-// check runs all checks and user-defined validators on the builder.
-func (wnu *WalletNodeUpdate) check() error {
-	if _, ok := wnu.mutation.CoinID(); wnu.mutation.CoinCleared() && !ok {
-		return errors.New("ent: clearing a required unique edge \"coin\"")
-	}
-	return nil
 }
 
 func (wnu *WalletNodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
@@ -258,10 +262,10 @@ func (wnu *WalletNodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if wnu.mutation.CoinCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   walletnode.CoinTable,
-			Columns: []string{walletnode.CoinColumn},
+			Columns: walletnode.CoinPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -272,12 +276,31 @@ func (wnu *WalletNodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := wnu.mutation.CoinIDs(); len(nodes) > 0 {
+	if nodes := wnu.mutation.RemovedCoinIDs(); len(nodes) > 0 && !wnu.mutation.CoinCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   walletnode.CoinTable,
-			Columns: []string{walletnode.CoinColumn},
+			Columns: walletnode.CoinPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: coininfo.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := wnu.mutation.CoinIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   walletnode.CoinTable,
+			Columns: walletnode.CoinPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -366,15 +389,19 @@ func (wnuo *WalletNodeUpdateOne) AddLastOnlineTimeUtc(i int64) *WalletNodeUpdate
 	return wnuo
 }
 
-// SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (wnuo *WalletNodeUpdateOne) SetCoinID(id uuid.UUID) *WalletNodeUpdateOne {
-	wnuo.mutation.SetCoinID(id)
+// AddCoinIDs adds the "coin" edge to the CoinInfo entity by IDs.
+func (wnuo *WalletNodeUpdateOne) AddCoinIDs(ids ...uuid.UUID) *WalletNodeUpdateOne {
+	wnuo.mutation.AddCoinIDs(ids...)
 	return wnuo
 }
 
-// SetCoin sets the "coin" edge to the CoinInfo entity.
-func (wnuo *WalletNodeUpdateOne) SetCoin(c *CoinInfo) *WalletNodeUpdateOne {
-	return wnuo.SetCoinID(c.ID)
+// AddCoin adds the "coin" edges to the CoinInfo entity.
+func (wnuo *WalletNodeUpdateOne) AddCoin(c ...*CoinInfo) *WalletNodeUpdateOne {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return wnuo.AddCoinIDs(ids...)
 }
 
 // Mutation returns the WalletNodeMutation object of the builder.
@@ -382,10 +409,25 @@ func (wnuo *WalletNodeUpdateOne) Mutation() *WalletNodeMutation {
 	return wnuo.mutation
 }
 
-// ClearCoin clears the "coin" edge to the CoinInfo entity.
+// ClearCoin clears all "coin" edges to the CoinInfo entity.
 func (wnuo *WalletNodeUpdateOne) ClearCoin() *WalletNodeUpdateOne {
 	wnuo.mutation.ClearCoin()
 	return wnuo
+}
+
+// RemoveCoinIDs removes the "coin" edge to CoinInfo entities by IDs.
+func (wnuo *WalletNodeUpdateOne) RemoveCoinIDs(ids ...uuid.UUID) *WalletNodeUpdateOne {
+	wnuo.mutation.RemoveCoinIDs(ids...)
+	return wnuo
+}
+
+// RemoveCoin removes "coin" edges to CoinInfo entities.
+func (wnuo *WalletNodeUpdateOne) RemoveCoin(c ...*CoinInfo) *WalletNodeUpdateOne {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return wnuo.RemoveCoinIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -402,18 +444,12 @@ func (wnuo *WalletNodeUpdateOne) Save(ctx context.Context) (*WalletNode, error) 
 		node *WalletNode
 	)
 	if len(wnuo.hooks) == 0 {
-		if err = wnuo.check(); err != nil {
-			return nil, err
-		}
 		node, err = wnuo.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*WalletNodeMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = wnuo.check(); err != nil {
-				return nil, err
 			}
 			wnuo.mutation = mutation
 			node, err = wnuo.sqlSave(ctx)
@@ -453,14 +489,6 @@ func (wnuo *WalletNodeUpdateOne) ExecX(ctx context.Context) {
 	if err := wnuo.Exec(ctx); err != nil {
 		panic(err)
 	}
-}
-
-// check runs all checks and user-defined validators on the builder.
-func (wnuo *WalletNodeUpdateOne) check() error {
-	if _, ok := wnuo.mutation.CoinID(); wnuo.mutation.CoinCleared() && !ok {
-		return errors.New("ent: clearing a required unique edge \"coin\"")
-	}
-	return nil
 }
 
 func (wnuo *WalletNodeUpdateOne) sqlSave(ctx context.Context) (_node *WalletNode, err error) {
@@ -563,10 +591,10 @@ func (wnuo *WalletNodeUpdateOne) sqlSave(ctx context.Context) (_node *WalletNode
 	}
 	if wnuo.mutation.CoinCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   walletnode.CoinTable,
-			Columns: []string{walletnode.CoinColumn},
+			Columns: walletnode.CoinPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -577,12 +605,31 @@ func (wnuo *WalletNodeUpdateOne) sqlSave(ctx context.Context) (_node *WalletNode
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := wnuo.mutation.CoinIDs(); len(nodes) > 0 {
+	if nodes := wnuo.mutation.RemovedCoinIDs(); len(nodes) > 0 && !wnuo.mutation.CoinCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   walletnode.CoinTable,
-			Columns: []string{walletnode.CoinColumn},
+			Columns: walletnode.CoinPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: coininfo.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := wnuo.mutation.CoinIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   walletnode.CoinTable,
+			Columns: walletnode.CoinPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

@@ -52,13 +52,11 @@ const (
 	CoinInverseTable = "coin_infos"
 	// CoinColumn is the table column denoting the coin relation/edge.
 	CoinColumn = "coin_info_transactions"
-	// ReviewTable is the table that holds the review relation/edge.
-	ReviewTable = "reviews"
+	// ReviewTable is the table that holds the review relation/edge. The primary key declared below.
+	ReviewTable = "transaction_review"
 	// ReviewInverseTable is the table name for the Review entity.
 	// It exists in this package in order to avoid circular dependency with the "review" package.
 	ReviewInverseTable = "reviews"
-	// ReviewColumn is the table column denoting the review relation/edge.
-	ReviewColumn = "transaction_review"
 )
 
 // Columns holds all SQL columns for transaction fields.
@@ -85,6 +83,12 @@ var Columns = []string{
 var ForeignKeys = []string{
 	"coin_info_transactions",
 }
+
+var (
+	// ReviewPrimaryKey and ReviewColumn2 are the table columns denoting the
+	// primary key for the review relation (M2M).
+	ReviewPrimaryKey = []string{"transaction_id", "review_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {

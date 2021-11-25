@@ -260,7 +260,7 @@ func (c *CoinInfoClient) QueryReviews(ci *CoinInfo) *ReviewQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(coininfo.Table, coininfo.FieldID, id),
 			sqlgraph.To(review.Table, review.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, coininfo.ReviewsTable, coininfo.ReviewsColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, coininfo.ReviewsTable, coininfo.ReviewsPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(ci.driver.Dialect(), step)
 		return fromV, nil
@@ -276,7 +276,7 @@ func (c *CoinInfoClient) QueryWalletNodes(ci *CoinInfo) *WalletNodeQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(coininfo.Table, coininfo.FieldID, id),
 			sqlgraph.To(walletnode.Table, walletnode.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, coininfo.WalletNodesTable, coininfo.WalletNodesColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, coininfo.WalletNodesTable, coininfo.WalletNodesPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(ci.driver.Dialect(), step)
 		return fromV, nil
@@ -472,7 +472,7 @@ func (c *ReviewClient) QueryTransaction(r *Review) *TransactionQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(review.Table, review.FieldID, id),
 			sqlgraph.To(transaction.Table, transaction.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, review.TransactionTable, review.TransactionColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, review.TransactionTable, review.TransactionPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil
@@ -488,7 +488,7 @@ func (c *ReviewClient) QueryCoin(r *Review) *CoinInfoQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(review.Table, review.FieldID, id),
 			sqlgraph.To(coininfo.Table, coininfo.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, review.CoinTable, review.CoinColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, review.CoinTable, review.CoinPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil
@@ -610,7 +610,7 @@ func (c *TransactionClient) QueryReview(t *Transaction) *ReviewQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(transaction.Table, transaction.FieldID, id),
 			sqlgraph.To(review.Table, review.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, transaction.ReviewTable, transaction.ReviewColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, transaction.ReviewTable, transaction.ReviewPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil
@@ -716,7 +716,7 @@ func (c *WalletNodeClient) QueryCoin(wn *WalletNode) *CoinInfoQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(walletnode.Table, walletnode.FieldID, id),
 			sqlgraph.To(coininfo.Table, coininfo.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, walletnode.CoinTable, walletnode.CoinColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, walletnode.CoinTable, walletnode.CoinPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(wn.driver.Dialect(), step)
 		return fromV, nil

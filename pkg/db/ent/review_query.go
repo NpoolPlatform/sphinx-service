@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"errors"
 	"fmt"
 	"math"
@@ -30,7 +31,6 @@ type ReviewQuery struct {
 	// eager-loading edges.
 	withTransaction *TransactionQuery
 	withCoin        *CoinInfoQuery
-	withFKs         bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -81,7 +81,7 @@ func (rq *ReviewQuery) QueryTransaction() *TransactionQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(review.Table, review.FieldID, selector),
 			sqlgraph.To(transaction.Table, transaction.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, review.TransactionTable, review.TransactionColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, review.TransactionTable, review.TransactionPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
 		return fromU, nil
@@ -103,7 +103,7 @@ func (rq *ReviewQuery) QueryCoin() *CoinInfoQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(review.Table, review.FieldID, selector),
 			sqlgraph.To(coininfo.Table, coininfo.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, review.CoinTable, review.CoinColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, review.CoinTable, review.CoinPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
 		return fromU, nil
@@ -386,19 +386,12 @@ func (rq *ReviewQuery) prepareQuery(ctx context.Context) error {
 func (rq *ReviewQuery) sqlAll(ctx context.Context) ([]*Review, error) {
 	var (
 		nodes       = []*Review{}
-		withFKs     = rq.withFKs
 		_spec       = rq.querySpec()
 		loadedTypes = [2]bool{
 			rq.withTransaction != nil,
 			rq.withCoin != nil,
 		}
 	)
-	if rq.withTransaction != nil || rq.withCoin != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, review.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
 		node := &Review{config: rq.config}
 		nodes = append(nodes, node)
@@ -420,59 +413,131 @@ func (rq *ReviewQuery) sqlAll(ctx context.Context) ([]*Review, error) {
 	}
 
 	if query := rq.withTransaction; query != nil {
-		ids := make([]int32, 0, len(nodes))
-		nodeids := make(map[int32][]*Review)
-		for i := range nodes {
-			if nodes[i].transaction_review == nil {
-				continue
-			}
-			fk := *nodes[i].transaction_review
-			if _, ok := nodeids[fk]; !ok {
-				ids = append(ids, fk)
-			}
-			nodeids[fk] = append(nodeids[fk], nodes[i])
+		fks := make([]driver.Value, 0, len(nodes))
+		ids := make(map[int32]*Review, len(nodes))
+		for _, node := range nodes {
+			ids[node.ID] = node
+			fks = append(fks, node.ID)
+			node.Edges.Transaction = []*Transaction{}
 		}
-		query.Where(transaction.IDIn(ids...))
+		var (
+			edgeids []int32
+			edges   = make(map[int32][]*Review)
+		)
+		_spec := &sqlgraph.EdgeQuerySpec{
+			Edge: &sqlgraph.EdgeSpec{
+				Inverse: true,
+				Table:   review.TransactionTable,
+				Columns: review.TransactionPrimaryKey,
+			},
+			Predicate: func(s *sql.Selector) {
+				s.Where(sql.InValues(review.TransactionPrimaryKey[1], fks...))
+			},
+			ScanValues: func() [2]interface{} {
+				return [2]interface{}{new(sql.NullInt64), new(sql.NullInt64)}
+			},
+			Assign: func(out, in interface{}) error {
+				eout, ok := out.(*sql.NullInt64)
+				if !ok || eout == nil {
+					return fmt.Errorf("unexpected id value for edge-out")
+				}
+				ein, ok := in.(*sql.NullInt64)
+				if !ok || ein == nil {
+					return fmt.Errorf("unexpected id value for edge-in")
+				}
+				outValue := int32(eout.Int64)
+				inValue := int32(ein.Int64)
+				node, ok := ids[outValue]
+				if !ok {
+					return fmt.Errorf("unexpected node id in edges: %v", outValue)
+				}
+				if _, ok := edges[inValue]; !ok {
+					edgeids = append(edgeids, inValue)
+				}
+				edges[inValue] = append(edges[inValue], node)
+				return nil
+			},
+		}
+		if err := sqlgraph.QueryEdges(ctx, rq.driver, _spec); err != nil {
+			return nil, fmt.Errorf(`query edges "transaction": %w`, err)
+		}
+		query.Where(transaction.IDIn(edgeids...))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			nodes, ok := nodeids[n.ID]
+			nodes, ok := edges[n.ID]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "transaction_review" returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected "transaction" node returned %v`, n.ID)
 			}
 			for i := range nodes {
-				nodes[i].Edges.Transaction = n
+				nodes[i].Edges.Transaction = append(nodes[i].Edges.Transaction, n)
 			}
 		}
 	}
 
 	if query := rq.withCoin; query != nil {
-		ids := make([]uuid.UUID, 0, len(nodes))
-		nodeids := make(map[uuid.UUID][]*Review)
-		for i := range nodes {
-			if nodes[i].coin_info_reviews == nil {
-				continue
-			}
-			fk := *nodes[i].coin_info_reviews
-			if _, ok := nodeids[fk]; !ok {
-				ids = append(ids, fk)
-			}
-			nodeids[fk] = append(nodeids[fk], nodes[i])
+		fks := make([]driver.Value, 0, len(nodes))
+		ids := make(map[int32]*Review, len(nodes))
+		for _, node := range nodes {
+			ids[node.ID] = node
+			fks = append(fks, node.ID)
+			node.Edges.Coin = []*CoinInfo{}
 		}
-		query.Where(coininfo.IDIn(ids...))
+		var (
+			edgeids []uuid.UUID
+			edges   = make(map[uuid.UUID][]*Review)
+		)
+		_spec := &sqlgraph.EdgeQuerySpec{
+			Edge: &sqlgraph.EdgeSpec{
+				Inverse: true,
+				Table:   review.CoinTable,
+				Columns: review.CoinPrimaryKey,
+			},
+			Predicate: func(s *sql.Selector) {
+				s.Where(sql.InValues(review.CoinPrimaryKey[1], fks...))
+			},
+			ScanValues: func() [2]interface{} {
+				return [2]interface{}{new(sql.NullInt64), new(uuid.UUID)}
+			},
+			Assign: func(out, in interface{}) error {
+				eout, ok := out.(*sql.NullInt64)
+				if !ok || eout == nil {
+					return fmt.Errorf("unexpected id value for edge-out")
+				}
+				ein, ok := in.(*uuid.UUID)
+				if !ok || ein == nil {
+					return fmt.Errorf("unexpected id value for edge-in")
+				}
+				outValue := int32(eout.Int64)
+				inValue := *ein
+				node, ok := ids[outValue]
+				if !ok {
+					return fmt.Errorf("unexpected node id in edges: %v", outValue)
+				}
+				if _, ok := edges[inValue]; !ok {
+					edgeids = append(edgeids, inValue)
+				}
+				edges[inValue] = append(edges[inValue], node)
+				return nil
+			},
+		}
+		if err := sqlgraph.QueryEdges(ctx, rq.driver, _spec); err != nil {
+			return nil, fmt.Errorf(`query edges "coin": %w`, err)
+		}
+		query.Where(coininfo.IDIn(edgeids...))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			nodes, ok := nodeids[n.ID]
+			nodes, ok := edges[n.ID]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "coin_info_reviews" returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected "coin" node returned %v`, n.ID)
 			}
 			for i := range nodes {
-				nodes[i].Edges.Coin = n
+				nodes[i].Edges.Coin = append(nodes[i].Edges.Coin, n)
 			}
 		}
 	}

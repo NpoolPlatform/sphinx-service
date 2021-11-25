@@ -4,7 +4,6 @@ package ent
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"entgo.io/ent/dialect/sql"
@@ -76,26 +75,34 @@ func (ru *ReviewUpdate) AddUpdatetimeUtc(i int64) *ReviewUpdate {
 	return ru
 }
 
-// SetTransactionID sets the "transaction" edge to the Transaction entity by ID.
-func (ru *ReviewUpdate) SetTransactionID(id int32) *ReviewUpdate {
-	ru.mutation.SetTransactionID(id)
+// AddTransactionIDs adds the "transaction" edge to the Transaction entity by IDs.
+func (ru *ReviewUpdate) AddTransactionIDs(ids ...int32) *ReviewUpdate {
+	ru.mutation.AddTransactionIDs(ids...)
 	return ru
 }
 
-// SetTransaction sets the "transaction" edge to the Transaction entity.
-func (ru *ReviewUpdate) SetTransaction(t *Transaction) *ReviewUpdate {
-	return ru.SetTransactionID(t.ID)
+// AddTransaction adds the "transaction" edges to the Transaction entity.
+func (ru *ReviewUpdate) AddTransaction(t ...*Transaction) *ReviewUpdate {
+	ids := make([]int32, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return ru.AddTransactionIDs(ids...)
 }
 
-// SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (ru *ReviewUpdate) SetCoinID(id uuid.UUID) *ReviewUpdate {
-	ru.mutation.SetCoinID(id)
+// AddCoinIDs adds the "coin" edge to the CoinInfo entity by IDs.
+func (ru *ReviewUpdate) AddCoinIDs(ids ...uuid.UUID) *ReviewUpdate {
+	ru.mutation.AddCoinIDs(ids...)
 	return ru
 }
 
-// SetCoin sets the "coin" edge to the CoinInfo entity.
-func (ru *ReviewUpdate) SetCoin(c *CoinInfo) *ReviewUpdate {
-	return ru.SetCoinID(c.ID)
+// AddCoin adds the "coin" edges to the CoinInfo entity.
+func (ru *ReviewUpdate) AddCoin(c ...*CoinInfo) *ReviewUpdate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return ru.AddCoinIDs(ids...)
 }
 
 // Mutation returns the ReviewMutation object of the builder.
@@ -103,16 +110,46 @@ func (ru *ReviewUpdate) Mutation() *ReviewMutation {
 	return ru.mutation
 }
 
-// ClearTransaction clears the "transaction" edge to the Transaction entity.
+// ClearTransaction clears all "transaction" edges to the Transaction entity.
 func (ru *ReviewUpdate) ClearTransaction() *ReviewUpdate {
 	ru.mutation.ClearTransaction()
 	return ru
 }
 
-// ClearCoin clears the "coin" edge to the CoinInfo entity.
+// RemoveTransactionIDs removes the "transaction" edge to Transaction entities by IDs.
+func (ru *ReviewUpdate) RemoveTransactionIDs(ids ...int32) *ReviewUpdate {
+	ru.mutation.RemoveTransactionIDs(ids...)
+	return ru
+}
+
+// RemoveTransaction removes "transaction" edges to Transaction entities.
+func (ru *ReviewUpdate) RemoveTransaction(t ...*Transaction) *ReviewUpdate {
+	ids := make([]int32, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return ru.RemoveTransactionIDs(ids...)
+}
+
+// ClearCoin clears all "coin" edges to the CoinInfo entity.
 func (ru *ReviewUpdate) ClearCoin() *ReviewUpdate {
 	ru.mutation.ClearCoin()
 	return ru
+}
+
+// RemoveCoinIDs removes the "coin" edge to CoinInfo entities by IDs.
+func (ru *ReviewUpdate) RemoveCoinIDs(ids ...uuid.UUID) *ReviewUpdate {
+	ru.mutation.RemoveCoinIDs(ids...)
+	return ru
+}
+
+// RemoveCoin removes "coin" edges to CoinInfo entities.
+func (ru *ReviewUpdate) RemoveCoin(c ...*CoinInfo) *ReviewUpdate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return ru.RemoveCoinIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -182,12 +219,6 @@ func (ru *ReviewUpdate) check() error {
 			return &ValidationError{Name: "operator_note", err: fmt.Errorf("ent: validator failed for field \"operator_note\": %w", err)}
 		}
 	}
-	if _, ok := ru.mutation.TransactionID(); ru.mutation.TransactionCleared() && !ok {
-		return errors.New("ent: clearing a required unique edge \"transaction\"")
-	}
-	if _, ok := ru.mutation.CoinID(); ru.mutation.CoinCleared() && !ok {
-		return errors.New("ent: clearing a required unique edge \"coin\"")
-	}
 	return nil
 }
 
@@ -253,10 +284,10 @@ func (ru *ReviewUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if ru.mutation.TransactionCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   review.TransactionTable,
-			Columns: []string{review.TransactionColumn},
+			Columns: review.TransactionPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -267,12 +298,31 @@ func (ru *ReviewUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ru.mutation.TransactionIDs(); len(nodes) > 0 {
+	if nodes := ru.mutation.RemovedTransactionIDs(); len(nodes) > 0 && !ru.mutation.TransactionCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   review.TransactionTable,
-			Columns: []string{review.TransactionColumn},
+			Columns: review.TransactionPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt32,
+					Column: transaction.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ru.mutation.TransactionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   review.TransactionTable,
+			Columns: review.TransactionPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -288,10 +338,10 @@ func (ru *ReviewUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if ru.mutation.CoinCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   review.CoinTable,
-			Columns: []string{review.CoinColumn},
+			Columns: review.CoinPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -302,12 +352,31 @@ func (ru *ReviewUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ru.mutation.CoinIDs(); len(nodes) > 0 {
+	if nodes := ru.mutation.RemovedCoinIDs(); len(nodes) > 0 && !ru.mutation.CoinCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   review.CoinTable,
-			Columns: []string{review.CoinColumn},
+			Columns: review.CoinPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: coininfo.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ru.mutation.CoinIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   review.CoinTable,
+			Columns: review.CoinPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -386,26 +455,34 @@ func (ruo *ReviewUpdateOne) AddUpdatetimeUtc(i int64) *ReviewUpdateOne {
 	return ruo
 }
 
-// SetTransactionID sets the "transaction" edge to the Transaction entity by ID.
-func (ruo *ReviewUpdateOne) SetTransactionID(id int32) *ReviewUpdateOne {
-	ruo.mutation.SetTransactionID(id)
+// AddTransactionIDs adds the "transaction" edge to the Transaction entity by IDs.
+func (ruo *ReviewUpdateOne) AddTransactionIDs(ids ...int32) *ReviewUpdateOne {
+	ruo.mutation.AddTransactionIDs(ids...)
 	return ruo
 }
 
-// SetTransaction sets the "transaction" edge to the Transaction entity.
-func (ruo *ReviewUpdateOne) SetTransaction(t *Transaction) *ReviewUpdateOne {
-	return ruo.SetTransactionID(t.ID)
+// AddTransaction adds the "transaction" edges to the Transaction entity.
+func (ruo *ReviewUpdateOne) AddTransaction(t ...*Transaction) *ReviewUpdateOne {
+	ids := make([]int32, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return ruo.AddTransactionIDs(ids...)
 }
 
-// SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (ruo *ReviewUpdateOne) SetCoinID(id uuid.UUID) *ReviewUpdateOne {
-	ruo.mutation.SetCoinID(id)
+// AddCoinIDs adds the "coin" edge to the CoinInfo entity by IDs.
+func (ruo *ReviewUpdateOne) AddCoinIDs(ids ...uuid.UUID) *ReviewUpdateOne {
+	ruo.mutation.AddCoinIDs(ids...)
 	return ruo
 }
 
-// SetCoin sets the "coin" edge to the CoinInfo entity.
-func (ruo *ReviewUpdateOne) SetCoin(c *CoinInfo) *ReviewUpdateOne {
-	return ruo.SetCoinID(c.ID)
+// AddCoin adds the "coin" edges to the CoinInfo entity.
+func (ruo *ReviewUpdateOne) AddCoin(c ...*CoinInfo) *ReviewUpdateOne {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return ruo.AddCoinIDs(ids...)
 }
 
 // Mutation returns the ReviewMutation object of the builder.
@@ -413,16 +490,46 @@ func (ruo *ReviewUpdateOne) Mutation() *ReviewMutation {
 	return ruo.mutation
 }
 
-// ClearTransaction clears the "transaction" edge to the Transaction entity.
+// ClearTransaction clears all "transaction" edges to the Transaction entity.
 func (ruo *ReviewUpdateOne) ClearTransaction() *ReviewUpdateOne {
 	ruo.mutation.ClearTransaction()
 	return ruo
 }
 
-// ClearCoin clears the "coin" edge to the CoinInfo entity.
+// RemoveTransactionIDs removes the "transaction" edge to Transaction entities by IDs.
+func (ruo *ReviewUpdateOne) RemoveTransactionIDs(ids ...int32) *ReviewUpdateOne {
+	ruo.mutation.RemoveTransactionIDs(ids...)
+	return ruo
+}
+
+// RemoveTransaction removes "transaction" edges to Transaction entities.
+func (ruo *ReviewUpdateOne) RemoveTransaction(t ...*Transaction) *ReviewUpdateOne {
+	ids := make([]int32, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return ruo.RemoveTransactionIDs(ids...)
+}
+
+// ClearCoin clears all "coin" edges to the CoinInfo entity.
 func (ruo *ReviewUpdateOne) ClearCoin() *ReviewUpdateOne {
 	ruo.mutation.ClearCoin()
 	return ruo
+}
+
+// RemoveCoinIDs removes the "coin" edge to CoinInfo entities by IDs.
+func (ruo *ReviewUpdateOne) RemoveCoinIDs(ids ...uuid.UUID) *ReviewUpdateOne {
+	ruo.mutation.RemoveCoinIDs(ids...)
+	return ruo
+}
+
+// RemoveCoin removes "coin" edges to CoinInfo entities.
+func (ruo *ReviewUpdateOne) RemoveCoin(c ...*CoinInfo) *ReviewUpdateOne {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return ruo.RemoveCoinIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -498,12 +605,6 @@ func (ruo *ReviewUpdateOne) check() error {
 		if err := review.OperatorNoteValidator(v); err != nil {
 			return &ValidationError{Name: "operator_note", err: fmt.Errorf("ent: validator failed for field \"operator_note\": %w", err)}
 		}
-	}
-	if _, ok := ruo.mutation.TransactionID(); ruo.mutation.TransactionCleared() && !ok {
-		return errors.New("ent: clearing a required unique edge \"transaction\"")
-	}
-	if _, ok := ruo.mutation.CoinID(); ruo.mutation.CoinCleared() && !ok {
-		return errors.New("ent: clearing a required unique edge \"coin\"")
 	}
 	return nil
 }
@@ -587,10 +688,10 @@ func (ruo *ReviewUpdateOne) sqlSave(ctx context.Context) (_node *Review, err err
 	}
 	if ruo.mutation.TransactionCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   review.TransactionTable,
-			Columns: []string{review.TransactionColumn},
+			Columns: review.TransactionPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -601,12 +702,31 @@ func (ruo *ReviewUpdateOne) sqlSave(ctx context.Context) (_node *Review, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ruo.mutation.TransactionIDs(); len(nodes) > 0 {
+	if nodes := ruo.mutation.RemovedTransactionIDs(); len(nodes) > 0 && !ruo.mutation.TransactionCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   review.TransactionTable,
-			Columns: []string{review.TransactionColumn},
+			Columns: review.TransactionPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt32,
+					Column: transaction.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ruo.mutation.TransactionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   review.TransactionTable,
+			Columns: review.TransactionPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -622,10 +742,10 @@ func (ruo *ReviewUpdateOne) sqlSave(ctx context.Context) (_node *Review, err err
 	}
 	if ruo.mutation.CoinCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   review.CoinTable,
-			Columns: []string{review.CoinColumn},
+			Columns: review.CoinPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -636,12 +756,31 @@ func (ruo *ReviewUpdateOne) sqlSave(ctx context.Context) (_node *Review, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ruo.mutation.CoinIDs(); len(nodes) > 0 {
+	if nodes := ruo.mutation.RemovedCoinIDs(); len(nodes) > 0 && !ruo.mutation.CoinCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   review.CoinTable,
-			Columns: []string{review.CoinColumn},
+			Columns: review.CoinPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: coininfo.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ruo.mutation.CoinIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   review.CoinTable,
+			Columns: review.CoinPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

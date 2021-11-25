@@ -25,13 +25,11 @@ const (
 	EdgeCoin = "coin"
 	// Table holds the table name of the walletnode in the database.
 	Table = "wallet_nodes"
-	// CoinTable is the table that holds the coin relation/edge.
-	CoinTable = "wallet_nodes"
+	// CoinTable is the table that holds the coin relation/edge. The primary key declared below.
+	CoinTable = "coin_info_wallet_nodes"
 	// CoinInverseTable is the table name for the CoinInfo entity.
 	// It exists in this package in order to avoid circular dependency with the "coininfo" package.
 	CoinInverseTable = "coin_infos"
-	// CoinColumn is the table column denoting the coin relation/edge.
-	CoinColumn = "coin_info_wallet_nodes"
 )
 
 // Columns holds all SQL columns for walletnode fields.
@@ -46,21 +44,16 @@ var Columns = []string{
 	FieldLastOnlineTimeUtc,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "wallet_nodes"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"coin_info_wallet_nodes",
-}
+var (
+	// CoinPrimaryKey and CoinColumn2 are the table columns denoting the
+	// primary key for the coin relation (M2M).
+	CoinPrimaryKey = []string{"coin_info_id", "wallet_node_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}

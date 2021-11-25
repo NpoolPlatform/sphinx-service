@@ -57,28 +57,12 @@ var (
 		{Name: "operator_note", Type: field.TypeString, Size: 70},
 		{Name: "createtime_utc", Type: field.TypeInt64},
 		{Name: "updatetime_utc", Type: field.TypeInt64},
-		{Name: "coin_info_reviews", Type: field.TypeUUID, Nullable: true},
-		{Name: "transaction_review", Type: field.TypeInt32, Nullable: true},
 	}
 	// ReviewsTable holds the schema information for the "reviews" table.
 	ReviewsTable = &schema.Table{
 		Name:       "reviews",
 		Columns:    ReviewsColumns,
 		PrimaryKey: []*schema.Column{ReviewsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "reviews_coin_infos_reviews",
-				Columns:    []*schema.Column{ReviewsColumns[5]},
-				RefColumns: []*schema.Column{CoinInfosColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "reviews_transactions_review",
-				Columns:    []*schema.Column{ReviewsColumns[6]},
-				RefColumns: []*schema.Column{TransactionsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
 		Indexes: []*schema.Index{
 			{
 				Name:    "review_is_approved",
@@ -172,21 +156,12 @@ var (
 		{Name: "local_ip", Type: field.TypeString},
 		{Name: "createtime_utc", Type: field.TypeInt64},
 		{Name: "last_online_time_utc", Type: field.TypeInt64},
-		{Name: "coin_info_wallet_nodes", Type: field.TypeUUID, Nullable: true},
 	}
 	// WalletNodesTable holds the schema information for the "wallet_nodes" table.
 	WalletNodesTable = &schema.Table{
 		Name:       "wallet_nodes",
 		Columns:    WalletNodesColumns,
 		PrimaryKey: []*schema.Column{WalletNodesColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "wallet_nodes_coin_infos_wallet_nodes",
-				Columns:    []*schema.Column{WalletNodesColumns[8]},
-				RefColumns: []*schema.Column{CoinInfosColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
 		Indexes: []*schema.Index{
 			{
 				Name:    "walletnode_uuid",
@@ -210,6 +185,81 @@ var (
 			},
 		},
 	}
+	// CoinInfoReviewsColumns holds the columns for the "coin_info_reviews" table.
+	CoinInfoReviewsColumns = []*schema.Column{
+		{Name: "coin_info_id", Type: field.TypeUUID},
+		{Name: "review_id", Type: field.TypeInt32},
+	}
+	// CoinInfoReviewsTable holds the schema information for the "coin_info_reviews" table.
+	CoinInfoReviewsTable = &schema.Table{
+		Name:       "coin_info_reviews",
+		Columns:    CoinInfoReviewsColumns,
+		PrimaryKey: []*schema.Column{CoinInfoReviewsColumns[0], CoinInfoReviewsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "coin_info_reviews_coin_info_id",
+				Columns:    []*schema.Column{CoinInfoReviewsColumns[0]},
+				RefColumns: []*schema.Column{CoinInfosColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "coin_info_reviews_review_id",
+				Columns:    []*schema.Column{CoinInfoReviewsColumns[1]},
+				RefColumns: []*schema.Column{ReviewsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// CoinInfoWalletNodesColumns holds the columns for the "coin_info_wallet_nodes" table.
+	CoinInfoWalletNodesColumns = []*schema.Column{
+		{Name: "coin_info_id", Type: field.TypeUUID},
+		{Name: "wallet_node_id", Type: field.TypeInt32},
+	}
+	// CoinInfoWalletNodesTable holds the schema information for the "coin_info_wallet_nodes" table.
+	CoinInfoWalletNodesTable = &schema.Table{
+		Name:       "coin_info_wallet_nodes",
+		Columns:    CoinInfoWalletNodesColumns,
+		PrimaryKey: []*schema.Column{CoinInfoWalletNodesColumns[0], CoinInfoWalletNodesColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "coin_info_wallet_nodes_coin_info_id",
+				Columns:    []*schema.Column{CoinInfoWalletNodesColumns[0]},
+				RefColumns: []*schema.Column{CoinInfosColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "coin_info_wallet_nodes_wallet_node_id",
+				Columns:    []*schema.Column{CoinInfoWalletNodesColumns[1]},
+				RefColumns: []*schema.Column{WalletNodesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// TransactionReviewColumns holds the columns for the "transaction_review" table.
+	TransactionReviewColumns = []*schema.Column{
+		{Name: "transaction_id", Type: field.TypeInt32},
+		{Name: "review_id", Type: field.TypeInt32},
+	}
+	// TransactionReviewTable holds the schema information for the "transaction_review" table.
+	TransactionReviewTable = &schema.Table{
+		Name:       "transaction_review",
+		Columns:    TransactionReviewColumns,
+		PrimaryKey: []*schema.Column{TransactionReviewColumns[0], TransactionReviewColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "transaction_review_transaction_id",
+				Columns:    []*schema.Column{TransactionReviewColumns[0]},
+				RefColumns: []*schema.Column{TransactionsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "transaction_review_review_id",
+				Columns:    []*schema.Column{TransactionReviewColumns[1]},
+				RefColumns: []*schema.Column{ReviewsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		CoinInfosTable,
@@ -217,12 +267,18 @@ var (
 		ReviewsTable,
 		TransactionsTable,
 		WalletNodesTable,
+		CoinInfoReviewsTable,
+		CoinInfoWalletNodesTable,
+		TransactionReviewTable,
 	}
 )
 
 func init() {
-	ReviewsTable.ForeignKeys[0].RefTable = CoinInfosTable
-	ReviewsTable.ForeignKeys[1].RefTable = TransactionsTable
 	TransactionsTable.ForeignKeys[0].RefTable = CoinInfosTable
-	WalletNodesTable.ForeignKeys[0].RefTable = CoinInfosTable
+	CoinInfoReviewsTable.ForeignKeys[0].RefTable = CoinInfosTable
+	CoinInfoReviewsTable.ForeignKeys[1].RefTable = ReviewsTable
+	CoinInfoWalletNodesTable.ForeignKeys[0].RefTable = CoinInfosTable
+	CoinInfoWalletNodesTable.ForeignKeys[1].RefTable = WalletNodesTable
+	TransactionReviewTable.ForeignKeys[0].RefTable = TransactionsTable
+	TransactionReviewTable.ForeignKeys[1].RefTable = ReviewsTable
 }

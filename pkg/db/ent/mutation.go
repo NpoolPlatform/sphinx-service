@@ -1085,9 +1085,11 @@ type ReviewMutation struct {
 	updatetime_utc     *int64
 	addupdatetime_utc  *int64
 	clearedFields      map[string]struct{}
-	transaction        *int32
+	transaction        map[int32]struct{}
+	removedtransaction map[int32]struct{}
 	clearedtransaction bool
-	coin               *uuid.UUID
+	coin               map[uuid.UUID]struct{}
+	removedcoin        map[uuid.UUID]struct{}
 	clearedcoin        bool
 	done               bool
 	oldValue           func(context.Context) (*Review, error)
@@ -1363,9 +1365,14 @@ func (m *ReviewMutation) ResetUpdatetimeUtc() {
 	m.addupdatetime_utc = nil
 }
 
-// SetTransactionID sets the "transaction" edge to the Transaction entity by id.
-func (m *ReviewMutation) SetTransactionID(id int32) {
-	m.transaction = &id
+// AddTransactionIDs adds the "transaction" edge to the Transaction entity by ids.
+func (m *ReviewMutation) AddTransactionIDs(ids ...int32) {
+	if m.transaction == nil {
+		m.transaction = make(map[int32]struct{})
+	}
+	for i := range ids {
+		m.transaction[ids[i]] = struct{}{}
+	}
 }
 
 // ClearTransaction clears the "transaction" edge to the Transaction entity.
@@ -1378,20 +1385,29 @@ func (m *ReviewMutation) TransactionCleared() bool {
 	return m.clearedtransaction
 }
 
-// TransactionID returns the "transaction" edge ID in the mutation.
-func (m *ReviewMutation) TransactionID() (id int32, exists bool) {
-	if m.transaction != nil {
-		return *m.transaction, true
+// RemoveTransactionIDs removes the "transaction" edge to the Transaction entity by IDs.
+func (m *ReviewMutation) RemoveTransactionIDs(ids ...int32) {
+	if m.removedtransaction == nil {
+		m.removedtransaction = make(map[int32]struct{})
+	}
+	for i := range ids {
+		delete(m.transaction, ids[i])
+		m.removedtransaction[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedTransaction returns the removed IDs of the "transaction" edge to the Transaction entity.
+func (m *ReviewMutation) RemovedTransactionIDs() (ids []int32) {
+	for id := range m.removedtransaction {
+		ids = append(ids, id)
 	}
 	return
 }
 
 // TransactionIDs returns the "transaction" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// TransactionID instead. It exists only for internal usage by the builders.
 func (m *ReviewMutation) TransactionIDs() (ids []int32) {
-	if id := m.transaction; id != nil {
-		ids = append(ids, *id)
+	for id := range m.transaction {
+		ids = append(ids, id)
 	}
 	return
 }
@@ -1400,11 +1416,17 @@ func (m *ReviewMutation) TransactionIDs() (ids []int32) {
 func (m *ReviewMutation) ResetTransaction() {
 	m.transaction = nil
 	m.clearedtransaction = false
+	m.removedtransaction = nil
 }
 
-// SetCoinID sets the "coin" edge to the CoinInfo entity by id.
-func (m *ReviewMutation) SetCoinID(id uuid.UUID) {
-	m.coin = &id
+// AddCoinIDs adds the "coin" edge to the CoinInfo entity by ids.
+func (m *ReviewMutation) AddCoinIDs(ids ...uuid.UUID) {
+	if m.coin == nil {
+		m.coin = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.coin[ids[i]] = struct{}{}
+	}
 }
 
 // ClearCoin clears the "coin" edge to the CoinInfo entity.
@@ -1417,20 +1439,29 @@ func (m *ReviewMutation) CoinCleared() bool {
 	return m.clearedcoin
 }
 
-// CoinID returns the "coin" edge ID in the mutation.
-func (m *ReviewMutation) CoinID() (id uuid.UUID, exists bool) {
-	if m.coin != nil {
-		return *m.coin, true
+// RemoveCoinIDs removes the "coin" edge to the CoinInfo entity by IDs.
+func (m *ReviewMutation) RemoveCoinIDs(ids ...uuid.UUID) {
+	if m.removedcoin == nil {
+		m.removedcoin = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.coin, ids[i])
+		m.removedcoin[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedCoin returns the removed IDs of the "coin" edge to the CoinInfo entity.
+func (m *ReviewMutation) RemovedCoinIDs() (ids []uuid.UUID) {
+	for id := range m.removedcoin {
+		ids = append(ids, id)
 	}
 	return
 }
 
 // CoinIDs returns the "coin" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// CoinID instead. It exists only for internal usage by the builders.
 func (m *ReviewMutation) CoinIDs() (ids []uuid.UUID) {
-	if id := m.coin; id != nil {
-		ids = append(ids, *id)
+	for id := range m.coin {
+		ids = append(ids, id)
 	}
 	return
 }
@@ -1439,6 +1470,7 @@ func (m *ReviewMutation) CoinIDs() (ids []uuid.UUID) {
 func (m *ReviewMutation) ResetCoin() {
 	m.coin = nil
 	m.clearedcoin = false
+	m.removedcoin = nil
 }
 
 // Where appends a list predicates to the ReviewMutation builder.
@@ -1652,13 +1684,17 @@ func (m *ReviewMutation) AddedEdges() []string {
 func (m *ReviewMutation) AddedIDs(name string) []ent.Value {
 	switch name {
 	case review.EdgeTransaction:
-		if id := m.transaction; id != nil {
-			return []ent.Value{*id}
+		ids := make([]ent.Value, 0, len(m.transaction))
+		for id := range m.transaction {
+			ids = append(ids, id)
 		}
+		return ids
 	case review.EdgeCoin:
-		if id := m.coin; id != nil {
-			return []ent.Value{*id}
+		ids := make([]ent.Value, 0, len(m.coin))
+		for id := range m.coin {
+			ids = append(ids, id)
 		}
+		return ids
 	}
 	return nil
 }
@@ -1666,6 +1702,12 @@ func (m *ReviewMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ReviewMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 2)
+	if m.removedtransaction != nil {
+		edges = append(edges, review.EdgeTransaction)
+	}
+	if m.removedcoin != nil {
+		edges = append(edges, review.EdgeCoin)
+	}
 	return edges
 }
 
@@ -1673,6 +1715,18 @@ func (m *ReviewMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *ReviewMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
+	case review.EdgeTransaction:
+		ids := make([]ent.Value, 0, len(m.removedtransaction))
+		for id := range m.removedtransaction {
+			ids = append(ids, id)
+		}
+		return ids
+	case review.EdgeCoin:
+		ids := make([]ent.Value, 0, len(m.removedcoin))
+		for id := range m.removedcoin {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
@@ -1705,12 +1759,6 @@ func (m *ReviewMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *ReviewMutation) ClearEdge(name string) error {
 	switch name {
-	case review.EdgeTransaction:
-		m.ClearTransaction()
-		return nil
-	case review.EdgeCoin:
-		m.ClearCoin()
-		return nil
 	}
 	return fmt.Errorf("unknown Review unique edge %s", name)
 }
@@ -3032,7 +3080,8 @@ type WalletNodeMutation struct {
 	last_online_time_utc    *int64
 	addlast_online_time_utc *int64
 	clearedFields           map[string]struct{}
-	coin                    *uuid.UUID
+	coin                    map[uuid.UUID]struct{}
+	removedcoin             map[uuid.UUID]struct{}
 	clearedcoin             bool
 	done                    bool
 	oldValue                func(context.Context) (*WalletNode, error)
@@ -3416,9 +3465,14 @@ func (m *WalletNodeMutation) ResetLastOnlineTimeUtc() {
 	m.addlast_online_time_utc = nil
 }
 
-// SetCoinID sets the "coin" edge to the CoinInfo entity by id.
-func (m *WalletNodeMutation) SetCoinID(id uuid.UUID) {
-	m.coin = &id
+// AddCoinIDs adds the "coin" edge to the CoinInfo entity by ids.
+func (m *WalletNodeMutation) AddCoinIDs(ids ...uuid.UUID) {
+	if m.coin == nil {
+		m.coin = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.coin[ids[i]] = struct{}{}
+	}
 }
 
 // ClearCoin clears the "coin" edge to the CoinInfo entity.
@@ -3431,20 +3485,29 @@ func (m *WalletNodeMutation) CoinCleared() bool {
 	return m.clearedcoin
 }
 
-// CoinID returns the "coin" edge ID in the mutation.
-func (m *WalletNodeMutation) CoinID() (id uuid.UUID, exists bool) {
-	if m.coin != nil {
-		return *m.coin, true
+// RemoveCoinIDs removes the "coin" edge to the CoinInfo entity by IDs.
+func (m *WalletNodeMutation) RemoveCoinIDs(ids ...uuid.UUID) {
+	if m.removedcoin == nil {
+		m.removedcoin = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.coin, ids[i])
+		m.removedcoin[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedCoin returns the removed IDs of the "coin" edge to the CoinInfo entity.
+func (m *WalletNodeMutation) RemovedCoinIDs() (ids []uuid.UUID) {
+	for id := range m.removedcoin {
+		ids = append(ids, id)
 	}
 	return
 }
 
 // CoinIDs returns the "coin" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// CoinID instead. It exists only for internal usage by the builders.
 func (m *WalletNodeMutation) CoinIDs() (ids []uuid.UUID) {
-	if id := m.coin; id != nil {
-		ids = append(ids, *id)
+	for id := range m.coin {
+		ids = append(ids, id)
 	}
 	return
 }
@@ -3453,6 +3516,7 @@ func (m *WalletNodeMutation) CoinIDs() (ids []uuid.UUID) {
 func (m *WalletNodeMutation) ResetCoin() {
 	m.coin = nil
 	m.clearedcoin = false
+	m.removedcoin = nil
 }
 
 // Where appends a list predicates to the WalletNodeMutation builder.
@@ -3714,9 +3778,11 @@ func (m *WalletNodeMutation) AddedEdges() []string {
 func (m *WalletNodeMutation) AddedIDs(name string) []ent.Value {
 	switch name {
 	case walletnode.EdgeCoin:
-		if id := m.coin; id != nil {
-			return []ent.Value{*id}
+		ids := make([]ent.Value, 0, len(m.coin))
+		for id := range m.coin {
+			ids = append(ids, id)
 		}
+		return ids
 	}
 	return nil
 }
@@ -3724,6 +3790,9 @@ func (m *WalletNodeMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *WalletNodeMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 1)
+	if m.removedcoin != nil {
+		edges = append(edges, walletnode.EdgeCoin)
+	}
 	return edges
 }
 
@@ -3731,6 +3800,12 @@ func (m *WalletNodeMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *WalletNodeMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
+	case walletnode.EdgeCoin:
+		ids := make([]ent.Value, 0, len(m.removedcoin))
+		for id := range m.removedcoin {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
@@ -3758,9 +3833,6 @@ func (m *WalletNodeMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *WalletNodeMutation) ClearEdge(name string) error {
 	switch name {
-	case walletnode.EdgeCoin:
-		m.ClearCoin()
-		return nil
 	}
 	return fmt.Errorf("unknown WalletNode unique edge %s", name)
 }

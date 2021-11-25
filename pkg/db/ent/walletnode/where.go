@@ -853,7 +853,7 @@ func HasCoin() predicate.WalletNode {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(CoinTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, CoinTable, CoinColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, CoinTable, CoinPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -865,7 +865,7 @@ func HasCoinWith(preds ...predicate.CoinInfo) predicate.WalletNode {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(CoinInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, CoinTable, CoinColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, CoinTable, CoinPrimaryKey...),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

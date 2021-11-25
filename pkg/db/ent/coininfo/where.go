@@ -584,7 +584,7 @@ func HasReviews() predicate.CoinInfo {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(ReviewsTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, ReviewsTable, ReviewsColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, ReviewsTable, ReviewsPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -596,7 +596,7 @@ func HasReviewsWith(preds ...predicate.Review) predicate.CoinInfo {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(ReviewsInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, ReviewsTable, ReviewsColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, ReviewsTable, ReviewsPrimaryKey...),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
@@ -612,7 +612,7 @@ func HasWalletNodes() predicate.CoinInfo {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(WalletNodesTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, WalletNodesTable, WalletNodesColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, WalletNodesTable, WalletNodesPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -624,7 +624,7 @@ func HasWalletNodesWith(preds ...predicate.WalletNode) predicate.CoinInfo {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(WalletNodesInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, WalletNodesTable, WalletNodesColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, WalletNodesTable, WalletNodesPrimaryKey...),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

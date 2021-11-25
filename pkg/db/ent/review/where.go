@@ -402,7 +402,7 @@ func HasTransaction() predicate.Review {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(TransactionTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, TransactionTable, TransactionColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, TransactionTable, TransactionPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -414,7 +414,7 @@ func HasTransactionWith(preds ...predicate.Transaction) predicate.Review {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(TransactionInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, TransactionTable, TransactionColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, TransactionTable, TransactionPrimaryKey...),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
@@ -430,7 +430,7 @@ func HasCoin() predicate.Review {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(CoinTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, CoinTable, CoinColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, CoinTable, CoinPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -442,7 +442,7 @@ func HasCoinWith(preds ...predicate.CoinInfo) predicate.Review {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(CoinInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, CoinTable, CoinColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, CoinTable, CoinPrimaryKey...),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

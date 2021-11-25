@@ -7,10 +7,7 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/review"
-	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
-	"github.com/google/uuid"
 )
 
 // Review is the model entity for the Review schema.
@@ -28,45 +25,33 @@ type Review struct {
 	UpdatetimeUtc int64 `json:"updatetime_utc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ReviewQuery when eager-loading is set.
-	Edges              ReviewEdges `json:"edges"`
-	coin_info_reviews  *uuid.UUID
-	transaction_review *int32
+	Edges ReviewEdges `json:"edges"`
 }
 
 // ReviewEdges holds the relations/edges for other nodes in the graph.
 type ReviewEdges struct {
 	// Transaction holds the value of the transaction edge.
-	Transaction *Transaction `json:"transaction,omitempty"`
+	Transaction []*Transaction `json:"transaction,omitempty"`
 	// Coin holds the value of the coin edge.
-	Coin *CoinInfo `json:"coin,omitempty"`
+	Coin []*CoinInfo `json:"coin,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
 }
 
 // TransactionOrErr returns the Transaction value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e ReviewEdges) TransactionOrErr() (*Transaction, error) {
+// was not loaded in eager-loading.
+func (e ReviewEdges) TransactionOrErr() ([]*Transaction, error) {
 	if e.loadedTypes[0] {
-		if e.Transaction == nil {
-			// The edge transaction was loaded in eager-loading,
-			// but was not found.
-			return nil, &NotFoundError{label: transaction.Label}
-		}
 		return e.Transaction, nil
 	}
 	return nil, &NotLoadedError{edge: "transaction"}
 }
 
 // CoinOrErr returns the Coin value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e ReviewEdges) CoinOrErr() (*CoinInfo, error) {
+// was not loaded in eager-loading.
+func (e ReviewEdges) CoinOrErr() ([]*CoinInfo, error) {
 	if e.loadedTypes[1] {
-		if e.Coin == nil {
-			// The edge coin was loaded in eager-loading,
-			// but was not found.
-			return nil, &NotFoundError{label: coininfo.Label}
-		}
 		return e.Coin, nil
 	}
 	return nil, &NotLoadedError{edge: "coin"}
@@ -83,10 +68,6 @@ func (*Review) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullInt64)
 		case review.FieldOperatorNote:
 			values[i] = new(sql.NullString)
-		case review.ForeignKeys[0]: // coin_info_reviews
-			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
-		case review.ForeignKeys[1]: // transaction_review
-			values[i] = new(sql.NullInt64)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Review", columns[i])
 		}
@@ -131,20 +112,6 @@ func (r *Review) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field updatetime_utc", values[i])
 			} else if value.Valid {
 				r.UpdatetimeUtc = value.Int64
-			}
-		case review.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullScanner); !ok {
-				return fmt.Errorf("unexpected type %T for field coin_info_reviews", values[i])
-			} else if value.Valid {
-				r.coin_info_reviews = new(uuid.UUID)
-				*r.coin_info_reviews = *value.S.(*uuid.UUID)
-			}
-		case review.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field transaction_review", value)
-			} else if value.Valid {
-				r.transaction_review = new(int32)
-				*r.transaction_review = int32(value.Int64)
 			}
 		}
 	}
