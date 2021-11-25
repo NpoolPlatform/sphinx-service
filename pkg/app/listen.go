@@ -65,7 +65,7 @@ func ListenTillSucceeded(transactionIDInsite string) (val *trading.ACKRequest, e
 			err = xerrors.New("tx rejected by proxy")
 		}
 		delete(mapACK, transactionIDInsite)
-		logger.Sugar().Infof("[listener] %v got resp and return %+v", transactionIDInsite, val)
+		logger.Sugar().Infof("[listener] %v got resp and return %v", transactionIDInsite, val)
 	} else {
 		err = xerrors.New("request timeout, please try again later")
 	}
