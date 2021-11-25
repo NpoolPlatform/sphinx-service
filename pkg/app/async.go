@@ -17,6 +17,7 @@ import (
 
 // next-version TODO send transaction when it be approved
 func MockApproveTransaction(tx *ent.Transaction) (err error) {
+	logger.Sugar().Infof("approving transaction %v", tx.ID)
 	// Approve result override
 	_, err = db.Client().Transaction.Update().
 		SetMutex(false).
@@ -33,6 +34,7 @@ func MockApproveTransaction(tx *ent.Transaction) (err error) {
 }
 
 func LetSendTransaction(tx *ent.Transaction) (txNew *ent.Transaction, err error) {
+	logger.Sugar().Infof("sending transaction %v", tx.ID)
 	// Get coin info
 	coinInfo, err := tx.QueryCoin().Only(context.Background())
 	if err != nil {
@@ -56,6 +58,7 @@ func LetSendTransaction(tx *ent.Transaction) (txNew *ent.Transaction, err error)
 		IsSuccess:           false, // no need
 		IsFailed:            false, // no need
 	})
+	logger.Sugar().Infof("notification sent %v", err)
 	if err != nil {
 		err = xerrors.Errorf("failed to send transaction to proxy: %v", err)
 		return

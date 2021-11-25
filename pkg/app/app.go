@@ -158,6 +158,9 @@ func CreateTransaction(ctx context.Context, in *trading.CreateTransactionRequest
 		err = status.Errorf(codes.Internal, "cannot notify transaction approval service, error: %v", err)
 		return
 	}
+	resp = &trading.CreateTransactionResponse{
+		Info: in.Info,
+	}
 	return resp, err
 }
 

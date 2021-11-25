@@ -12,7 +12,6 @@ func (s *Server) GetWalletBalance(ctx context.Context, in *npool.GetWalletBalanc
 	resp, err = app.GetWalletBalance(ctx, in)
 	if err != nil {
 		err = PatchGRPCError(err, "get wallet balance")
-		resp = &npool.GetWalletBalanceResponse{}
 	}
 	return
 }
@@ -22,7 +21,6 @@ func (s *Server) CreateTransaction(ctx context.Context, in *npool.CreateTransact
 	resp, err = app.CreateTransaction(ctx, in)
 	if err != nil {
 		err = PatchGRPCError(err, "create transaction")
-		resp = &npool.CreateTransactionResponse{}
 	}
 	return
 }
@@ -32,7 +30,6 @@ func (s *Server) GetTransaction(ctx context.Context, in *npool.GetTransactionReq
 	resp, err = app.GetTransaction(ctx, in)
 	if err != nil {
 		err = PatchGRPCError(err, "get transaction")
-		resp = &npool.GetTransactionResponse{}
 	}
 	return
 }
@@ -42,7 +39,6 @@ func (s *Server) CreateWallet(ctx context.Context, in *npool.CreateWalletRequest
 	resp, err = app.CreateWallet(ctx, in.CoinName, in.UUID)
 	if err != nil {
 		err = PatchGRPCError(err, "create wallet")
-		resp = &npool.CreateWalletResponse{}
 	}
 	return
 }
