@@ -52,8 +52,7 @@ func (Transaction) Indexes() []ent.Index {
 		index.Fields("status"),
 		index.Fields("createtime_utc"),
 		index.Fields("transaction_id_insite").
-			Edges("coin").Unique(),
-		index.Fields("transaction_id_chain").
-			Edges("coin").Unique(),
+			Unique(),
+		index.Fields("transaction_id_chain"),
 	}
 }

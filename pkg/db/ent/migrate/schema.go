@@ -151,14 +151,14 @@ var (
 				Columns: []*schema.Column{TransactionsColumns[13]},
 			},
 			{
-				Name:    "transaction_transaction_id_insite_coin_info_transactions",
+				Name:    "transaction_transaction_id_insite",
 				Unique:  true,
-				Columns: []*schema.Column{TransactionsColumns[7], TransactionsColumns[15]},
+				Columns: []*schema.Column{TransactionsColumns[7]},
 			},
 			{
-				Name:    "transaction_transaction_id_chain_coin_info_transactions",
-				Unique:  true,
-				Columns: []*schema.Column{TransactionsColumns[8], TransactionsColumns[15]},
+				Name:    "transaction_transaction_id_chain",
+				Unique:  false,
+				Columns: []*schema.Column{TransactionsColumns[8]},
 			},
 		},
 	}
