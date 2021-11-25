@@ -4,7 +4,6 @@ package ent
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"entgo.io/ent/dialect/sql"
@@ -164,6 +163,14 @@ func (tu *TransactionUpdate) SetCoinID(id uuid.UUID) *TransactionUpdate {
 	return tu
 }
 
+// SetNillableCoinID sets the "coin" edge to the CoinInfo entity by ID if the given value is not nil.
+func (tu *TransactionUpdate) SetNillableCoinID(id *uuid.UUID) *TransactionUpdate {
+	if id != nil {
+		tu = tu.SetCoinID(*id)
+	}
+	return tu
+}
+
 // SetCoin sets the "coin" edge to the CoinInfo entity.
 func (tu *TransactionUpdate) SetCoin(c *CoinInfo) *TransactionUpdate {
 	return tu.SetCoinID(c.ID)
@@ -317,9 +324,6 @@ func (tu *TransactionUpdate) check() error {
 		if err := transaction.SignaturePlatformValidator(v); err != nil {
 			return &ValidationError{Name: "signature_platform", err: fmt.Errorf("ent: validator failed for field \"signature_platform\": %w", err)}
 		}
-	}
-	if _, ok := tu.mutation.CoinID(); tu.mutation.CoinCleared() && !ok {
-		return errors.New("ent: clearing a required unique edge \"coin\"")
 	}
 	return nil
 }
@@ -710,6 +714,14 @@ func (tuo *TransactionUpdateOne) SetCoinID(id uuid.UUID) *TransactionUpdateOne {
 	return tuo
 }
 
+// SetNillableCoinID sets the "coin" edge to the CoinInfo entity by ID if the given value is not nil.
+func (tuo *TransactionUpdateOne) SetNillableCoinID(id *uuid.UUID) *TransactionUpdateOne {
+	if id != nil {
+		tuo = tuo.SetCoinID(*id)
+	}
+	return tuo
+}
+
 // SetCoin sets the "coin" edge to the CoinInfo entity.
 func (tuo *TransactionUpdateOne) SetCoin(c *CoinInfo) *TransactionUpdateOne {
 	return tuo.SetCoinID(c.ID)
@@ -870,9 +882,6 @@ func (tuo *TransactionUpdateOne) check() error {
 		if err := transaction.SignaturePlatformValidator(v); err != nil {
 			return &ValidationError{Name: "signature_platform", err: fmt.Errorf("ent: validator failed for field \"signature_platform\": %w", err)}
 		}
-	}
-	if _, ok := tuo.mutation.CoinID(); tuo.mutation.CoinCleared() && !ok {
-		return errors.New("ent: clearing a required unique edge \"coin\"")
 	}
 	return nil
 }

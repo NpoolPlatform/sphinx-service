@@ -134,6 +134,14 @@ func (tc *TransactionCreate) SetCoinID(id uuid.UUID) *TransactionCreate {
 	return tc
 }
 
+// SetNillableCoinID sets the "coin" edge to the CoinInfo entity by ID if the given value is not nil.
+func (tc *TransactionCreate) SetNillableCoinID(id *uuid.UUID) *TransactionCreate {
+	if id != nil {
+		tc = tc.SetCoinID(*id)
+	}
+	return tc
+}
+
 // SetCoin sets the "coin" edge to the CoinInfo entity.
 func (tc *TransactionCreate) SetCoin(c *CoinInfo) *TransactionCreate {
 	return tc.SetCoinID(c.ID)
@@ -318,9 +326,6 @@ func (tc *TransactionCreate) check() error {
 	}
 	if _, ok := tc.mutation.UpdatetimeUtc(); !ok {
 		return &ValidationError{Name: "updatetime_utc", err: errors.New(`ent: missing required field "updatetime_utc"`)}
-	}
-	if _, ok := tc.mutation.CoinID(); !ok {
-		return &ValidationError{Name: "coin", err: errors.New("ent: missing required edge \"coin\"")}
 	}
 	return nil
 }

@@ -38,7 +38,7 @@ func (Transaction) Fields() []ent.Field {
 
 func (Transaction) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("coin", CoinInfo.Type).Ref("transactions").Unique().Required(),
+		edge.From("coin", CoinInfo.Type).Ref("transactions").Unique(),
 		edge.To("review", Review.Type),
 	}
 }
