@@ -11,8 +11,8 @@ const FlagPrintError = true
 // only for api layer
 // in apps please use xerrors instead
 func PatchGRPCError(errOri error, msg string) (err error) {
-	if err != nil {
-		logger.Sugar().Warn(msg, errOri)
+	if errOri != nil {
+		logger.Sugar().Warnf("grpc warn, "+msg+" %v", errOri)
 		if !FlagPrintError {
 			err = status.Error(codes.Internal, "[api] internal server error")
 		} else {
