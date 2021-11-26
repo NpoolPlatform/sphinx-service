@@ -15,13 +15,9 @@ import (
 	"golang.org/x/xerrors"
 )
 
-var (
-	ctxPublic     context.Context
-	txType2Status map[signproxy.TransactionType]transaction.Status
-)
+var txType2Status map[signproxy.TransactionType]transaction.Status
 
 func init() {
-	ctxPublic = context.Background()
 	// Transaction State Machine
 	txType2Status = make(map[signproxy.TransactionType]transaction.Status, 4)
 	txType2Status[signproxy.TransactionType_TransactionNew] = transaction.StatusPendingProcess
@@ -32,13 +28,13 @@ func init() {
 
 func CreateTransaction(ctx context.Context, in *trading.CreateTransactionRequest, needManualReview bool, txType transaction.Type) (info *ent.Transaction, err error) {
 	// get coin info
-	coinInfo, err := db.Client().CoinInfo.Query().Where(coininfo.Name(in.Info.CoinName)).Only(ctxPublic)
+	coinInfo, err := db.Client().CoinInfo.Query().Where(coininfo.Name(in.Info.CoinName)).Only(ctx)
 	if err != nil {
 		err = xerrors.Errorf(in.Info.CoinName+" coin not found %v", err)
 		return
 	}
 	// check if exists
-	info, err = GetSameTransactionOrNil(in)
+	info, err = GetSameTransactionOrNil(ctx, in)
 	if info != nil {
 		return info, err
 	}
@@ -59,18 +55,18 @@ func CreateTransaction(ctx context.Context, in *trading.CreateTransactionRequest
 		SetCreatetimeUtc(time.Now().UTC().Unix()).
 		SetUpdatetimeUtc(time.Now().UTC().Unix()).
 		SetCoin(coinInfo).
-		Save(ctxPublic)
+		Save(ctx)
 	return info, err
 }
 
-func GetSameTransactionOrNil(in *trading.CreateTransactionRequest) (record *ent.Transaction, err error) {
+func GetSameTransactionOrNil(ctx context.Context, in *trading.CreateTransactionRequest) (record *ent.Transaction, err error) {
 	var info []*ent.Transaction
 	info, err = db.Client().Transaction.Query().
 		Where(
 			transaction.And(
 				transaction.TransactionIDInsite(in.Info.TransactionIDInsite),
 			),
-		).All(ctxPublic)
+		).All(ctx)
 	if err != nil {
 		return
 	}
@@ -78,7 +74,7 @@ func GetSameTransactionOrNil(in *trading.CreateTransactionRequest) (record *ent.
 		if len(info) > 1 {
 			err = xerrors.New("impossible")
 		}
-		coinInfo, err := info[0].QueryCoin().Only(ctxPublic)
+		coinInfo, err := info[0].QueryCoin().Only(ctx)
 		if err != nil {
 			err = xerrors.Errorf("transaction no coininfo %v", err)
 			return record, err

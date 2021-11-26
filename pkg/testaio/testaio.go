@@ -15,15 +15,19 @@ var (
 	Host        string
 	RestyClient *resty.Client
 	AccountInfo = trading.EntAccount{
-		CoinName: "Unknown",
+		CoinName: "FIL",
 		Address:  "testaddresshere",
 	}
-	CoinInfo = coininfo.CoinInfo{
-		ID:        "6ba7b812-9dad-11d1-80b4-00c04fd430c8",
-		Enum:      0,
+	AddressFrom   = "t15kaul3frzthweyc44njodf7qjch7nbrhatmrrui"
+	AddressTo     = "t13cjqm4dlj26huz4y7bobaqh2m542stvunznmiqa"
+	AmountFloat64 = 0.01
+	InsiteTxType  = "payment"
+	CoinInfo      = coininfo.CoinInfo{
+		ID:        "8fbcbdc2-25ea-4ff0-b049-9d2f4c8ab646",
+		Enum:      1,
 		PreSale:   false,
-		Name:      "Unknown",
-		Unit:      "DK",
+		Name:      "FIL",
+		Unit:      "FIL",
 		LogoImage: "",
 	}
 	AccountUUID         = "6ba7b812-9dad-80b4-11d1-00c04fd430c8"
