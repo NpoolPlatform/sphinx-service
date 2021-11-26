@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"testing"
 	"time"
 
@@ -10,7 +9,6 @@ import (
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger" //nolint
 	"github.com/NpoolPlatform/message/npool/signproxy"
 	"github.com/NpoolPlatform/message/npool/trading"
-	testinit "github.com/NpoolPlatform/sphinx-service/pkg/test-init"
 	"github.com/NpoolPlatform/sphinx-service/pkg/testaio"
 	resty "github.com/go-resty/resty/v2"
 	"golang.org/x/xerrors"
@@ -181,12 +179,4 @@ func init() {
 		return
 	}
 	testaio.RestyClient = resty.New()
-	if testaio.InitAlready == false {
-		err = testinit.Init()
-		if err != nil {
-			panic(fmt.Sprintf("test init failed, %+v", err))
-		} else {
-			testaio.InitAlready = true
-		}
-	}
 }
