@@ -20,7 +20,7 @@ func TestCRUD(t *testing.T) {
 		return
 	}
 	if !testaio.InitAlready {
-		assert.Nil(t, testinit.Init().Error())
+		assert.Nil(t, testinit.Init())
 		testaio.InitAlready = true
 	}
 	ctx := context.Background()
