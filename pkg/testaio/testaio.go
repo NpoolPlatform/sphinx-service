@@ -3,11 +3,13 @@ package testaio
 import (
 	"os"
 	"strconv"
+	"testing"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	"github.com/NpoolPlatform/message/npool/coininfo"
 	"github.com/NpoolPlatform/message/npool/trading"
 	"github.com/go-resty/resty/v2"
+	"github.com/stretchr/testify/assert"
 )
 
 var (
@@ -47,6 +49,13 @@ func LogWhenError(err error) {
 	if err != nil {
 		logger.Sugar().Warn(err)
 	}
+}
+
+func AbortWhenError(t *testing.T, err error) {
+	if err != nil {
+		logger.Sugar().Warn(err)
+	}
+	assert.Nil(t, err)
 }
 
 func RunByGithub() bool {
