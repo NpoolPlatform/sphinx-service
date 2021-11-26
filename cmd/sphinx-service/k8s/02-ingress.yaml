@@ -15,7 +15,7 @@ spec:
     - host: api.npool.top
       http:
         paths:
-          - path: /sphinx-service
+          - path: /api/sphinx-service
             backend:
               serviceName: sphinx-service
               servicePort: 50160
@@ -39,7 +39,7 @@ spec:
     - host: api.xpool.top
       http:
         paths:
-          - path: /sphinx-service
+          - path: /api/sphinx-service
             backend:
               serviceName: sphinx-service
               servicePort: 50160
@@ -54,4 +54,4 @@ metadata:
 spec:
   stripPrefix:
     prefixes:
-      - /sphinx-service
+      - /api/sphinx-service
