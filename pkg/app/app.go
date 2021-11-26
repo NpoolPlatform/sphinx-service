@@ -18,6 +18,11 @@ import (
 	"google.golang.org/grpc/codes"
 )
 
+/* next-version:
+async ==> sync
+MQ+Listener ==> GRPC call
+(for HA support)
+*/
 func CreateWallet(ctx context.Context, coinName, uuid string) (resp *trading.CreateWalletResponse, err error) {
 	// Check if coin exists
 	coinInfo, err := crud.CoinName2Coin(ctx, coinName)
@@ -71,6 +76,7 @@ func CreateWallet(ctx context.Context, coinName, uuid string) (resp *trading.Cre
 	return resp, err
 }
 
+// rewrite in next-version, same as CreateWallet
 func GetWalletBalance(ctx context.Context, in *trading.GetWalletBalanceRequest) (resp *trading.GetWalletBalanceResponse, err error) {
 	// Check coin
 	coinInfo, err := crud.CoinName2Coin(ctx, in.Info.CoinName)
@@ -145,7 +151,7 @@ func CreateTransaction(ctx context.Context, in *trading.CreateTransactionRequest
 	}
 
 	// Insert sql record
-	info, err := crud.CreateRecordTransaction(in, needManualReview, txType)
+	info, err := crud.CreateTransaction(ctx, in, needManualReview, txType)
 	if err != nil {
 		// if same transaction(and signature), err == nil, return old record.
 		// if TID exists but not same, err happens here;
@@ -164,6 +170,9 @@ func CreateTransaction(ctx context.Context, in *trading.CreateTransactionRequest
 	return resp, err
 }
 
+/* Select row from database;
+transaction status should have been updated by notifications from signproxy
+*/
 func GetTransaction(ctx context.Context, in *trading.GetTransactionRequest) (resp *trading.GetTransactionResponse, err error) {
 	transactionRow, err := crud.GetTransaction(ctx, in)
 	if err == nil {
@@ -197,7 +206,7 @@ func GetTransaction(ctx context.Context, in *trading.GetTransactionRequest) (res
 	return resp, err
 }
 
-// Version (original code)
+// Version
 func Version() (*trading.VersionResponse, error) {
 	info, err := cv.GetVersion()
 	if err != nil {

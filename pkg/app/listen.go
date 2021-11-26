@@ -12,7 +12,7 @@ import (
 	"golang.org/x/xerrors"
 )
 
-// MARK: optimization can be made, use channel (maybe) to improve performance under high qps payload
+// next-version: use channel to improve performance under high qps
 
 var (
 	mapACK              map[string]*trading.ACKRequest
@@ -32,15 +32,15 @@ func init() {
 }
 
 func ACK(ctx context.Context, in *trading.ACKRequest) (resp *trading.ACKResponse, err error) {
-	resp = &trading.ACKResponse{
-		IsOkay: false,
-	}
+	resp = &trading.ACKResponse{}
 	if in.TransactionType == signproxy.TransactionType_TransactionNew ||
 		in.TransactionType == signproxy.TransactionType_PreSign ||
 		in.TransactionType == signproxy.TransactionType_Signature ||
 		in.TransactionType == signproxy.TransactionType_Broadcast {
-		resp.IsOkay, err = crud.UpdateTransactionStatus(ctx, in)
+		err = crud.UpdateTransactionStatusV0(ctx, in)
+		resp.IsOkay = (err == nil)
 	} else {
+		// remove these async logic in next-version
 		ackMutex.Lock()
 		mapACK[in.TransactionIdInsite] = in
 		ackMutex.Unlock()

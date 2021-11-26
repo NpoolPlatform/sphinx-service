@@ -15,13 +15,22 @@ import (
 	"golang.org/x/xerrors"
 )
 
-var ctxPublic context.Context
+var (
+	ctxPublic     context.Context
+	txType2Status map[signproxy.TransactionType]transaction.Status
+)
 
 func init() {
 	ctxPublic = context.Background()
+	// Transaction State Machine
+	txType2Status = make(map[signproxy.TransactionType]transaction.Status, 4)
+	txType2Status[signproxy.TransactionType_TransactionNew] = transaction.StatusPendingProcess
+	txType2Status[signproxy.TransactionType_PreSign] = transaction.StatusPendingSigninfo
+	txType2Status[signproxy.TransactionType_Signature] = transaction.StatusPendingBroadcast
+	txType2Status[signproxy.TransactionType_Broadcast] = transaction.StatusPendingConfirm
 }
 
-func CreateRecordTransaction(in *trading.CreateTransactionRequest, needManualReview bool, txType transaction.Type) (info *ent.Transaction, err error) {
+func CreateTransaction(ctx context.Context, in *trading.CreateTransactionRequest, needManualReview bool, txType transaction.Type) (info *ent.Transaction, err error) {
 	// get coin info
 	coinInfo, err := db.Client().CoinInfo.Query().Where(coininfo.Name(in.Info.CoinName)).Only(ctxPublic)
 	if err != nil {
@@ -29,13 +38,9 @@ func CreateRecordTransaction(in *trading.CreateTransactionRequest, needManualRev
 		return
 	}
 	// check if exists
-	info, err = GetTransactionOrNil(in)
+	info, err = GetSameTransactionOrNil(in)
 	if info != nil {
-		err = xerrors.Errorf("tx already exists: %v", info)
-		return
-	} else if err != nil {
-		err = xerrors.Errorf("db error: %v", err)
-		return
+		return info, err
 	}
 	// do create
 	info, err = db.Client().Transaction.Create().
@@ -58,7 +63,7 @@ func CreateRecordTransaction(in *trading.CreateTransactionRequest, needManualRev
 	return info, err
 }
 
-func GetTransactionOrNil(in *trading.CreateTransactionRequest) (record *ent.Transaction, err error) {
+func GetSameTransactionOrNil(in *trading.CreateTransactionRequest) (record *ent.Transaction, err error) {
 	var info []*ent.Transaction
 	info, err = db.Client().Transaction.Query().
 		Where(
@@ -88,63 +93,46 @@ func GetTransactionOrNil(in *trading.CreateTransactionRequest) (record *ent.Tran
 	return record, err
 }
 
-func UpdateTransactionStatus(ctx context.Context, in *trading.ACKRequest) (isSuccess bool, err error) {
-	isSuccess = true
-	entResp, err := db.Client().Transaction.Query().
-		Where(
-			transaction.And(
-				transaction.TransactionIDInsite(in.TransactionIdInsite),
-			),
-		).
-		First(ctx)
-	if err != nil || entResp == nil {
-		logger.Sugar().Errorf("transaction incorrect, %v", err)
+func UpdateTransactionStatusDeprecated(ctx context.Context, in *trading.ACKRequest) (isSuccess bool, err error) {
+	// half state machine
+	txStatus, ok := txType2Status[in.TransactionType]
+	if !ok {
+		err = xerrors.Errorf("ack tx type incorrect, %v", in)
 		return
 	}
-	flagErr := 0
-	if in.TransactionType == signproxy.TransactionType_TransactionNew {
-		if entResp.Status != transaction.StatusPendingProcess {
-			flagErr = 1
-		}
-		err = entResp.Update().
-			SetStatus(transaction.StatusPendingSigninfo).
-			SetMutex(false).
-			Exec(ctx)
-	} else if in.TransactionType == signproxy.TransactionType_PreSign {
-		if entResp.Status != transaction.StatusPendingSigninfo {
-			flagErr = 1
-		}
-		err = entResp.Update().
-			SetStatus(transaction.StatusPendingSign).
-			SetMutex(false).
-			Exec(ctx)
-	} else if in.TransactionType == signproxy.TransactionType_Signature {
-		if entResp.Status != transaction.StatusPendingSign {
-			flagErr = 1
-		}
-		err = entResp.Update().
-			SetStatus(transaction.StatusPendingBroadcast).
-			SetMutex(false).
-			Exec(ctx)
-	} else if in.TransactionType == signproxy.TransactionType_Broadcast {
-		if entResp.Status != transaction.StatusPendingBroadcast {
-			flagErr = 1
-		}
-		err = entResp.Update().
-			SetStatus(transaction.StatusPendingConfirm).
-			SetTransactionIDChain(in.TransactionIdChain).
-			SetMutex(false).
-			Exec(ctx)
+	err = db.Client().Transaction.Update().
+		Where(
+			transaction.TransactionIDInsite(in.TransactionIdInsite),
+		).
+		SetStatus(txStatus).
+		SetTransactionIDChain(in.TransactionIdChain).
+		SetMutex(false).
+		SetUpdatetimeUtc(time.Now().UTC().Unix()).
+		Exec(ctx)
+	isSuccess = (err == nil)
+	return
+}
+
+func UpdateTransactionStatusV0(ctx context.Context, in *trading.ACKRequest) (err error) {
+	// Judge status
+	var txStatus transaction.Status
+	if !in.IsOkay || in.TransactionIdChain == "" {
+		txStatus = transaction.StatusErrorExpected
+		logger.Sugar().Infof("[proxy] failure reported from proxy, %v", in)
+	} else {
+		txStatus = transaction.StatusDone
 	}
-	if flagErr == 1 {
-		logger.Sugar().Errorf("failed to update transaction status, %v", err)
-		isSuccess = false
-	}
-	if err != nil {
-		logger.Sugar().Errorf("update transaction db failed: %v", err)
-		isSuccess = false
-	}
-	return isSuccess, err
+	// Update db
+	err = db.Client().Transaction.Update().
+		Where(
+			transaction.TransactionIDInsite(in.TransactionIdInsite),
+		).
+		SetStatus(txStatus).
+		SetTransactionIDChain(in.TransactionIdChain).
+		SetMutex(false).
+		SetUpdatetimeUtc(time.Now().UTC().Unix()).
+		Exec(ctx)
+	return
 }
 
 func GetTransaction(ctx context.Context, in *trading.GetTransactionRequest) (resp *ent.Transaction, err error) {

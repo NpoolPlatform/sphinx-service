@@ -15,7 +15,7 @@ import (
 	"golang.org/x/xerrors"
 )
 
-// next-version TODO send transaction when it be approved
+// next-version: link up review service
 func MockApproveTransaction(tx *ent.Transaction) (err error) {
 	logger.Sugar().Infof("approving transaction %v", tx.ID)
 	// Approve result override
