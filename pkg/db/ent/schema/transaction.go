@@ -38,7 +38,7 @@ func (Transaction) Fields() []ent.Field {
 
 func (Transaction) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("coin", CoinInfo.Type).Ref("transactions").Unique(),
+		edge.From("coin", CoinInfo.Type).Ref("transactions").Unique().Required(),
 		edge.To("review", Review.Type),
 	}
 }
@@ -50,7 +50,7 @@ func (Transaction) Indexes() []ent.Index {
 		index.Fields("type"),
 		index.Fields("status"),
 		index.Fields("createtime_utc"),
-		index.Fields("transaction_id_insite").Unique(),
+		index.Fields("transaction_id_insite"),
 		index.Fields("transaction_id_chain"),
 	}
 }

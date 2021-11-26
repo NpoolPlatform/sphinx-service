@@ -33,11 +33,6 @@ var (
 				Unique:  false,
 				Columns: []*schema.Column{CoinInfosColumns[3]},
 			},
-			{
-				Name:    "coininfo_id",
-				Unique:  true,
-				Columns: []*schema.Column{CoinInfosColumns[0]},
-			},
 		},
 	}
 	// EmptiesColumns holds the columns for the "empties" table.
@@ -136,7 +131,7 @@ var (
 			},
 			{
 				Name:    "transaction_transaction_id_insite",
-				Unique:  true,
+				Unique:  false,
 				Columns: []*schema.Column{TransactionsColumns[7]},
 			},
 			{
