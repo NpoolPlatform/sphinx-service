@@ -1,10 +1,12 @@
 package schema
 
 import (
+	"time"
+
 	"entgo.io/ent"
-	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
+	"github.com/google/uuid"
 )
 
 type Transaction struct {
@@ -13,47 +15,44 @@ type Transaction struct {
 
 func (Transaction) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int32("id"),
-		field.Uint64("amount_uint64"),
-		field.Float("amount_float64"),
-		field.String("address_from").MaxLen(64).NotEmpty(),
-		field.String("address_to").MaxLen(64).NotEmpty(),
-		field.Bool("need_manual_review").Default(true),
-		field.Enum("type").
-			Values("recharge", "payment", "withdraw", "unknown"),
-		field.String("transaction_id_insite").
-			MaxLen(64).Unique(),
-		field.String("transaction_id_chain").
-			MaxLen(80),
+		field.UUID("id", uuid.UUID{}).
+			Default(uuid.New).
+			Unique(),
+		field.String("name").Default(""),
+		field.Uint64("amount").Default(0),
+		field.String("from").NotEmpty().Default(""),
+		field.String("to").NotEmpty().Default(""),
+		field.String("transaction_id").NotEmpty().
+			Unique(),
+		field.String("cid").NotEmpty().Default(""),
 		field.Enum("status").
-			Values("pending_review", "pending_process", "pending_signinfo", "pending_sign", "pending_broadcast", "pending_confirm", "done", "rejected", "error", "error_expected"),
-		field.Bool("mutex").
-			Default(false),
-		field.String("signature_user").MaxLen(16),
-		field.String("signature_platform").MaxLen(64),
-		field.Int64("createtime_utc"),
-		field.Int64("updatetime_utc"),
-	}
-}
-
-func (Transaction) Edges() []ent.Edge {
-	return []ent.Edge{
-		edge.From("coin", CoinInfo.Type).Ref("transactions").
-			Unique().Required(),
-		edge.To("review", Review.Type),
+			Values("pending_review", "confirm", "rejected", "pending_transaction", "done"),
+		field.Uint32("created_at").
+			DefaultFunc(func() uint32 {
+				return uint32(time.Now().Unix())
+			}),
+		field.Uint32("updated_at").
+			DefaultFunc(func() uint32 {
+				return uint32(time.Now().Unix())
+			}).
+			UpdateDefault(func() uint32 {
+				return uint32(time.Now().Unix())
+			}),
+		field.Uint32("deleted_at").
+			DefaultFunc(func() uint32 {
+				return 0
+			}),
 	}
 }
 
 func (Transaction) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("address_from"),
-		index.Fields("address_to"),
-		index.Fields("type"),
+		index.Fields("transaction_id").
+			Unique(),
+		index.Fields("from"),
+		index.Fields("to"),
 		index.Fields("status"),
-		index.Fields("createtime_utc"),
-		index.Fields("transaction_id_insite").
-			Edges("coin").Unique(),
-		index.Fields("transaction_id_chain").
-			Edges("coin").Unique(),
+		index.Fields("created_at"),
+		index.Fields("updated_at"),
 	}
 }

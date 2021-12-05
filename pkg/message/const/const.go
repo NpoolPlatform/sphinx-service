@@ -6,11 +6,12 @@ import (
 )
 
 const (
-	ServiceName   = "sphinx-service.npool.top"
-	TradingDomain = "sphinx-service.npool.top"
-	AgentDomain   = "sphinx-service.npool.top"
-	AdminDomain   = "sphinx-service.npool.top"
-	GrpcTimeout   = time.Second * 10
+	ServiceName = "sphinx-service.npool.top"
+)
+
+const (
+	GrpcTimeout = time.Second * 10
+	PageSize    = 10
 )
 
 func GetMQChannel() string {

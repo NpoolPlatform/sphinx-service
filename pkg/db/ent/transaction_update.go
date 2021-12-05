@@ -4,17 +4,13 @@ package ent
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/predicate"
-	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/review"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
-	"github.com/google/uuid"
 )
 
 // TransactionUpdate is the builder for updating Transaction entities.
@@ -30,73 +26,86 @@ func (tu *TransactionUpdate) Where(ps ...predicate.Transaction) *TransactionUpda
 	return tu
 }
 
-// SetAmountUint64 sets the "amount_uint64" field.
-func (tu *TransactionUpdate) SetAmountUint64(u uint64) *TransactionUpdate {
-	tu.mutation.ResetAmountUint64()
-	tu.mutation.SetAmountUint64(u)
+// SetName sets the "name" field.
+func (tu *TransactionUpdate) SetName(s string) *TransactionUpdate {
+	tu.mutation.SetName(s)
 	return tu
 }
 
-// AddAmountUint64 adds u to the "amount_uint64" field.
-func (tu *TransactionUpdate) AddAmountUint64(u uint64) *TransactionUpdate {
-	tu.mutation.AddAmountUint64(u)
-	return tu
-}
-
-// SetAmountFloat64 sets the "amount_float64" field.
-func (tu *TransactionUpdate) SetAmountFloat64(f float64) *TransactionUpdate {
-	tu.mutation.ResetAmountFloat64()
-	tu.mutation.SetAmountFloat64(f)
-	return tu
-}
-
-// AddAmountFloat64 adds f to the "amount_float64" field.
-func (tu *TransactionUpdate) AddAmountFloat64(f float64) *TransactionUpdate {
-	tu.mutation.AddAmountFloat64(f)
-	return tu
-}
-
-// SetAddressFrom sets the "address_from" field.
-func (tu *TransactionUpdate) SetAddressFrom(s string) *TransactionUpdate {
-	tu.mutation.SetAddressFrom(s)
-	return tu
-}
-
-// SetAddressTo sets the "address_to" field.
-func (tu *TransactionUpdate) SetAddressTo(s string) *TransactionUpdate {
-	tu.mutation.SetAddressTo(s)
-	return tu
-}
-
-// SetNeedManualReview sets the "need_manual_review" field.
-func (tu *TransactionUpdate) SetNeedManualReview(b bool) *TransactionUpdate {
-	tu.mutation.SetNeedManualReview(b)
-	return tu
-}
-
-// SetNillableNeedManualReview sets the "need_manual_review" field if the given value is not nil.
-func (tu *TransactionUpdate) SetNillableNeedManualReview(b *bool) *TransactionUpdate {
-	if b != nil {
-		tu.SetNeedManualReview(*b)
+// SetNillableName sets the "name" field if the given value is not nil.
+func (tu *TransactionUpdate) SetNillableName(s *string) *TransactionUpdate {
+	if s != nil {
+		tu.SetName(*s)
 	}
 	return tu
 }
 
-// SetType sets the "type" field.
-func (tu *TransactionUpdate) SetType(t transaction.Type) *TransactionUpdate {
-	tu.mutation.SetType(t)
+// SetAmount sets the "amount" field.
+func (tu *TransactionUpdate) SetAmount(u uint64) *TransactionUpdate {
+	tu.mutation.ResetAmount()
+	tu.mutation.SetAmount(u)
 	return tu
 }
 
-// SetTransactionIDInsite sets the "transaction_id_insite" field.
-func (tu *TransactionUpdate) SetTransactionIDInsite(s string) *TransactionUpdate {
-	tu.mutation.SetTransactionIDInsite(s)
+// SetNillableAmount sets the "amount" field if the given value is not nil.
+func (tu *TransactionUpdate) SetNillableAmount(u *uint64) *TransactionUpdate {
+	if u != nil {
+		tu.SetAmount(*u)
+	}
 	return tu
 }
 
-// SetTransactionIDChain sets the "transaction_id_chain" field.
-func (tu *TransactionUpdate) SetTransactionIDChain(s string) *TransactionUpdate {
-	tu.mutation.SetTransactionIDChain(s)
+// AddAmount adds u to the "amount" field.
+func (tu *TransactionUpdate) AddAmount(u uint64) *TransactionUpdate {
+	tu.mutation.AddAmount(u)
+	return tu
+}
+
+// SetFrom sets the "from" field.
+func (tu *TransactionUpdate) SetFrom(s string) *TransactionUpdate {
+	tu.mutation.SetFrom(s)
+	return tu
+}
+
+// SetNillableFrom sets the "from" field if the given value is not nil.
+func (tu *TransactionUpdate) SetNillableFrom(s *string) *TransactionUpdate {
+	if s != nil {
+		tu.SetFrom(*s)
+	}
+	return tu
+}
+
+// SetTo sets the "to" field.
+func (tu *TransactionUpdate) SetTo(s string) *TransactionUpdate {
+	tu.mutation.SetTo(s)
+	return tu
+}
+
+// SetNillableTo sets the "to" field if the given value is not nil.
+func (tu *TransactionUpdate) SetNillableTo(s *string) *TransactionUpdate {
+	if s != nil {
+		tu.SetTo(*s)
+	}
+	return tu
+}
+
+// SetTransactionID sets the "transaction_id" field.
+func (tu *TransactionUpdate) SetTransactionID(s string) *TransactionUpdate {
+	tu.mutation.SetTransactionID(s)
+	return tu
+}
+
+// SetCid sets the "cid" field.
+func (tu *TransactionUpdate) SetCid(s string) *TransactionUpdate {
+	tu.mutation.SetCid(s)
+	return tu
+}
+
+// SetNillableCid sets the "cid" field if the given value is not nil.
+func (tu *TransactionUpdate) SetNillableCid(s *string) *TransactionUpdate {
+	if s != nil {
+		tu.SetCid(*s)
+	}
 	return tu
 }
 
@@ -106,114 +115,64 @@ func (tu *TransactionUpdate) SetStatus(t transaction.Status) *TransactionUpdate 
 	return tu
 }
 
-// SetMutex sets the "mutex" field.
-func (tu *TransactionUpdate) SetMutex(b bool) *TransactionUpdate {
-	tu.mutation.SetMutex(b)
+// SetCreatedAt sets the "created_at" field.
+func (tu *TransactionUpdate) SetCreatedAt(u uint32) *TransactionUpdate {
+	tu.mutation.ResetCreatedAt()
+	tu.mutation.SetCreatedAt(u)
 	return tu
 }
 
-// SetNillableMutex sets the "mutex" field if the given value is not nil.
-func (tu *TransactionUpdate) SetNillableMutex(b *bool) *TransactionUpdate {
-	if b != nil {
-		tu.SetMutex(*b)
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (tu *TransactionUpdate) SetNillableCreatedAt(u *uint32) *TransactionUpdate {
+	if u != nil {
+		tu.SetCreatedAt(*u)
 	}
 	return tu
 }
 
-// SetSignatureUser sets the "signature_user" field.
-func (tu *TransactionUpdate) SetSignatureUser(s string) *TransactionUpdate {
-	tu.mutation.SetSignatureUser(s)
+// AddCreatedAt adds u to the "created_at" field.
+func (tu *TransactionUpdate) AddCreatedAt(u uint32) *TransactionUpdate {
+	tu.mutation.AddCreatedAt(u)
 	return tu
 }
 
-// SetSignaturePlatform sets the "signature_platform" field.
-func (tu *TransactionUpdate) SetSignaturePlatform(s string) *TransactionUpdate {
-	tu.mutation.SetSignaturePlatform(s)
+// SetUpdatedAt sets the "updated_at" field.
+func (tu *TransactionUpdate) SetUpdatedAt(u uint32) *TransactionUpdate {
+	tu.mutation.ResetUpdatedAt()
+	tu.mutation.SetUpdatedAt(u)
 	return tu
 }
 
-// SetCreatetimeUtc sets the "createtime_utc" field.
-func (tu *TransactionUpdate) SetCreatetimeUtc(i int64) *TransactionUpdate {
-	tu.mutation.ResetCreatetimeUtc()
-	tu.mutation.SetCreatetimeUtc(i)
+// AddUpdatedAt adds u to the "updated_at" field.
+func (tu *TransactionUpdate) AddUpdatedAt(u uint32) *TransactionUpdate {
+	tu.mutation.AddUpdatedAt(u)
 	return tu
 }
 
-// AddCreatetimeUtc adds i to the "createtime_utc" field.
-func (tu *TransactionUpdate) AddCreatetimeUtc(i int64) *TransactionUpdate {
-	tu.mutation.AddCreatetimeUtc(i)
+// SetDeletedAt sets the "deleted_at" field.
+func (tu *TransactionUpdate) SetDeletedAt(u uint32) *TransactionUpdate {
+	tu.mutation.ResetDeletedAt()
+	tu.mutation.SetDeletedAt(u)
 	return tu
 }
 
-// SetUpdatetimeUtc sets the "updatetime_utc" field.
-func (tu *TransactionUpdate) SetUpdatetimeUtc(i int64) *TransactionUpdate {
-	tu.mutation.ResetUpdatetimeUtc()
-	tu.mutation.SetUpdatetimeUtc(i)
-	return tu
-}
-
-// AddUpdatetimeUtc adds i to the "updatetime_utc" field.
-func (tu *TransactionUpdate) AddUpdatetimeUtc(i int64) *TransactionUpdate {
-	tu.mutation.AddUpdatetimeUtc(i)
-	return tu
-}
-
-// SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (tu *TransactionUpdate) SetCoinID(id uuid.UUID) *TransactionUpdate {
-	tu.mutation.SetCoinID(id)
-	return tu
-}
-
-// SetCoin sets the "coin" edge to the CoinInfo entity.
-func (tu *TransactionUpdate) SetCoin(c *CoinInfo) *TransactionUpdate {
-	return tu.SetCoinID(c.ID)
-}
-
-// AddReviewIDs adds the "review" edge to the Review entity by IDs.
-func (tu *TransactionUpdate) AddReviewIDs(ids ...int32) *TransactionUpdate {
-	tu.mutation.AddReviewIDs(ids...)
-	return tu
-}
-
-// AddReview adds the "review" edges to the Review entity.
-func (tu *TransactionUpdate) AddReview(r ...*Review) *TransactionUpdate {
-	ids := make([]int32, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (tu *TransactionUpdate) SetNillableDeletedAt(u *uint32) *TransactionUpdate {
+	if u != nil {
+		tu.SetDeletedAt(*u)
 	}
-	return tu.AddReviewIDs(ids...)
+	return tu
+}
+
+// AddDeletedAt adds u to the "deleted_at" field.
+func (tu *TransactionUpdate) AddDeletedAt(u uint32) *TransactionUpdate {
+	tu.mutation.AddDeletedAt(u)
+	return tu
 }
 
 // Mutation returns the TransactionMutation object of the builder.
 func (tu *TransactionUpdate) Mutation() *TransactionMutation {
 	return tu.mutation
-}
-
-// ClearCoin clears the "coin" edge to the CoinInfo entity.
-func (tu *TransactionUpdate) ClearCoin() *TransactionUpdate {
-	tu.mutation.ClearCoin()
-	return tu
-}
-
-// ClearReview clears all "review" edges to the Review entity.
-func (tu *TransactionUpdate) ClearReview() *TransactionUpdate {
-	tu.mutation.ClearReview()
-	return tu
-}
-
-// RemoveReviewIDs removes the "review" edge to Review entities by IDs.
-func (tu *TransactionUpdate) RemoveReviewIDs(ids ...int32) *TransactionUpdate {
-	tu.mutation.RemoveReviewIDs(ids...)
-	return tu
-}
-
-// RemoveReview removes "review" edges to Review entities.
-func (tu *TransactionUpdate) RemoveReview(r ...*Review) *TransactionUpdate {
-	ids := make([]int32, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
-	}
-	return tu.RemoveReviewIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -222,6 +181,7 @@ func (tu *TransactionUpdate) Save(ctx context.Context) (int, error) {
 		err      error
 		affected int
 	)
+	tu.defaults()
 	if len(tu.hooks) == 0 {
 		if err = tu.check(); err != nil {
 			return 0, err
@@ -276,50 +236,40 @@ func (tu *TransactionUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (tu *TransactionUpdate) defaults() {
+	if _, ok := tu.mutation.UpdatedAt(); !ok {
+		v := transaction.UpdateDefaultUpdatedAt()
+		tu.mutation.SetUpdatedAt(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (tu *TransactionUpdate) check() error {
-	if v, ok := tu.mutation.AddressFrom(); ok {
-		if err := transaction.AddressFromValidator(v); err != nil {
-			return &ValidationError{Name: "address_from", err: fmt.Errorf("ent: validator failed for field \"address_from\": %w", err)}
+	if v, ok := tu.mutation.From(); ok {
+		if err := transaction.FromValidator(v); err != nil {
+			return &ValidationError{Name: "from", err: fmt.Errorf("ent: validator failed for field \"from\": %w", err)}
 		}
 	}
-	if v, ok := tu.mutation.AddressTo(); ok {
-		if err := transaction.AddressToValidator(v); err != nil {
-			return &ValidationError{Name: "address_to", err: fmt.Errorf("ent: validator failed for field \"address_to\": %w", err)}
+	if v, ok := tu.mutation.To(); ok {
+		if err := transaction.ToValidator(v); err != nil {
+			return &ValidationError{Name: "to", err: fmt.Errorf("ent: validator failed for field \"to\": %w", err)}
 		}
 	}
-	if v, ok := tu.mutation.GetType(); ok {
-		if err := transaction.TypeValidator(v); err != nil {
-			return &ValidationError{Name: "type", err: fmt.Errorf("ent: validator failed for field \"type\": %w", err)}
+	if v, ok := tu.mutation.TransactionID(); ok {
+		if err := transaction.TransactionIDValidator(v); err != nil {
+			return &ValidationError{Name: "transaction_id", err: fmt.Errorf("ent: validator failed for field \"transaction_id\": %w", err)}
 		}
 	}
-	if v, ok := tu.mutation.TransactionIDInsite(); ok {
-		if err := transaction.TransactionIDInsiteValidator(v); err != nil {
-			return &ValidationError{Name: "transaction_id_insite", err: fmt.Errorf("ent: validator failed for field \"transaction_id_insite\": %w", err)}
-		}
-	}
-	if v, ok := tu.mutation.TransactionIDChain(); ok {
-		if err := transaction.TransactionIDChainValidator(v); err != nil {
-			return &ValidationError{Name: "transaction_id_chain", err: fmt.Errorf("ent: validator failed for field \"transaction_id_chain\": %w", err)}
+	if v, ok := tu.mutation.Cid(); ok {
+		if err := transaction.CidValidator(v); err != nil {
+			return &ValidationError{Name: "cid", err: fmt.Errorf("ent: validator failed for field \"cid\": %w", err)}
 		}
 	}
 	if v, ok := tu.mutation.Status(); ok {
 		if err := transaction.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf("ent: validator failed for field \"status\": %w", err)}
 		}
-	}
-	if v, ok := tu.mutation.SignatureUser(); ok {
-		if err := transaction.SignatureUserValidator(v); err != nil {
-			return &ValidationError{Name: "signature_user", err: fmt.Errorf("ent: validator failed for field \"signature_user\": %w", err)}
-		}
-	}
-	if v, ok := tu.mutation.SignaturePlatform(); ok {
-		if err := transaction.SignaturePlatformValidator(v); err != nil {
-			return &ValidationError{Name: "signature_platform", err: fmt.Errorf("ent: validator failed for field \"signature_platform\": %w", err)}
-		}
-	}
-	if _, ok := tu.mutation.CoinID(); tu.mutation.CoinCleared() && !ok {
-		return errors.New("ent: clearing a required unique edge \"coin\"")
 	}
 	return nil
 }
@@ -330,7 +280,7 @@ func (tu *TransactionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   transaction.Table,
 			Columns: transaction.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt32,
+				Type:   field.TypeUUID,
 				Column: transaction.FieldID,
 			},
 		},
@@ -342,74 +292,53 @@ func (tu *TransactionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := tu.mutation.AmountUint64(); ok {
+	if value, ok := tu.mutation.Name(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: transaction.FieldName,
+		})
+	}
+	if value, ok := tu.mutation.Amount(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeUint64,
 			Value:  value,
-			Column: transaction.FieldAmountUint64,
+			Column: transaction.FieldAmount,
 		})
 	}
-	if value, ok := tu.mutation.AddedAmountUint64(); ok {
+	if value, ok := tu.mutation.AddedAmount(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
 			Type:   field.TypeUint64,
 			Value:  value,
-			Column: transaction.FieldAmountUint64,
+			Column: transaction.FieldAmount,
 		})
 	}
-	if value, ok := tu.mutation.AmountFloat64(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeFloat64,
-			Value:  value,
-			Column: transaction.FieldAmountFloat64,
-		})
-	}
-	if value, ok := tu.mutation.AddedAmountFloat64(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeFloat64,
-			Value:  value,
-			Column: transaction.FieldAmountFloat64,
-		})
-	}
-	if value, ok := tu.mutation.AddressFrom(); ok {
+	if value, ok := tu.mutation.From(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
-			Column: transaction.FieldAddressFrom,
+			Column: transaction.FieldFrom,
 		})
 	}
-	if value, ok := tu.mutation.AddressTo(); ok {
+	if value, ok := tu.mutation.To(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
-			Column: transaction.FieldAddressTo,
+			Column: transaction.FieldTo,
 		})
 	}
-	if value, ok := tu.mutation.NeedManualReview(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeBool,
-			Value:  value,
-			Column: transaction.FieldNeedManualReview,
-		})
-	}
-	if value, ok := tu.mutation.GetType(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeEnum,
-			Value:  value,
-			Column: transaction.FieldType,
-		})
-	}
-	if value, ok := tu.mutation.TransactionIDInsite(); ok {
+	if value, ok := tu.mutation.TransactionID(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
-			Column: transaction.FieldTransactionIDInsite,
+			Column: transaction.FieldTransactionID,
 		})
 	}
-	if value, ok := tu.mutation.TransactionIDChain(); ok {
+	if value, ok := tu.mutation.Cid(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
-			Column: transaction.FieldTransactionIDChain,
+			Column: transaction.FieldCid,
 		})
 	}
 	if value, ok := tu.mutation.Status(); ok {
@@ -419,143 +348,47 @@ func (tu *TransactionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: transaction.FieldStatus,
 		})
 	}
-	if value, ok := tu.mutation.Mutex(); ok {
+	if value, ok := tu.mutation.CreatedAt(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeBool,
+			Type:   field.TypeUint32,
 			Value:  value,
-			Column: transaction.FieldMutex,
+			Column: transaction.FieldCreatedAt,
 		})
 	}
-	if value, ok := tu.mutation.SignatureUser(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: transaction.FieldSignatureUser,
-		})
-	}
-	if value, ok := tu.mutation.SignaturePlatform(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: transaction.FieldSignaturePlatform,
-		})
-	}
-	if value, ok := tu.mutation.CreatetimeUtc(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt64,
-			Value:  value,
-			Column: transaction.FieldCreatetimeUtc,
-		})
-	}
-	if value, ok := tu.mutation.AddedCreatetimeUtc(); ok {
+	if value, ok := tu.mutation.AddedCreatedAt(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt64,
+			Type:   field.TypeUint32,
 			Value:  value,
-			Column: transaction.FieldCreatetimeUtc,
+			Column: transaction.FieldCreatedAt,
 		})
 	}
-	if value, ok := tu.mutation.UpdatetimeUtc(); ok {
+	if value, ok := tu.mutation.UpdatedAt(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt64,
+			Type:   field.TypeUint32,
 			Value:  value,
-			Column: transaction.FieldUpdatetimeUtc,
+			Column: transaction.FieldUpdatedAt,
 		})
 	}
-	if value, ok := tu.mutation.AddedUpdatetimeUtc(); ok {
+	if value, ok := tu.mutation.AddedUpdatedAt(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt64,
+			Type:   field.TypeUint32,
 			Value:  value,
-			Column: transaction.FieldUpdatetimeUtc,
+			Column: transaction.FieldUpdatedAt,
 		})
 	}
-	if tu.mutation.CoinCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   transaction.CoinTable,
-			Columns: []string{transaction.CoinColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: coininfo.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	if value, ok := tu.mutation.DeletedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: transaction.FieldDeletedAt,
+		})
 	}
-	if nodes := tu.mutation.CoinIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   transaction.CoinTable,
-			Columns: []string{transaction.CoinColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: coininfo.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if tu.mutation.ReviewCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   transaction.ReviewTable,
-			Columns: []string{transaction.ReviewColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt32,
-					Column: review.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tu.mutation.RemovedReviewIDs(); len(nodes) > 0 && !tu.mutation.ReviewCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   transaction.ReviewTable,
-			Columns: []string{transaction.ReviewColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt32,
-					Column: review.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tu.mutation.ReviewIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   transaction.ReviewTable,
-			Columns: []string{transaction.ReviewColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt32,
-					Column: review.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	if value, ok := tu.mutation.AddedDeletedAt(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: transaction.FieldDeletedAt,
+		})
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, tu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -576,73 +409,86 @@ type TransactionUpdateOne struct {
 	mutation *TransactionMutation
 }
 
-// SetAmountUint64 sets the "amount_uint64" field.
-func (tuo *TransactionUpdateOne) SetAmountUint64(u uint64) *TransactionUpdateOne {
-	tuo.mutation.ResetAmountUint64()
-	tuo.mutation.SetAmountUint64(u)
+// SetName sets the "name" field.
+func (tuo *TransactionUpdateOne) SetName(s string) *TransactionUpdateOne {
+	tuo.mutation.SetName(s)
 	return tuo
 }
 
-// AddAmountUint64 adds u to the "amount_uint64" field.
-func (tuo *TransactionUpdateOne) AddAmountUint64(u uint64) *TransactionUpdateOne {
-	tuo.mutation.AddAmountUint64(u)
-	return tuo
-}
-
-// SetAmountFloat64 sets the "amount_float64" field.
-func (tuo *TransactionUpdateOne) SetAmountFloat64(f float64) *TransactionUpdateOne {
-	tuo.mutation.ResetAmountFloat64()
-	tuo.mutation.SetAmountFloat64(f)
-	return tuo
-}
-
-// AddAmountFloat64 adds f to the "amount_float64" field.
-func (tuo *TransactionUpdateOne) AddAmountFloat64(f float64) *TransactionUpdateOne {
-	tuo.mutation.AddAmountFloat64(f)
-	return tuo
-}
-
-// SetAddressFrom sets the "address_from" field.
-func (tuo *TransactionUpdateOne) SetAddressFrom(s string) *TransactionUpdateOne {
-	tuo.mutation.SetAddressFrom(s)
-	return tuo
-}
-
-// SetAddressTo sets the "address_to" field.
-func (tuo *TransactionUpdateOne) SetAddressTo(s string) *TransactionUpdateOne {
-	tuo.mutation.SetAddressTo(s)
-	return tuo
-}
-
-// SetNeedManualReview sets the "need_manual_review" field.
-func (tuo *TransactionUpdateOne) SetNeedManualReview(b bool) *TransactionUpdateOne {
-	tuo.mutation.SetNeedManualReview(b)
-	return tuo
-}
-
-// SetNillableNeedManualReview sets the "need_manual_review" field if the given value is not nil.
-func (tuo *TransactionUpdateOne) SetNillableNeedManualReview(b *bool) *TransactionUpdateOne {
-	if b != nil {
-		tuo.SetNeedManualReview(*b)
+// SetNillableName sets the "name" field if the given value is not nil.
+func (tuo *TransactionUpdateOne) SetNillableName(s *string) *TransactionUpdateOne {
+	if s != nil {
+		tuo.SetName(*s)
 	}
 	return tuo
 }
 
-// SetType sets the "type" field.
-func (tuo *TransactionUpdateOne) SetType(t transaction.Type) *TransactionUpdateOne {
-	tuo.mutation.SetType(t)
+// SetAmount sets the "amount" field.
+func (tuo *TransactionUpdateOne) SetAmount(u uint64) *TransactionUpdateOne {
+	tuo.mutation.ResetAmount()
+	tuo.mutation.SetAmount(u)
 	return tuo
 }
 
-// SetTransactionIDInsite sets the "transaction_id_insite" field.
-func (tuo *TransactionUpdateOne) SetTransactionIDInsite(s string) *TransactionUpdateOne {
-	tuo.mutation.SetTransactionIDInsite(s)
+// SetNillableAmount sets the "amount" field if the given value is not nil.
+func (tuo *TransactionUpdateOne) SetNillableAmount(u *uint64) *TransactionUpdateOne {
+	if u != nil {
+		tuo.SetAmount(*u)
+	}
 	return tuo
 }
 
-// SetTransactionIDChain sets the "transaction_id_chain" field.
-func (tuo *TransactionUpdateOne) SetTransactionIDChain(s string) *TransactionUpdateOne {
-	tuo.mutation.SetTransactionIDChain(s)
+// AddAmount adds u to the "amount" field.
+func (tuo *TransactionUpdateOne) AddAmount(u uint64) *TransactionUpdateOne {
+	tuo.mutation.AddAmount(u)
+	return tuo
+}
+
+// SetFrom sets the "from" field.
+func (tuo *TransactionUpdateOne) SetFrom(s string) *TransactionUpdateOne {
+	tuo.mutation.SetFrom(s)
+	return tuo
+}
+
+// SetNillableFrom sets the "from" field if the given value is not nil.
+func (tuo *TransactionUpdateOne) SetNillableFrom(s *string) *TransactionUpdateOne {
+	if s != nil {
+		tuo.SetFrom(*s)
+	}
+	return tuo
+}
+
+// SetTo sets the "to" field.
+func (tuo *TransactionUpdateOne) SetTo(s string) *TransactionUpdateOne {
+	tuo.mutation.SetTo(s)
+	return tuo
+}
+
+// SetNillableTo sets the "to" field if the given value is not nil.
+func (tuo *TransactionUpdateOne) SetNillableTo(s *string) *TransactionUpdateOne {
+	if s != nil {
+		tuo.SetTo(*s)
+	}
+	return tuo
+}
+
+// SetTransactionID sets the "transaction_id" field.
+func (tuo *TransactionUpdateOne) SetTransactionID(s string) *TransactionUpdateOne {
+	tuo.mutation.SetTransactionID(s)
+	return tuo
+}
+
+// SetCid sets the "cid" field.
+func (tuo *TransactionUpdateOne) SetCid(s string) *TransactionUpdateOne {
+	tuo.mutation.SetCid(s)
+	return tuo
+}
+
+// SetNillableCid sets the "cid" field if the given value is not nil.
+func (tuo *TransactionUpdateOne) SetNillableCid(s *string) *TransactionUpdateOne {
+	if s != nil {
+		tuo.SetCid(*s)
+	}
 	return tuo
 }
 
@@ -652,114 +498,64 @@ func (tuo *TransactionUpdateOne) SetStatus(t transaction.Status) *TransactionUpd
 	return tuo
 }
 
-// SetMutex sets the "mutex" field.
-func (tuo *TransactionUpdateOne) SetMutex(b bool) *TransactionUpdateOne {
-	tuo.mutation.SetMutex(b)
+// SetCreatedAt sets the "created_at" field.
+func (tuo *TransactionUpdateOne) SetCreatedAt(u uint32) *TransactionUpdateOne {
+	tuo.mutation.ResetCreatedAt()
+	tuo.mutation.SetCreatedAt(u)
 	return tuo
 }
 
-// SetNillableMutex sets the "mutex" field if the given value is not nil.
-func (tuo *TransactionUpdateOne) SetNillableMutex(b *bool) *TransactionUpdateOne {
-	if b != nil {
-		tuo.SetMutex(*b)
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (tuo *TransactionUpdateOne) SetNillableCreatedAt(u *uint32) *TransactionUpdateOne {
+	if u != nil {
+		tuo.SetCreatedAt(*u)
 	}
 	return tuo
 }
 
-// SetSignatureUser sets the "signature_user" field.
-func (tuo *TransactionUpdateOne) SetSignatureUser(s string) *TransactionUpdateOne {
-	tuo.mutation.SetSignatureUser(s)
+// AddCreatedAt adds u to the "created_at" field.
+func (tuo *TransactionUpdateOne) AddCreatedAt(u uint32) *TransactionUpdateOne {
+	tuo.mutation.AddCreatedAt(u)
 	return tuo
 }
 
-// SetSignaturePlatform sets the "signature_platform" field.
-func (tuo *TransactionUpdateOne) SetSignaturePlatform(s string) *TransactionUpdateOne {
-	tuo.mutation.SetSignaturePlatform(s)
+// SetUpdatedAt sets the "updated_at" field.
+func (tuo *TransactionUpdateOne) SetUpdatedAt(u uint32) *TransactionUpdateOne {
+	tuo.mutation.ResetUpdatedAt()
+	tuo.mutation.SetUpdatedAt(u)
 	return tuo
 }
 
-// SetCreatetimeUtc sets the "createtime_utc" field.
-func (tuo *TransactionUpdateOne) SetCreatetimeUtc(i int64) *TransactionUpdateOne {
-	tuo.mutation.ResetCreatetimeUtc()
-	tuo.mutation.SetCreatetimeUtc(i)
+// AddUpdatedAt adds u to the "updated_at" field.
+func (tuo *TransactionUpdateOne) AddUpdatedAt(u uint32) *TransactionUpdateOne {
+	tuo.mutation.AddUpdatedAt(u)
 	return tuo
 }
 
-// AddCreatetimeUtc adds i to the "createtime_utc" field.
-func (tuo *TransactionUpdateOne) AddCreatetimeUtc(i int64) *TransactionUpdateOne {
-	tuo.mutation.AddCreatetimeUtc(i)
+// SetDeletedAt sets the "deleted_at" field.
+func (tuo *TransactionUpdateOne) SetDeletedAt(u uint32) *TransactionUpdateOne {
+	tuo.mutation.ResetDeletedAt()
+	tuo.mutation.SetDeletedAt(u)
 	return tuo
 }
 
-// SetUpdatetimeUtc sets the "updatetime_utc" field.
-func (tuo *TransactionUpdateOne) SetUpdatetimeUtc(i int64) *TransactionUpdateOne {
-	tuo.mutation.ResetUpdatetimeUtc()
-	tuo.mutation.SetUpdatetimeUtc(i)
-	return tuo
-}
-
-// AddUpdatetimeUtc adds i to the "updatetime_utc" field.
-func (tuo *TransactionUpdateOne) AddUpdatetimeUtc(i int64) *TransactionUpdateOne {
-	tuo.mutation.AddUpdatetimeUtc(i)
-	return tuo
-}
-
-// SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (tuo *TransactionUpdateOne) SetCoinID(id uuid.UUID) *TransactionUpdateOne {
-	tuo.mutation.SetCoinID(id)
-	return tuo
-}
-
-// SetCoin sets the "coin" edge to the CoinInfo entity.
-func (tuo *TransactionUpdateOne) SetCoin(c *CoinInfo) *TransactionUpdateOne {
-	return tuo.SetCoinID(c.ID)
-}
-
-// AddReviewIDs adds the "review" edge to the Review entity by IDs.
-func (tuo *TransactionUpdateOne) AddReviewIDs(ids ...int32) *TransactionUpdateOne {
-	tuo.mutation.AddReviewIDs(ids...)
-	return tuo
-}
-
-// AddReview adds the "review" edges to the Review entity.
-func (tuo *TransactionUpdateOne) AddReview(r ...*Review) *TransactionUpdateOne {
-	ids := make([]int32, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (tuo *TransactionUpdateOne) SetNillableDeletedAt(u *uint32) *TransactionUpdateOne {
+	if u != nil {
+		tuo.SetDeletedAt(*u)
 	}
-	return tuo.AddReviewIDs(ids...)
+	return tuo
+}
+
+// AddDeletedAt adds u to the "deleted_at" field.
+func (tuo *TransactionUpdateOne) AddDeletedAt(u uint32) *TransactionUpdateOne {
+	tuo.mutation.AddDeletedAt(u)
+	return tuo
 }
 
 // Mutation returns the TransactionMutation object of the builder.
 func (tuo *TransactionUpdateOne) Mutation() *TransactionMutation {
 	return tuo.mutation
-}
-
-// ClearCoin clears the "coin" edge to the CoinInfo entity.
-func (tuo *TransactionUpdateOne) ClearCoin() *TransactionUpdateOne {
-	tuo.mutation.ClearCoin()
-	return tuo
-}
-
-// ClearReview clears all "review" edges to the Review entity.
-func (tuo *TransactionUpdateOne) ClearReview() *TransactionUpdateOne {
-	tuo.mutation.ClearReview()
-	return tuo
-}
-
-// RemoveReviewIDs removes the "review" edge to Review entities by IDs.
-func (tuo *TransactionUpdateOne) RemoveReviewIDs(ids ...int32) *TransactionUpdateOne {
-	tuo.mutation.RemoveReviewIDs(ids...)
-	return tuo
-}
-
-// RemoveReview removes "review" edges to Review entities.
-func (tuo *TransactionUpdateOne) RemoveReview(r ...*Review) *TransactionUpdateOne {
-	ids := make([]int32, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
-	}
-	return tuo.RemoveReviewIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -775,6 +571,7 @@ func (tuo *TransactionUpdateOne) Save(ctx context.Context) (*Transaction, error)
 		err  error
 		node *Transaction
 	)
+	tuo.defaults()
 	if len(tuo.hooks) == 0 {
 		if err = tuo.check(); err != nil {
 			return nil, err
@@ -829,50 +626,40 @@ func (tuo *TransactionUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (tuo *TransactionUpdateOne) defaults() {
+	if _, ok := tuo.mutation.UpdatedAt(); !ok {
+		v := transaction.UpdateDefaultUpdatedAt()
+		tuo.mutation.SetUpdatedAt(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (tuo *TransactionUpdateOne) check() error {
-	if v, ok := tuo.mutation.AddressFrom(); ok {
-		if err := transaction.AddressFromValidator(v); err != nil {
-			return &ValidationError{Name: "address_from", err: fmt.Errorf("ent: validator failed for field \"address_from\": %w", err)}
+	if v, ok := tuo.mutation.From(); ok {
+		if err := transaction.FromValidator(v); err != nil {
+			return &ValidationError{Name: "from", err: fmt.Errorf("ent: validator failed for field \"from\": %w", err)}
 		}
 	}
-	if v, ok := tuo.mutation.AddressTo(); ok {
-		if err := transaction.AddressToValidator(v); err != nil {
-			return &ValidationError{Name: "address_to", err: fmt.Errorf("ent: validator failed for field \"address_to\": %w", err)}
+	if v, ok := tuo.mutation.To(); ok {
+		if err := transaction.ToValidator(v); err != nil {
+			return &ValidationError{Name: "to", err: fmt.Errorf("ent: validator failed for field \"to\": %w", err)}
 		}
 	}
-	if v, ok := tuo.mutation.GetType(); ok {
-		if err := transaction.TypeValidator(v); err != nil {
-			return &ValidationError{Name: "type", err: fmt.Errorf("ent: validator failed for field \"type\": %w", err)}
+	if v, ok := tuo.mutation.TransactionID(); ok {
+		if err := transaction.TransactionIDValidator(v); err != nil {
+			return &ValidationError{Name: "transaction_id", err: fmt.Errorf("ent: validator failed for field \"transaction_id\": %w", err)}
 		}
 	}
-	if v, ok := tuo.mutation.TransactionIDInsite(); ok {
-		if err := transaction.TransactionIDInsiteValidator(v); err != nil {
-			return &ValidationError{Name: "transaction_id_insite", err: fmt.Errorf("ent: validator failed for field \"transaction_id_insite\": %w", err)}
-		}
-	}
-	if v, ok := tuo.mutation.TransactionIDChain(); ok {
-		if err := transaction.TransactionIDChainValidator(v); err != nil {
-			return &ValidationError{Name: "transaction_id_chain", err: fmt.Errorf("ent: validator failed for field \"transaction_id_chain\": %w", err)}
+	if v, ok := tuo.mutation.Cid(); ok {
+		if err := transaction.CidValidator(v); err != nil {
+			return &ValidationError{Name: "cid", err: fmt.Errorf("ent: validator failed for field \"cid\": %w", err)}
 		}
 	}
 	if v, ok := tuo.mutation.Status(); ok {
 		if err := transaction.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf("ent: validator failed for field \"status\": %w", err)}
 		}
-	}
-	if v, ok := tuo.mutation.SignatureUser(); ok {
-		if err := transaction.SignatureUserValidator(v); err != nil {
-			return &ValidationError{Name: "signature_user", err: fmt.Errorf("ent: validator failed for field \"signature_user\": %w", err)}
-		}
-	}
-	if v, ok := tuo.mutation.SignaturePlatform(); ok {
-		if err := transaction.SignaturePlatformValidator(v); err != nil {
-			return &ValidationError{Name: "signature_platform", err: fmt.Errorf("ent: validator failed for field \"signature_platform\": %w", err)}
-		}
-	}
-	if _, ok := tuo.mutation.CoinID(); tuo.mutation.CoinCleared() && !ok {
-		return errors.New("ent: clearing a required unique edge \"coin\"")
 	}
 	return nil
 }
@@ -883,7 +670,7 @@ func (tuo *TransactionUpdateOne) sqlSave(ctx context.Context) (_node *Transactio
 			Table:   transaction.Table,
 			Columns: transaction.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt32,
+				Type:   field.TypeUUID,
 				Column: transaction.FieldID,
 			},
 		},
@@ -912,74 +699,53 @@ func (tuo *TransactionUpdateOne) sqlSave(ctx context.Context) (_node *Transactio
 			}
 		}
 	}
-	if value, ok := tuo.mutation.AmountUint64(); ok {
+	if value, ok := tuo.mutation.Name(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: transaction.FieldName,
+		})
+	}
+	if value, ok := tuo.mutation.Amount(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeUint64,
 			Value:  value,
-			Column: transaction.FieldAmountUint64,
+			Column: transaction.FieldAmount,
 		})
 	}
-	if value, ok := tuo.mutation.AddedAmountUint64(); ok {
+	if value, ok := tuo.mutation.AddedAmount(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
 			Type:   field.TypeUint64,
 			Value:  value,
-			Column: transaction.FieldAmountUint64,
+			Column: transaction.FieldAmount,
 		})
 	}
-	if value, ok := tuo.mutation.AmountFloat64(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeFloat64,
-			Value:  value,
-			Column: transaction.FieldAmountFloat64,
-		})
-	}
-	if value, ok := tuo.mutation.AddedAmountFloat64(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeFloat64,
-			Value:  value,
-			Column: transaction.FieldAmountFloat64,
-		})
-	}
-	if value, ok := tuo.mutation.AddressFrom(); ok {
+	if value, ok := tuo.mutation.From(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
-			Column: transaction.FieldAddressFrom,
+			Column: transaction.FieldFrom,
 		})
 	}
-	if value, ok := tuo.mutation.AddressTo(); ok {
+	if value, ok := tuo.mutation.To(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
-			Column: transaction.FieldAddressTo,
+			Column: transaction.FieldTo,
 		})
 	}
-	if value, ok := tuo.mutation.NeedManualReview(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeBool,
-			Value:  value,
-			Column: transaction.FieldNeedManualReview,
-		})
-	}
-	if value, ok := tuo.mutation.GetType(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeEnum,
-			Value:  value,
-			Column: transaction.FieldType,
-		})
-	}
-	if value, ok := tuo.mutation.TransactionIDInsite(); ok {
+	if value, ok := tuo.mutation.TransactionID(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
-			Column: transaction.FieldTransactionIDInsite,
+			Column: transaction.FieldTransactionID,
 		})
 	}
-	if value, ok := tuo.mutation.TransactionIDChain(); ok {
+	if value, ok := tuo.mutation.Cid(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
-			Column: transaction.FieldTransactionIDChain,
+			Column: transaction.FieldCid,
 		})
 	}
 	if value, ok := tuo.mutation.Status(); ok {
@@ -989,143 +755,47 @@ func (tuo *TransactionUpdateOne) sqlSave(ctx context.Context) (_node *Transactio
 			Column: transaction.FieldStatus,
 		})
 	}
-	if value, ok := tuo.mutation.Mutex(); ok {
+	if value, ok := tuo.mutation.CreatedAt(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeBool,
+			Type:   field.TypeUint32,
 			Value:  value,
-			Column: transaction.FieldMutex,
+			Column: transaction.FieldCreatedAt,
 		})
 	}
-	if value, ok := tuo.mutation.SignatureUser(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: transaction.FieldSignatureUser,
-		})
-	}
-	if value, ok := tuo.mutation.SignaturePlatform(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: transaction.FieldSignaturePlatform,
-		})
-	}
-	if value, ok := tuo.mutation.CreatetimeUtc(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt64,
-			Value:  value,
-			Column: transaction.FieldCreatetimeUtc,
-		})
-	}
-	if value, ok := tuo.mutation.AddedCreatetimeUtc(); ok {
+	if value, ok := tuo.mutation.AddedCreatedAt(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt64,
+			Type:   field.TypeUint32,
 			Value:  value,
-			Column: transaction.FieldCreatetimeUtc,
+			Column: transaction.FieldCreatedAt,
 		})
 	}
-	if value, ok := tuo.mutation.UpdatetimeUtc(); ok {
+	if value, ok := tuo.mutation.UpdatedAt(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt64,
+			Type:   field.TypeUint32,
 			Value:  value,
-			Column: transaction.FieldUpdatetimeUtc,
+			Column: transaction.FieldUpdatedAt,
 		})
 	}
-	if value, ok := tuo.mutation.AddedUpdatetimeUtc(); ok {
+	if value, ok := tuo.mutation.AddedUpdatedAt(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt64,
+			Type:   field.TypeUint32,
 			Value:  value,
-			Column: transaction.FieldUpdatetimeUtc,
+			Column: transaction.FieldUpdatedAt,
 		})
 	}
-	if tuo.mutation.CoinCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   transaction.CoinTable,
-			Columns: []string{transaction.CoinColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: coininfo.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	if value, ok := tuo.mutation.DeletedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: transaction.FieldDeletedAt,
+		})
 	}
-	if nodes := tuo.mutation.CoinIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   transaction.CoinTable,
-			Columns: []string{transaction.CoinColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: coininfo.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if tuo.mutation.ReviewCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   transaction.ReviewTable,
-			Columns: []string{transaction.ReviewColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt32,
-					Column: review.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tuo.mutation.RemovedReviewIDs(); len(nodes) > 0 && !tuo.mutation.ReviewCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   transaction.ReviewTable,
-			Columns: []string{transaction.ReviewColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt32,
-					Column: review.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tuo.mutation.ReviewIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   transaction.ReviewTable,
-			Columns: []string{transaction.ReviewColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt32,
-					Column: review.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	if value, ok := tuo.mutation.AddedDeletedAt(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: transaction.FieldDeletedAt,
+		})
 	}
 	_node = &Transaction{config: tuo.config}
 	_spec.Assign = _node.assignValues

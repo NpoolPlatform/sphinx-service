@@ -7,11 +7,8 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/predicate"
-	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/review"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
-	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/walletnode"
 	"github.com/google/uuid"
 
 	"entgo.io/ent"
@@ -26,1742 +23,33 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeCoinInfo    = "CoinInfo"
-	TypeEmpty       = "Empty"
-	TypeReview      = "Review"
 	TypeTransaction = "Transaction"
-	TypeWalletNode  = "WalletNode"
 )
-
-// CoinInfoMutation represents an operation that mutates the CoinInfo nodes in the graph.
-type CoinInfoMutation struct {
-	config
-	op                  Op
-	typ                 string
-	id                  *uuid.UUID
-	coin_type_id        *int32
-	addcoin_type_id     *int32
-	name                *string
-	unit                *string
-	is_presale          *bool
-	logo_image          *string
-	clearedFields       map[string]struct{}
-	transactions        map[int32]struct{}
-	removedtransactions map[int32]struct{}
-	clearedtransactions bool
-	reviews             map[int32]struct{}
-	removedreviews      map[int32]struct{}
-	clearedreviews      bool
-	wallet_nodes        map[int32]struct{}
-	removedwallet_nodes map[int32]struct{}
-	clearedwallet_nodes bool
-	done                bool
-	oldValue            func(context.Context) (*CoinInfo, error)
-	predicates          []predicate.CoinInfo
-}
-
-var _ ent.Mutation = (*CoinInfoMutation)(nil)
-
-// coininfoOption allows management of the mutation configuration using functional options.
-type coininfoOption func(*CoinInfoMutation)
-
-// newCoinInfoMutation creates new mutation for the CoinInfo entity.
-func newCoinInfoMutation(c config, op Op, opts ...coininfoOption) *CoinInfoMutation {
-	m := &CoinInfoMutation{
-		config:        c,
-		op:            op,
-		typ:           TypeCoinInfo,
-		clearedFields: make(map[string]struct{}),
-	}
-	for _, opt := range opts {
-		opt(m)
-	}
-	return m
-}
-
-// withCoinInfoID sets the ID field of the mutation.
-func withCoinInfoID(id uuid.UUID) coininfoOption {
-	return func(m *CoinInfoMutation) {
-		var (
-			err   error
-			once  sync.Once
-			value *CoinInfo
-		)
-		m.oldValue = func(ctx context.Context) (*CoinInfo, error) {
-			once.Do(func() {
-				if m.done {
-					err = fmt.Errorf("querying old values post mutation is not allowed")
-				} else {
-					value, err = m.Client().CoinInfo.Get(ctx, id)
-				}
-			})
-			return value, err
-		}
-		m.id = &id
-	}
-}
-
-// withCoinInfo sets the old CoinInfo of the mutation.
-func withCoinInfo(node *CoinInfo) coininfoOption {
-	return func(m *CoinInfoMutation) {
-		m.oldValue = func(context.Context) (*CoinInfo, error) {
-			return node, nil
-		}
-		m.id = &node.ID
-	}
-}
-
-// Client returns a new `ent.Client` from the mutation. If the mutation was
-// executed in a transaction (ent.Tx), a transactional client is returned.
-func (m CoinInfoMutation) Client() *Client {
-	client := &Client{config: m.config}
-	client.init()
-	return client
-}
-
-// Tx returns an `ent.Tx` for mutations that were executed in transactions;
-// it returns an error otherwise.
-func (m CoinInfoMutation) Tx() (*Tx, error) {
-	if _, ok := m.driver.(*txDriver); !ok {
-		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
-	}
-	tx := &Tx{config: m.config}
-	tx.init()
-	return tx, nil
-}
-
-// SetID sets the value of the id field. Note that this
-// operation is only accepted on creation of CoinInfo entities.
-func (m *CoinInfoMutation) SetID(id uuid.UUID) {
-	m.id = &id
-}
-
-// ID returns the ID value in the mutation. Note that the ID is only available
-// if it was provided to the builder or after it was returned from the database.
-func (m *CoinInfoMutation) ID() (id uuid.UUID, exists bool) {
-	if m.id == nil {
-		return
-	}
-	return *m.id, true
-}
-
-// SetCoinTypeID sets the "coin_type_id" field.
-func (m *CoinInfoMutation) SetCoinTypeID(i int32) {
-	m.coin_type_id = &i
-	m.addcoin_type_id = nil
-}
-
-// CoinTypeID returns the value of the "coin_type_id" field in the mutation.
-func (m *CoinInfoMutation) CoinTypeID() (r int32, exists bool) {
-	v := m.coin_type_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCoinTypeID returns the old "coin_type_id" field's value of the CoinInfo entity.
-// If the CoinInfo object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CoinInfoMutation) OldCoinTypeID(ctx context.Context) (v int32, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldCoinTypeID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldCoinTypeID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCoinTypeID: %w", err)
-	}
-	return oldValue.CoinTypeID, nil
-}
-
-// AddCoinTypeID adds i to the "coin_type_id" field.
-func (m *CoinInfoMutation) AddCoinTypeID(i int32) {
-	if m.addcoin_type_id != nil {
-		*m.addcoin_type_id += i
-	} else {
-		m.addcoin_type_id = &i
-	}
-}
-
-// AddedCoinTypeID returns the value that was added to the "coin_type_id" field in this mutation.
-func (m *CoinInfoMutation) AddedCoinTypeID() (r int32, exists bool) {
-	v := m.addcoin_type_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetCoinTypeID resets all changes to the "coin_type_id" field.
-func (m *CoinInfoMutation) ResetCoinTypeID() {
-	m.coin_type_id = nil
-	m.addcoin_type_id = nil
-}
-
-// SetName sets the "name" field.
-func (m *CoinInfoMutation) SetName(s string) {
-	m.name = &s
-}
-
-// Name returns the value of the "name" field in the mutation.
-func (m *CoinInfoMutation) Name() (r string, exists bool) {
-	v := m.name
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldName returns the old "name" field's value of the CoinInfo entity.
-// If the CoinInfo object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CoinInfoMutation) OldName(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldName is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldName requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldName: %w", err)
-	}
-	return oldValue.Name, nil
-}
-
-// ResetName resets all changes to the "name" field.
-func (m *CoinInfoMutation) ResetName() {
-	m.name = nil
-}
-
-// SetUnit sets the "unit" field.
-func (m *CoinInfoMutation) SetUnit(s string) {
-	m.unit = &s
-}
-
-// Unit returns the value of the "unit" field in the mutation.
-func (m *CoinInfoMutation) Unit() (r string, exists bool) {
-	v := m.unit
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUnit returns the old "unit" field's value of the CoinInfo entity.
-// If the CoinInfo object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CoinInfoMutation) OldUnit(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldUnit is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldUnit requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUnit: %w", err)
-	}
-	return oldValue.Unit, nil
-}
-
-// ResetUnit resets all changes to the "unit" field.
-func (m *CoinInfoMutation) ResetUnit() {
-	m.unit = nil
-}
-
-// SetIsPresale sets the "is_presale" field.
-func (m *CoinInfoMutation) SetIsPresale(b bool) {
-	m.is_presale = &b
-}
-
-// IsPresale returns the value of the "is_presale" field in the mutation.
-func (m *CoinInfoMutation) IsPresale() (r bool, exists bool) {
-	v := m.is_presale
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldIsPresale returns the old "is_presale" field's value of the CoinInfo entity.
-// If the CoinInfo object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CoinInfoMutation) OldIsPresale(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldIsPresale is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldIsPresale requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldIsPresale: %w", err)
-	}
-	return oldValue.IsPresale, nil
-}
-
-// ResetIsPresale resets all changes to the "is_presale" field.
-func (m *CoinInfoMutation) ResetIsPresale() {
-	m.is_presale = nil
-}
-
-// SetLogoImage sets the "logo_image" field.
-func (m *CoinInfoMutation) SetLogoImage(s string) {
-	m.logo_image = &s
-}
-
-// LogoImage returns the value of the "logo_image" field in the mutation.
-func (m *CoinInfoMutation) LogoImage() (r string, exists bool) {
-	v := m.logo_image
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldLogoImage returns the old "logo_image" field's value of the CoinInfo entity.
-// If the CoinInfo object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CoinInfoMutation) OldLogoImage(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldLogoImage is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldLogoImage requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldLogoImage: %w", err)
-	}
-	return oldValue.LogoImage, nil
-}
-
-// ResetLogoImage resets all changes to the "logo_image" field.
-func (m *CoinInfoMutation) ResetLogoImage() {
-	m.logo_image = nil
-}
-
-// AddTransactionIDs adds the "transactions" edge to the Transaction entity by ids.
-func (m *CoinInfoMutation) AddTransactionIDs(ids ...int32) {
-	if m.transactions == nil {
-		m.transactions = make(map[int32]struct{})
-	}
-	for i := range ids {
-		m.transactions[ids[i]] = struct{}{}
-	}
-}
-
-// ClearTransactions clears the "transactions" edge to the Transaction entity.
-func (m *CoinInfoMutation) ClearTransactions() {
-	m.clearedtransactions = true
-}
-
-// TransactionsCleared reports if the "transactions" edge to the Transaction entity was cleared.
-func (m *CoinInfoMutation) TransactionsCleared() bool {
-	return m.clearedtransactions
-}
-
-// RemoveTransactionIDs removes the "transactions" edge to the Transaction entity by IDs.
-func (m *CoinInfoMutation) RemoveTransactionIDs(ids ...int32) {
-	if m.removedtransactions == nil {
-		m.removedtransactions = make(map[int32]struct{})
-	}
-	for i := range ids {
-		delete(m.transactions, ids[i])
-		m.removedtransactions[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedTransactions returns the removed IDs of the "transactions" edge to the Transaction entity.
-func (m *CoinInfoMutation) RemovedTransactionsIDs() (ids []int32) {
-	for id := range m.removedtransactions {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// TransactionsIDs returns the "transactions" edge IDs in the mutation.
-func (m *CoinInfoMutation) TransactionsIDs() (ids []int32) {
-	for id := range m.transactions {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetTransactions resets all changes to the "transactions" edge.
-func (m *CoinInfoMutation) ResetTransactions() {
-	m.transactions = nil
-	m.clearedtransactions = false
-	m.removedtransactions = nil
-}
-
-// AddReviewIDs adds the "reviews" edge to the Review entity by ids.
-func (m *CoinInfoMutation) AddReviewIDs(ids ...int32) {
-	if m.reviews == nil {
-		m.reviews = make(map[int32]struct{})
-	}
-	for i := range ids {
-		m.reviews[ids[i]] = struct{}{}
-	}
-}
-
-// ClearReviews clears the "reviews" edge to the Review entity.
-func (m *CoinInfoMutation) ClearReviews() {
-	m.clearedreviews = true
-}
-
-// ReviewsCleared reports if the "reviews" edge to the Review entity was cleared.
-func (m *CoinInfoMutation) ReviewsCleared() bool {
-	return m.clearedreviews
-}
-
-// RemoveReviewIDs removes the "reviews" edge to the Review entity by IDs.
-func (m *CoinInfoMutation) RemoveReviewIDs(ids ...int32) {
-	if m.removedreviews == nil {
-		m.removedreviews = make(map[int32]struct{})
-	}
-	for i := range ids {
-		delete(m.reviews, ids[i])
-		m.removedreviews[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedReviews returns the removed IDs of the "reviews" edge to the Review entity.
-func (m *CoinInfoMutation) RemovedReviewsIDs() (ids []int32) {
-	for id := range m.removedreviews {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ReviewsIDs returns the "reviews" edge IDs in the mutation.
-func (m *CoinInfoMutation) ReviewsIDs() (ids []int32) {
-	for id := range m.reviews {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetReviews resets all changes to the "reviews" edge.
-func (m *CoinInfoMutation) ResetReviews() {
-	m.reviews = nil
-	m.clearedreviews = false
-	m.removedreviews = nil
-}
-
-// AddWalletNodeIDs adds the "wallet_nodes" edge to the WalletNode entity by ids.
-func (m *CoinInfoMutation) AddWalletNodeIDs(ids ...int32) {
-	if m.wallet_nodes == nil {
-		m.wallet_nodes = make(map[int32]struct{})
-	}
-	for i := range ids {
-		m.wallet_nodes[ids[i]] = struct{}{}
-	}
-}
-
-// ClearWalletNodes clears the "wallet_nodes" edge to the WalletNode entity.
-func (m *CoinInfoMutation) ClearWalletNodes() {
-	m.clearedwallet_nodes = true
-}
-
-// WalletNodesCleared reports if the "wallet_nodes" edge to the WalletNode entity was cleared.
-func (m *CoinInfoMutation) WalletNodesCleared() bool {
-	return m.clearedwallet_nodes
-}
-
-// RemoveWalletNodeIDs removes the "wallet_nodes" edge to the WalletNode entity by IDs.
-func (m *CoinInfoMutation) RemoveWalletNodeIDs(ids ...int32) {
-	if m.removedwallet_nodes == nil {
-		m.removedwallet_nodes = make(map[int32]struct{})
-	}
-	for i := range ids {
-		delete(m.wallet_nodes, ids[i])
-		m.removedwallet_nodes[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedWalletNodes returns the removed IDs of the "wallet_nodes" edge to the WalletNode entity.
-func (m *CoinInfoMutation) RemovedWalletNodesIDs() (ids []int32) {
-	for id := range m.removedwallet_nodes {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// WalletNodesIDs returns the "wallet_nodes" edge IDs in the mutation.
-func (m *CoinInfoMutation) WalletNodesIDs() (ids []int32) {
-	for id := range m.wallet_nodes {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetWalletNodes resets all changes to the "wallet_nodes" edge.
-func (m *CoinInfoMutation) ResetWalletNodes() {
-	m.wallet_nodes = nil
-	m.clearedwallet_nodes = false
-	m.removedwallet_nodes = nil
-}
-
-// Where appends a list predicates to the CoinInfoMutation builder.
-func (m *CoinInfoMutation) Where(ps ...predicate.CoinInfo) {
-	m.predicates = append(m.predicates, ps...)
-}
-
-// Op returns the operation name.
-func (m *CoinInfoMutation) Op() Op {
-	return m.op
-}
-
-// Type returns the node type of this mutation (CoinInfo).
-func (m *CoinInfoMutation) Type() string {
-	return m.typ
-}
-
-// Fields returns all fields that were changed during this mutation. Note that in
-// order to get all numeric fields that were incremented/decremented, call
-// AddedFields().
-func (m *CoinInfoMutation) Fields() []string {
-	fields := make([]string, 0, 5)
-	if m.coin_type_id != nil {
-		fields = append(fields, coininfo.FieldCoinTypeID)
-	}
-	if m.name != nil {
-		fields = append(fields, coininfo.FieldName)
-	}
-	if m.unit != nil {
-		fields = append(fields, coininfo.FieldUnit)
-	}
-	if m.is_presale != nil {
-		fields = append(fields, coininfo.FieldIsPresale)
-	}
-	if m.logo_image != nil {
-		fields = append(fields, coininfo.FieldLogoImage)
-	}
-	return fields
-}
-
-// Field returns the value of a field with the given name. The second boolean
-// return value indicates that this field was not set, or was not defined in the
-// schema.
-func (m *CoinInfoMutation) Field(name string) (ent.Value, bool) {
-	switch name {
-	case coininfo.FieldCoinTypeID:
-		return m.CoinTypeID()
-	case coininfo.FieldName:
-		return m.Name()
-	case coininfo.FieldUnit:
-		return m.Unit()
-	case coininfo.FieldIsPresale:
-		return m.IsPresale()
-	case coininfo.FieldLogoImage:
-		return m.LogoImage()
-	}
-	return nil, false
-}
-
-// OldField returns the old value of the field from the database. An error is
-// returned if the mutation operation is not UpdateOne, or the query to the
-// database failed.
-func (m *CoinInfoMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	switch name {
-	case coininfo.FieldCoinTypeID:
-		return m.OldCoinTypeID(ctx)
-	case coininfo.FieldName:
-		return m.OldName(ctx)
-	case coininfo.FieldUnit:
-		return m.OldUnit(ctx)
-	case coininfo.FieldIsPresale:
-		return m.OldIsPresale(ctx)
-	case coininfo.FieldLogoImage:
-		return m.OldLogoImage(ctx)
-	}
-	return nil, fmt.Errorf("unknown CoinInfo field %s", name)
-}
-
-// SetField sets the value of a field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *CoinInfoMutation) SetField(name string, value ent.Value) error {
-	switch name {
-	case coininfo.FieldCoinTypeID:
-		v, ok := value.(int32)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCoinTypeID(v)
-		return nil
-	case coininfo.FieldName:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetName(v)
-		return nil
-	case coininfo.FieldUnit:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUnit(v)
-		return nil
-	case coininfo.FieldIsPresale:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetIsPresale(v)
-		return nil
-	case coininfo.FieldLogoImage:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetLogoImage(v)
-		return nil
-	}
-	return fmt.Errorf("unknown CoinInfo field %s", name)
-}
-
-// AddedFields returns all numeric fields that were incremented/decremented during
-// this mutation.
-func (m *CoinInfoMutation) AddedFields() []string {
-	var fields []string
-	if m.addcoin_type_id != nil {
-		fields = append(fields, coininfo.FieldCoinTypeID)
-	}
-	return fields
-}
-
-// AddedField returns the numeric value that was incremented/decremented on a field
-// with the given name. The second boolean return value indicates that this field
-// was not set, or was not defined in the schema.
-func (m *CoinInfoMutation) AddedField(name string) (ent.Value, bool) {
-	switch name {
-	case coininfo.FieldCoinTypeID:
-		return m.AddedCoinTypeID()
-	}
-	return nil, false
-}
-
-// AddField adds the value to the field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *CoinInfoMutation) AddField(name string, value ent.Value) error {
-	switch name {
-	case coininfo.FieldCoinTypeID:
-		v, ok := value.(int32)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddCoinTypeID(v)
-		return nil
-	}
-	return fmt.Errorf("unknown CoinInfo numeric field %s", name)
-}
-
-// ClearedFields returns all nullable fields that were cleared during this
-// mutation.
-func (m *CoinInfoMutation) ClearedFields() []string {
-	return nil
-}
-
-// FieldCleared returns a boolean indicating if a field with the given name was
-// cleared in this mutation.
-func (m *CoinInfoMutation) FieldCleared(name string) bool {
-	_, ok := m.clearedFields[name]
-	return ok
-}
-
-// ClearField clears the value of the field with the given name. It returns an
-// error if the field is not defined in the schema.
-func (m *CoinInfoMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown CoinInfo nullable field %s", name)
-}
-
-// ResetField resets all changes in the mutation for the field with the given name.
-// It returns an error if the field is not defined in the schema.
-func (m *CoinInfoMutation) ResetField(name string) error {
-	switch name {
-	case coininfo.FieldCoinTypeID:
-		m.ResetCoinTypeID()
-		return nil
-	case coininfo.FieldName:
-		m.ResetName()
-		return nil
-	case coininfo.FieldUnit:
-		m.ResetUnit()
-		return nil
-	case coininfo.FieldIsPresale:
-		m.ResetIsPresale()
-		return nil
-	case coininfo.FieldLogoImage:
-		m.ResetLogoImage()
-		return nil
-	}
-	return fmt.Errorf("unknown CoinInfo field %s", name)
-}
-
-// AddedEdges returns all edge names that were set/added in this mutation.
-func (m *CoinInfoMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
-	if m.transactions != nil {
-		edges = append(edges, coininfo.EdgeTransactions)
-	}
-	if m.reviews != nil {
-		edges = append(edges, coininfo.EdgeReviews)
-	}
-	if m.wallet_nodes != nil {
-		edges = append(edges, coininfo.EdgeWalletNodes)
-	}
-	return edges
-}
-
-// AddedIDs returns all IDs (to other nodes) that were added for the given edge
-// name in this mutation.
-func (m *CoinInfoMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case coininfo.EdgeTransactions:
-		ids := make([]ent.Value, 0, len(m.transactions))
-		for id := range m.transactions {
-			ids = append(ids, id)
-		}
-		return ids
-	case coininfo.EdgeReviews:
-		ids := make([]ent.Value, 0, len(m.reviews))
-		for id := range m.reviews {
-			ids = append(ids, id)
-		}
-		return ids
-	case coininfo.EdgeWalletNodes:
-		ids := make([]ent.Value, 0, len(m.wallet_nodes))
-		for id := range m.wallet_nodes {
-			ids = append(ids, id)
-		}
-		return ids
-	}
-	return nil
-}
-
-// RemovedEdges returns all edge names that were removed in this mutation.
-func (m *CoinInfoMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
-	if m.removedtransactions != nil {
-		edges = append(edges, coininfo.EdgeTransactions)
-	}
-	if m.removedreviews != nil {
-		edges = append(edges, coininfo.EdgeReviews)
-	}
-	if m.removedwallet_nodes != nil {
-		edges = append(edges, coininfo.EdgeWalletNodes)
-	}
-	return edges
-}
-
-// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
-// the given name in this mutation.
-func (m *CoinInfoMutation) RemovedIDs(name string) []ent.Value {
-	switch name {
-	case coininfo.EdgeTransactions:
-		ids := make([]ent.Value, 0, len(m.removedtransactions))
-		for id := range m.removedtransactions {
-			ids = append(ids, id)
-		}
-		return ids
-	case coininfo.EdgeReviews:
-		ids := make([]ent.Value, 0, len(m.removedreviews))
-		for id := range m.removedreviews {
-			ids = append(ids, id)
-		}
-		return ids
-	case coininfo.EdgeWalletNodes:
-		ids := make([]ent.Value, 0, len(m.removedwallet_nodes))
-		for id := range m.removedwallet_nodes {
-			ids = append(ids, id)
-		}
-		return ids
-	}
-	return nil
-}
-
-// ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *CoinInfoMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
-	if m.clearedtransactions {
-		edges = append(edges, coininfo.EdgeTransactions)
-	}
-	if m.clearedreviews {
-		edges = append(edges, coininfo.EdgeReviews)
-	}
-	if m.clearedwallet_nodes {
-		edges = append(edges, coininfo.EdgeWalletNodes)
-	}
-	return edges
-}
-
-// EdgeCleared returns a boolean which indicates if the edge with the given name
-// was cleared in this mutation.
-func (m *CoinInfoMutation) EdgeCleared(name string) bool {
-	switch name {
-	case coininfo.EdgeTransactions:
-		return m.clearedtransactions
-	case coininfo.EdgeReviews:
-		return m.clearedreviews
-	case coininfo.EdgeWalletNodes:
-		return m.clearedwallet_nodes
-	}
-	return false
-}
-
-// ClearEdge clears the value of the edge with the given name. It returns an error
-// if that edge is not defined in the schema.
-func (m *CoinInfoMutation) ClearEdge(name string) error {
-	switch name {
-	}
-	return fmt.Errorf("unknown CoinInfo unique edge %s", name)
-}
-
-// ResetEdge resets all changes to the edge with the given name in this mutation.
-// It returns an error if the edge is not defined in the schema.
-func (m *CoinInfoMutation) ResetEdge(name string) error {
-	switch name {
-	case coininfo.EdgeTransactions:
-		m.ResetTransactions()
-		return nil
-	case coininfo.EdgeReviews:
-		m.ResetReviews()
-		return nil
-	case coininfo.EdgeWalletNodes:
-		m.ResetWalletNodes()
-		return nil
-	}
-	return fmt.Errorf("unknown CoinInfo edge %s", name)
-}
-
-// EmptyMutation represents an operation that mutates the Empty nodes in the graph.
-type EmptyMutation struct {
-	config
-	op            Op
-	typ           string
-	id            *int
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*Empty, error)
-	predicates    []predicate.Empty
-}
-
-var _ ent.Mutation = (*EmptyMutation)(nil)
-
-// emptyOption allows management of the mutation configuration using functional options.
-type emptyOption func(*EmptyMutation)
-
-// newEmptyMutation creates new mutation for the Empty entity.
-func newEmptyMutation(c config, op Op, opts ...emptyOption) *EmptyMutation {
-	m := &EmptyMutation{
-		config:        c,
-		op:            op,
-		typ:           TypeEmpty,
-		clearedFields: make(map[string]struct{}),
-	}
-	for _, opt := range opts {
-		opt(m)
-	}
-	return m
-}
-
-// withEmptyID sets the ID field of the mutation.
-func withEmptyID(id int) emptyOption {
-	return func(m *EmptyMutation) {
-		var (
-			err   error
-			once  sync.Once
-			value *Empty
-		)
-		m.oldValue = func(ctx context.Context) (*Empty, error) {
-			once.Do(func() {
-				if m.done {
-					err = fmt.Errorf("querying old values post mutation is not allowed")
-				} else {
-					value, err = m.Client().Empty.Get(ctx, id)
-				}
-			})
-			return value, err
-		}
-		m.id = &id
-	}
-}
-
-// withEmpty sets the old Empty of the mutation.
-func withEmpty(node *Empty) emptyOption {
-	return func(m *EmptyMutation) {
-		m.oldValue = func(context.Context) (*Empty, error) {
-			return node, nil
-		}
-		m.id = &node.ID
-	}
-}
-
-// Client returns a new `ent.Client` from the mutation. If the mutation was
-// executed in a transaction (ent.Tx), a transactional client is returned.
-func (m EmptyMutation) Client() *Client {
-	client := &Client{config: m.config}
-	client.init()
-	return client
-}
-
-// Tx returns an `ent.Tx` for mutations that were executed in transactions;
-// it returns an error otherwise.
-func (m EmptyMutation) Tx() (*Tx, error) {
-	if _, ok := m.driver.(*txDriver); !ok {
-		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
-	}
-	tx := &Tx{config: m.config}
-	tx.init()
-	return tx, nil
-}
-
-// ID returns the ID value in the mutation. Note that the ID is only available
-// if it was provided to the builder or after it was returned from the database.
-func (m *EmptyMutation) ID() (id int, exists bool) {
-	if m.id == nil {
-		return
-	}
-	return *m.id, true
-}
-
-// Where appends a list predicates to the EmptyMutation builder.
-func (m *EmptyMutation) Where(ps ...predicate.Empty) {
-	m.predicates = append(m.predicates, ps...)
-}
-
-// Op returns the operation name.
-func (m *EmptyMutation) Op() Op {
-	return m.op
-}
-
-// Type returns the node type of this mutation (Empty).
-func (m *EmptyMutation) Type() string {
-	return m.typ
-}
-
-// Fields returns all fields that were changed during this mutation. Note that in
-// order to get all numeric fields that were incremented/decremented, call
-// AddedFields().
-func (m *EmptyMutation) Fields() []string {
-	fields := make([]string, 0, 0)
-	return fields
-}
-
-// Field returns the value of a field with the given name. The second boolean
-// return value indicates that this field was not set, or was not defined in the
-// schema.
-func (m *EmptyMutation) Field(name string) (ent.Value, bool) {
-	return nil, false
-}
-
-// OldField returns the old value of the field from the database. An error is
-// returned if the mutation operation is not UpdateOne, or the query to the
-// database failed.
-func (m *EmptyMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	return nil, fmt.Errorf("unknown Empty field %s", name)
-}
-
-// SetField sets the value of a field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *EmptyMutation) SetField(name string, value ent.Value) error {
-	switch name {
-	}
-	return fmt.Errorf("unknown Empty field %s", name)
-}
-
-// AddedFields returns all numeric fields that were incremented/decremented during
-// this mutation.
-func (m *EmptyMutation) AddedFields() []string {
-	return nil
-}
-
-// AddedField returns the numeric value that was incremented/decremented on a field
-// with the given name. The second boolean return value indicates that this field
-// was not set, or was not defined in the schema.
-func (m *EmptyMutation) AddedField(name string) (ent.Value, bool) {
-	return nil, false
-}
-
-// AddField adds the value to the field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *EmptyMutation) AddField(name string, value ent.Value) error {
-	return fmt.Errorf("unknown Empty numeric field %s", name)
-}
-
-// ClearedFields returns all nullable fields that were cleared during this
-// mutation.
-func (m *EmptyMutation) ClearedFields() []string {
-	return nil
-}
-
-// FieldCleared returns a boolean indicating if a field with the given name was
-// cleared in this mutation.
-func (m *EmptyMutation) FieldCleared(name string) bool {
-	_, ok := m.clearedFields[name]
-	return ok
-}
-
-// ClearField clears the value of the field with the given name. It returns an
-// error if the field is not defined in the schema.
-func (m *EmptyMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown Empty nullable field %s", name)
-}
-
-// ResetField resets all changes in the mutation for the field with the given name.
-// It returns an error if the field is not defined in the schema.
-func (m *EmptyMutation) ResetField(name string) error {
-	return fmt.Errorf("unknown Empty field %s", name)
-}
-
-// AddedEdges returns all edge names that were set/added in this mutation.
-func (m *EmptyMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
-	return edges
-}
-
-// AddedIDs returns all IDs (to other nodes) that were added for the given edge
-// name in this mutation.
-func (m *EmptyMutation) AddedIDs(name string) []ent.Value {
-	return nil
-}
-
-// RemovedEdges returns all edge names that were removed in this mutation.
-func (m *EmptyMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
-	return edges
-}
-
-// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
-// the given name in this mutation.
-func (m *EmptyMutation) RemovedIDs(name string) []ent.Value {
-	return nil
-}
-
-// ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *EmptyMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
-	return edges
-}
-
-// EdgeCleared returns a boolean which indicates if the edge with the given name
-// was cleared in this mutation.
-func (m *EmptyMutation) EdgeCleared(name string) bool {
-	return false
-}
-
-// ClearEdge clears the value of the edge with the given name. It returns an error
-// if that edge is not defined in the schema.
-func (m *EmptyMutation) ClearEdge(name string) error {
-	return fmt.Errorf("unknown Empty unique edge %s", name)
-}
-
-// ResetEdge resets all changes to the edge with the given name in this mutation.
-// It returns an error if the edge is not defined in the schema.
-func (m *EmptyMutation) ResetEdge(name string) error {
-	return fmt.Errorf("unknown Empty edge %s", name)
-}
-
-// ReviewMutation represents an operation that mutates the Review nodes in the graph.
-type ReviewMutation struct {
-	config
-	op                 Op
-	typ                string
-	id                 *int32
-	is_approved        *bool
-	operator_note      *string
-	createtime_utc     *int64
-	addcreatetime_utc  *int64
-	updatetime_utc     *int64
-	addupdatetime_utc  *int64
-	clearedFields      map[string]struct{}
-	transaction        *int32
-	clearedtransaction bool
-	coin               *uuid.UUID
-	clearedcoin        bool
-	done               bool
-	oldValue           func(context.Context) (*Review, error)
-	predicates         []predicate.Review
-}
-
-var _ ent.Mutation = (*ReviewMutation)(nil)
-
-// reviewOption allows management of the mutation configuration using functional options.
-type reviewOption func(*ReviewMutation)
-
-// newReviewMutation creates new mutation for the Review entity.
-func newReviewMutation(c config, op Op, opts ...reviewOption) *ReviewMutation {
-	m := &ReviewMutation{
-		config:        c,
-		op:            op,
-		typ:           TypeReview,
-		clearedFields: make(map[string]struct{}),
-	}
-	for _, opt := range opts {
-		opt(m)
-	}
-	return m
-}
-
-// withReviewID sets the ID field of the mutation.
-func withReviewID(id int32) reviewOption {
-	return func(m *ReviewMutation) {
-		var (
-			err   error
-			once  sync.Once
-			value *Review
-		)
-		m.oldValue = func(ctx context.Context) (*Review, error) {
-			once.Do(func() {
-				if m.done {
-					err = fmt.Errorf("querying old values post mutation is not allowed")
-				} else {
-					value, err = m.Client().Review.Get(ctx, id)
-				}
-			})
-			return value, err
-		}
-		m.id = &id
-	}
-}
-
-// withReview sets the old Review of the mutation.
-func withReview(node *Review) reviewOption {
-	return func(m *ReviewMutation) {
-		m.oldValue = func(context.Context) (*Review, error) {
-			return node, nil
-		}
-		m.id = &node.ID
-	}
-}
-
-// Client returns a new `ent.Client` from the mutation. If the mutation was
-// executed in a transaction (ent.Tx), a transactional client is returned.
-func (m ReviewMutation) Client() *Client {
-	client := &Client{config: m.config}
-	client.init()
-	return client
-}
-
-// Tx returns an `ent.Tx` for mutations that were executed in transactions;
-// it returns an error otherwise.
-func (m ReviewMutation) Tx() (*Tx, error) {
-	if _, ok := m.driver.(*txDriver); !ok {
-		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
-	}
-	tx := &Tx{config: m.config}
-	tx.init()
-	return tx, nil
-}
-
-// SetID sets the value of the id field. Note that this
-// operation is only accepted on creation of Review entities.
-func (m *ReviewMutation) SetID(id int32) {
-	m.id = &id
-}
-
-// ID returns the ID value in the mutation. Note that the ID is only available
-// if it was provided to the builder or after it was returned from the database.
-func (m *ReviewMutation) ID() (id int32, exists bool) {
-	if m.id == nil {
-		return
-	}
-	return *m.id, true
-}
-
-// SetIsApproved sets the "is_approved" field.
-func (m *ReviewMutation) SetIsApproved(b bool) {
-	m.is_approved = &b
-}
-
-// IsApproved returns the value of the "is_approved" field in the mutation.
-func (m *ReviewMutation) IsApproved() (r bool, exists bool) {
-	v := m.is_approved
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldIsApproved returns the old "is_approved" field's value of the Review entity.
-// If the Review object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ReviewMutation) OldIsApproved(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldIsApproved is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldIsApproved requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldIsApproved: %w", err)
-	}
-	return oldValue.IsApproved, nil
-}
-
-// ResetIsApproved resets all changes to the "is_approved" field.
-func (m *ReviewMutation) ResetIsApproved() {
-	m.is_approved = nil
-}
-
-// SetOperatorNote sets the "operator_note" field.
-func (m *ReviewMutation) SetOperatorNote(s string) {
-	m.operator_note = &s
-}
-
-// OperatorNote returns the value of the "operator_note" field in the mutation.
-func (m *ReviewMutation) OperatorNote() (r string, exists bool) {
-	v := m.operator_note
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldOperatorNote returns the old "operator_note" field's value of the Review entity.
-// If the Review object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ReviewMutation) OldOperatorNote(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldOperatorNote is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldOperatorNote requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldOperatorNote: %w", err)
-	}
-	return oldValue.OperatorNote, nil
-}
-
-// ResetOperatorNote resets all changes to the "operator_note" field.
-func (m *ReviewMutation) ResetOperatorNote() {
-	m.operator_note = nil
-}
-
-// SetCreatetimeUtc sets the "createtime_utc" field.
-func (m *ReviewMutation) SetCreatetimeUtc(i int64) {
-	m.createtime_utc = &i
-	m.addcreatetime_utc = nil
-}
-
-// CreatetimeUtc returns the value of the "createtime_utc" field in the mutation.
-func (m *ReviewMutation) CreatetimeUtc() (r int64, exists bool) {
-	v := m.createtime_utc
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCreatetimeUtc returns the old "createtime_utc" field's value of the Review entity.
-// If the Review object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ReviewMutation) OldCreatetimeUtc(ctx context.Context) (v int64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldCreatetimeUtc is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldCreatetimeUtc requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCreatetimeUtc: %w", err)
-	}
-	return oldValue.CreatetimeUtc, nil
-}
-
-// AddCreatetimeUtc adds i to the "createtime_utc" field.
-func (m *ReviewMutation) AddCreatetimeUtc(i int64) {
-	if m.addcreatetime_utc != nil {
-		*m.addcreatetime_utc += i
-	} else {
-		m.addcreatetime_utc = &i
-	}
-}
-
-// AddedCreatetimeUtc returns the value that was added to the "createtime_utc" field in this mutation.
-func (m *ReviewMutation) AddedCreatetimeUtc() (r int64, exists bool) {
-	v := m.addcreatetime_utc
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetCreatetimeUtc resets all changes to the "createtime_utc" field.
-func (m *ReviewMutation) ResetCreatetimeUtc() {
-	m.createtime_utc = nil
-	m.addcreatetime_utc = nil
-}
-
-// SetUpdatetimeUtc sets the "updatetime_utc" field.
-func (m *ReviewMutation) SetUpdatetimeUtc(i int64) {
-	m.updatetime_utc = &i
-	m.addupdatetime_utc = nil
-}
-
-// UpdatetimeUtc returns the value of the "updatetime_utc" field in the mutation.
-func (m *ReviewMutation) UpdatetimeUtc() (r int64, exists bool) {
-	v := m.updatetime_utc
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUpdatetimeUtc returns the old "updatetime_utc" field's value of the Review entity.
-// If the Review object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ReviewMutation) OldUpdatetimeUtc(ctx context.Context) (v int64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldUpdatetimeUtc is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldUpdatetimeUtc requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUpdatetimeUtc: %w", err)
-	}
-	return oldValue.UpdatetimeUtc, nil
-}
-
-// AddUpdatetimeUtc adds i to the "updatetime_utc" field.
-func (m *ReviewMutation) AddUpdatetimeUtc(i int64) {
-	if m.addupdatetime_utc != nil {
-		*m.addupdatetime_utc += i
-	} else {
-		m.addupdatetime_utc = &i
-	}
-}
-
-// AddedUpdatetimeUtc returns the value that was added to the "updatetime_utc" field in this mutation.
-func (m *ReviewMutation) AddedUpdatetimeUtc() (r int64, exists bool) {
-	v := m.addupdatetime_utc
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetUpdatetimeUtc resets all changes to the "updatetime_utc" field.
-func (m *ReviewMutation) ResetUpdatetimeUtc() {
-	m.updatetime_utc = nil
-	m.addupdatetime_utc = nil
-}
-
-// SetTransactionID sets the "transaction" edge to the Transaction entity by id.
-func (m *ReviewMutation) SetTransactionID(id int32) {
-	m.transaction = &id
-}
-
-// ClearTransaction clears the "transaction" edge to the Transaction entity.
-func (m *ReviewMutation) ClearTransaction() {
-	m.clearedtransaction = true
-}
-
-// TransactionCleared reports if the "transaction" edge to the Transaction entity was cleared.
-func (m *ReviewMutation) TransactionCleared() bool {
-	return m.clearedtransaction
-}
-
-// TransactionID returns the "transaction" edge ID in the mutation.
-func (m *ReviewMutation) TransactionID() (id int32, exists bool) {
-	if m.transaction != nil {
-		return *m.transaction, true
-	}
-	return
-}
-
-// TransactionIDs returns the "transaction" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// TransactionID instead. It exists only for internal usage by the builders.
-func (m *ReviewMutation) TransactionIDs() (ids []int32) {
-	if id := m.transaction; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetTransaction resets all changes to the "transaction" edge.
-func (m *ReviewMutation) ResetTransaction() {
-	m.transaction = nil
-	m.clearedtransaction = false
-}
-
-// SetCoinID sets the "coin" edge to the CoinInfo entity by id.
-func (m *ReviewMutation) SetCoinID(id uuid.UUID) {
-	m.coin = &id
-}
-
-// ClearCoin clears the "coin" edge to the CoinInfo entity.
-func (m *ReviewMutation) ClearCoin() {
-	m.clearedcoin = true
-}
-
-// CoinCleared reports if the "coin" edge to the CoinInfo entity was cleared.
-func (m *ReviewMutation) CoinCleared() bool {
-	return m.clearedcoin
-}
-
-// CoinID returns the "coin" edge ID in the mutation.
-func (m *ReviewMutation) CoinID() (id uuid.UUID, exists bool) {
-	if m.coin != nil {
-		return *m.coin, true
-	}
-	return
-}
-
-// CoinIDs returns the "coin" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// CoinID instead. It exists only for internal usage by the builders.
-func (m *ReviewMutation) CoinIDs() (ids []uuid.UUID) {
-	if id := m.coin; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetCoin resets all changes to the "coin" edge.
-func (m *ReviewMutation) ResetCoin() {
-	m.coin = nil
-	m.clearedcoin = false
-}
-
-// Where appends a list predicates to the ReviewMutation builder.
-func (m *ReviewMutation) Where(ps ...predicate.Review) {
-	m.predicates = append(m.predicates, ps...)
-}
-
-// Op returns the operation name.
-func (m *ReviewMutation) Op() Op {
-	return m.op
-}
-
-// Type returns the node type of this mutation (Review).
-func (m *ReviewMutation) Type() string {
-	return m.typ
-}
-
-// Fields returns all fields that were changed during this mutation. Note that in
-// order to get all numeric fields that were incremented/decremented, call
-// AddedFields().
-func (m *ReviewMutation) Fields() []string {
-	fields := make([]string, 0, 4)
-	if m.is_approved != nil {
-		fields = append(fields, review.FieldIsApproved)
-	}
-	if m.operator_note != nil {
-		fields = append(fields, review.FieldOperatorNote)
-	}
-	if m.createtime_utc != nil {
-		fields = append(fields, review.FieldCreatetimeUtc)
-	}
-	if m.updatetime_utc != nil {
-		fields = append(fields, review.FieldUpdatetimeUtc)
-	}
-	return fields
-}
-
-// Field returns the value of a field with the given name. The second boolean
-// return value indicates that this field was not set, or was not defined in the
-// schema.
-func (m *ReviewMutation) Field(name string) (ent.Value, bool) {
-	switch name {
-	case review.FieldIsApproved:
-		return m.IsApproved()
-	case review.FieldOperatorNote:
-		return m.OperatorNote()
-	case review.FieldCreatetimeUtc:
-		return m.CreatetimeUtc()
-	case review.FieldUpdatetimeUtc:
-		return m.UpdatetimeUtc()
-	}
-	return nil, false
-}
-
-// OldField returns the old value of the field from the database. An error is
-// returned if the mutation operation is not UpdateOne, or the query to the
-// database failed.
-func (m *ReviewMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	switch name {
-	case review.FieldIsApproved:
-		return m.OldIsApproved(ctx)
-	case review.FieldOperatorNote:
-		return m.OldOperatorNote(ctx)
-	case review.FieldCreatetimeUtc:
-		return m.OldCreatetimeUtc(ctx)
-	case review.FieldUpdatetimeUtc:
-		return m.OldUpdatetimeUtc(ctx)
-	}
-	return nil, fmt.Errorf("unknown Review field %s", name)
-}
-
-// SetField sets the value of a field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *ReviewMutation) SetField(name string, value ent.Value) error {
-	switch name {
-	case review.FieldIsApproved:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetIsApproved(v)
-		return nil
-	case review.FieldOperatorNote:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetOperatorNote(v)
-		return nil
-	case review.FieldCreatetimeUtc:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCreatetimeUtc(v)
-		return nil
-	case review.FieldUpdatetimeUtc:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUpdatetimeUtc(v)
-		return nil
-	}
-	return fmt.Errorf("unknown Review field %s", name)
-}
-
-// AddedFields returns all numeric fields that were incremented/decremented during
-// this mutation.
-func (m *ReviewMutation) AddedFields() []string {
-	var fields []string
-	if m.addcreatetime_utc != nil {
-		fields = append(fields, review.FieldCreatetimeUtc)
-	}
-	if m.addupdatetime_utc != nil {
-		fields = append(fields, review.FieldUpdatetimeUtc)
-	}
-	return fields
-}
-
-// AddedField returns the numeric value that was incremented/decremented on a field
-// with the given name. The second boolean return value indicates that this field
-// was not set, or was not defined in the schema.
-func (m *ReviewMutation) AddedField(name string) (ent.Value, bool) {
-	switch name {
-	case review.FieldCreatetimeUtc:
-		return m.AddedCreatetimeUtc()
-	case review.FieldUpdatetimeUtc:
-		return m.AddedUpdatetimeUtc()
-	}
-	return nil, false
-}
-
-// AddField adds the value to the field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *ReviewMutation) AddField(name string, value ent.Value) error {
-	switch name {
-	case review.FieldCreatetimeUtc:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddCreatetimeUtc(v)
-		return nil
-	case review.FieldUpdatetimeUtc:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddUpdatetimeUtc(v)
-		return nil
-	}
-	return fmt.Errorf("unknown Review numeric field %s", name)
-}
-
-// ClearedFields returns all nullable fields that were cleared during this
-// mutation.
-func (m *ReviewMutation) ClearedFields() []string {
-	return nil
-}
-
-// FieldCleared returns a boolean indicating if a field with the given name was
-// cleared in this mutation.
-func (m *ReviewMutation) FieldCleared(name string) bool {
-	_, ok := m.clearedFields[name]
-	return ok
-}
-
-// ClearField clears the value of the field with the given name. It returns an
-// error if the field is not defined in the schema.
-func (m *ReviewMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown Review nullable field %s", name)
-}
-
-// ResetField resets all changes in the mutation for the field with the given name.
-// It returns an error if the field is not defined in the schema.
-func (m *ReviewMutation) ResetField(name string) error {
-	switch name {
-	case review.FieldIsApproved:
-		m.ResetIsApproved()
-		return nil
-	case review.FieldOperatorNote:
-		m.ResetOperatorNote()
-		return nil
-	case review.FieldCreatetimeUtc:
-		m.ResetCreatetimeUtc()
-		return nil
-	case review.FieldUpdatetimeUtc:
-		m.ResetUpdatetimeUtc()
-		return nil
-	}
-	return fmt.Errorf("unknown Review field %s", name)
-}
-
-// AddedEdges returns all edge names that were set/added in this mutation.
-func (m *ReviewMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.transaction != nil {
-		edges = append(edges, review.EdgeTransaction)
-	}
-	if m.coin != nil {
-		edges = append(edges, review.EdgeCoin)
-	}
-	return edges
-}
-
-// AddedIDs returns all IDs (to other nodes) that were added for the given edge
-// name in this mutation.
-func (m *ReviewMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case review.EdgeTransaction:
-		if id := m.transaction; id != nil {
-			return []ent.Value{*id}
-		}
-	case review.EdgeCoin:
-		if id := m.coin; id != nil {
-			return []ent.Value{*id}
-		}
-	}
-	return nil
-}
-
-// RemovedEdges returns all edge names that were removed in this mutation.
-func (m *ReviewMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
-	return edges
-}
-
-// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
-// the given name in this mutation.
-func (m *ReviewMutation) RemovedIDs(name string) []ent.Value {
-	switch name {
-	}
-	return nil
-}
-
-// ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *ReviewMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.clearedtransaction {
-		edges = append(edges, review.EdgeTransaction)
-	}
-	if m.clearedcoin {
-		edges = append(edges, review.EdgeCoin)
-	}
-	return edges
-}
-
-// EdgeCleared returns a boolean which indicates if the edge with the given name
-// was cleared in this mutation.
-func (m *ReviewMutation) EdgeCleared(name string) bool {
-	switch name {
-	case review.EdgeTransaction:
-		return m.clearedtransaction
-	case review.EdgeCoin:
-		return m.clearedcoin
-	}
-	return false
-}
-
-// ClearEdge clears the value of the edge with the given name. It returns an error
-// if that edge is not defined in the schema.
-func (m *ReviewMutation) ClearEdge(name string) error {
-	switch name {
-	case review.EdgeTransaction:
-		m.ClearTransaction()
-		return nil
-	case review.EdgeCoin:
-		m.ClearCoin()
-		return nil
-	}
-	return fmt.Errorf("unknown Review unique edge %s", name)
-}
-
-// ResetEdge resets all changes to the edge with the given name in this mutation.
-// It returns an error if the edge is not defined in the schema.
-func (m *ReviewMutation) ResetEdge(name string) error {
-	switch name {
-	case review.EdgeTransaction:
-		m.ResetTransaction()
-		return nil
-	case review.EdgeCoin:
-		m.ResetCoin()
-		return nil
-	}
-	return fmt.Errorf("unknown Review edge %s", name)
-}
 
 // TransactionMutation represents an operation that mutates the Transaction nodes in the graph.
 type TransactionMutation struct {
 	config
-	op                    Op
-	typ                   string
-	id                    *int32
-	amount_uint64         *uint64
-	addamount_uint64      *uint64
-	amount_float64        *float64
-	addamount_float64     *float64
-	address_from          *string
-	address_to            *string
-	need_manual_review    *bool
-	_type                 *transaction.Type
-	transaction_id_insite *string
-	transaction_id_chain  *string
-	status                *transaction.Status
-	mutex                 *bool
-	signature_user        *string
-	signature_platform    *string
-	createtime_utc        *int64
-	addcreatetime_utc     *int64
-	updatetime_utc        *int64
-	addupdatetime_utc     *int64
-	clearedFields         map[string]struct{}
-	coin                  *uuid.UUID
-	clearedcoin           bool
-	review                map[int32]struct{}
-	removedreview         map[int32]struct{}
-	clearedreview         bool
-	done                  bool
-	oldValue              func(context.Context) (*Transaction, error)
-	predicates            []predicate.Transaction
+	op             Op
+	typ            string
+	id             *uuid.UUID
+	name           *string
+	amount         *uint64
+	addamount      *uint64
+	from           *string
+	to             *string
+	transaction_id *string
+	cid            *string
+	status         *transaction.Status
+	created_at     *uint32
+	addcreated_at  *uint32
+	updated_at     *uint32
+	addupdated_at  *uint32
+	deleted_at     *uint32
+	adddeleted_at  *uint32
+	clearedFields  map[string]struct{}
+	done           bool
+	oldValue       func(context.Context) (*Transaction, error)
+	predicates     []predicate.Transaction
 }
 
 var _ ent.Mutation = (*TransactionMutation)(nil)
@@ -1784,7 +72,7 @@ func newTransactionMutation(c config, op Op, opts ...transactionOption) *Transac
 }
 
 // withTransactionID sets the ID field of the mutation.
-func withTransactionID(id int32) transactionOption {
+func withTransactionID(id uuid.UUID) transactionOption {
 	return func(m *TransactionMutation) {
 		var (
 			err   error
@@ -1836,345 +124,253 @@ func (m TransactionMutation) Tx() (*Tx, error) {
 
 // SetID sets the value of the id field. Note that this
 // operation is only accepted on creation of Transaction entities.
-func (m *TransactionMutation) SetID(id int32) {
+func (m *TransactionMutation) SetID(id uuid.UUID) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *TransactionMutation) ID() (id int32, exists bool) {
+func (m *TransactionMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
 	return *m.id, true
 }
 
-// SetAmountUint64 sets the "amount_uint64" field.
-func (m *TransactionMutation) SetAmountUint64(u uint64) {
-	m.amount_uint64 = &u
-	m.addamount_uint64 = nil
+// SetName sets the "name" field.
+func (m *TransactionMutation) SetName(s string) {
+	m.name = &s
 }
 
-// AmountUint64 returns the value of the "amount_uint64" field in the mutation.
-func (m *TransactionMutation) AmountUint64() (r uint64, exists bool) {
-	v := m.amount_uint64
+// Name returns the value of the "name" field in the mutation.
+func (m *TransactionMutation) Name() (r string, exists bool) {
+	v := m.name
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldAmountUint64 returns the old "amount_uint64" field's value of the Transaction entity.
+// OldName returns the old "name" field's value of the Transaction entity.
 // If the Transaction object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TransactionMutation) OldAmountUint64(ctx context.Context) (v uint64, err error) {
+func (m *TransactionMutation) OldName(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldAmountUint64 is only allowed on UpdateOne operations")
+		return v, fmt.Errorf("OldName is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldAmountUint64 requires an ID field in the mutation")
+		return v, fmt.Errorf("OldName requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldAmountUint64: %w", err)
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
 	}
-	return oldValue.AmountUint64, nil
+	return oldValue.Name, nil
 }
 
-// AddAmountUint64 adds u to the "amount_uint64" field.
-func (m *TransactionMutation) AddAmountUint64(u uint64) {
-	if m.addamount_uint64 != nil {
-		*m.addamount_uint64 += u
+// ResetName resets all changes to the "name" field.
+func (m *TransactionMutation) ResetName() {
+	m.name = nil
+}
+
+// SetAmount sets the "amount" field.
+func (m *TransactionMutation) SetAmount(u uint64) {
+	m.amount = &u
+	m.addamount = nil
+}
+
+// Amount returns the value of the "amount" field in the mutation.
+func (m *TransactionMutation) Amount() (r uint64, exists bool) {
+	v := m.amount
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAmount returns the old "amount" field's value of the Transaction entity.
+// If the Transaction object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TransactionMutation) OldAmount(ctx context.Context) (v uint64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldAmount is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldAmount requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAmount: %w", err)
+	}
+	return oldValue.Amount, nil
+}
+
+// AddAmount adds u to the "amount" field.
+func (m *TransactionMutation) AddAmount(u uint64) {
+	if m.addamount != nil {
+		*m.addamount += u
 	} else {
-		m.addamount_uint64 = &u
+		m.addamount = &u
 	}
 }
 
-// AddedAmountUint64 returns the value that was added to the "amount_uint64" field in this mutation.
-func (m *TransactionMutation) AddedAmountUint64() (r uint64, exists bool) {
-	v := m.addamount_uint64
+// AddedAmount returns the value that was added to the "amount" field in this mutation.
+func (m *TransactionMutation) AddedAmount() (r uint64, exists bool) {
+	v := m.addamount
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetAmountUint64 resets all changes to the "amount_uint64" field.
-func (m *TransactionMutation) ResetAmountUint64() {
-	m.amount_uint64 = nil
-	m.addamount_uint64 = nil
+// ResetAmount resets all changes to the "amount" field.
+func (m *TransactionMutation) ResetAmount() {
+	m.amount = nil
+	m.addamount = nil
 }
 
-// SetAmountFloat64 sets the "amount_float64" field.
-func (m *TransactionMutation) SetAmountFloat64(f float64) {
-	m.amount_float64 = &f
-	m.addamount_float64 = nil
+// SetFrom sets the "from" field.
+func (m *TransactionMutation) SetFrom(s string) {
+	m.from = &s
 }
 
-// AmountFloat64 returns the value of the "amount_float64" field in the mutation.
-func (m *TransactionMutation) AmountFloat64() (r float64, exists bool) {
-	v := m.amount_float64
+// From returns the value of the "from" field in the mutation.
+func (m *TransactionMutation) From() (r string, exists bool) {
+	v := m.from
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldAmountFloat64 returns the old "amount_float64" field's value of the Transaction entity.
+// OldFrom returns the old "from" field's value of the Transaction entity.
 // If the Transaction object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TransactionMutation) OldAmountFloat64(ctx context.Context) (v float64, err error) {
+func (m *TransactionMutation) OldFrom(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldAmountFloat64 is only allowed on UpdateOne operations")
+		return v, fmt.Errorf("OldFrom is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldAmountFloat64 requires an ID field in the mutation")
+		return v, fmt.Errorf("OldFrom requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldAmountFloat64: %w", err)
+		return v, fmt.Errorf("querying old value for OldFrom: %w", err)
 	}
-	return oldValue.AmountFloat64, nil
+	return oldValue.From, nil
 }
 
-// AddAmountFloat64 adds f to the "amount_float64" field.
-func (m *TransactionMutation) AddAmountFloat64(f float64) {
-	if m.addamount_float64 != nil {
-		*m.addamount_float64 += f
-	} else {
-		m.addamount_float64 = &f
-	}
+// ResetFrom resets all changes to the "from" field.
+func (m *TransactionMutation) ResetFrom() {
+	m.from = nil
 }
 
-// AddedAmountFloat64 returns the value that was added to the "amount_float64" field in this mutation.
-func (m *TransactionMutation) AddedAmountFloat64() (r float64, exists bool) {
-	v := m.addamount_float64
+// SetTo sets the "to" field.
+func (m *TransactionMutation) SetTo(s string) {
+	m.to = &s
+}
+
+// To returns the value of the "to" field in the mutation.
+func (m *TransactionMutation) To() (r string, exists bool) {
+	v := m.to
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetAmountFloat64 resets all changes to the "amount_float64" field.
-func (m *TransactionMutation) ResetAmountFloat64() {
-	m.amount_float64 = nil
-	m.addamount_float64 = nil
-}
-
-// SetAddressFrom sets the "address_from" field.
-func (m *TransactionMutation) SetAddressFrom(s string) {
-	m.address_from = &s
-}
-
-// AddressFrom returns the value of the "address_from" field in the mutation.
-func (m *TransactionMutation) AddressFrom() (r string, exists bool) {
-	v := m.address_from
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldAddressFrom returns the old "address_from" field's value of the Transaction entity.
+// OldTo returns the old "to" field's value of the Transaction entity.
 // If the Transaction object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TransactionMutation) OldAddressFrom(ctx context.Context) (v string, err error) {
+func (m *TransactionMutation) OldTo(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldAddressFrom is only allowed on UpdateOne operations")
+		return v, fmt.Errorf("OldTo is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldAddressFrom requires an ID field in the mutation")
+		return v, fmt.Errorf("OldTo requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldAddressFrom: %w", err)
+		return v, fmt.Errorf("querying old value for OldTo: %w", err)
 	}
-	return oldValue.AddressFrom, nil
+	return oldValue.To, nil
 }
 
-// ResetAddressFrom resets all changes to the "address_from" field.
-func (m *TransactionMutation) ResetAddressFrom() {
-	m.address_from = nil
+// ResetTo resets all changes to the "to" field.
+func (m *TransactionMutation) ResetTo() {
+	m.to = nil
 }
 
-// SetAddressTo sets the "address_to" field.
-func (m *TransactionMutation) SetAddressTo(s string) {
-	m.address_to = &s
+// SetTransactionID sets the "transaction_id" field.
+func (m *TransactionMutation) SetTransactionID(s string) {
+	m.transaction_id = &s
 }
 
-// AddressTo returns the value of the "address_to" field in the mutation.
-func (m *TransactionMutation) AddressTo() (r string, exists bool) {
-	v := m.address_to
+// TransactionID returns the value of the "transaction_id" field in the mutation.
+func (m *TransactionMutation) TransactionID() (r string, exists bool) {
+	v := m.transaction_id
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldAddressTo returns the old "address_to" field's value of the Transaction entity.
+// OldTransactionID returns the old "transaction_id" field's value of the Transaction entity.
 // If the Transaction object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TransactionMutation) OldAddressTo(ctx context.Context) (v string, err error) {
+func (m *TransactionMutation) OldTransactionID(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldAddressTo is only allowed on UpdateOne operations")
+		return v, fmt.Errorf("OldTransactionID is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldAddressTo requires an ID field in the mutation")
+		return v, fmt.Errorf("OldTransactionID requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldAddressTo: %w", err)
+		return v, fmt.Errorf("querying old value for OldTransactionID: %w", err)
 	}
-	return oldValue.AddressTo, nil
+	return oldValue.TransactionID, nil
 }
 
-// ResetAddressTo resets all changes to the "address_to" field.
-func (m *TransactionMutation) ResetAddressTo() {
-	m.address_to = nil
+// ResetTransactionID resets all changes to the "transaction_id" field.
+func (m *TransactionMutation) ResetTransactionID() {
+	m.transaction_id = nil
 }
 
-// SetNeedManualReview sets the "need_manual_review" field.
-func (m *TransactionMutation) SetNeedManualReview(b bool) {
-	m.need_manual_review = &b
+// SetCid sets the "cid" field.
+func (m *TransactionMutation) SetCid(s string) {
+	m.cid = &s
 }
 
-// NeedManualReview returns the value of the "need_manual_review" field in the mutation.
-func (m *TransactionMutation) NeedManualReview() (r bool, exists bool) {
-	v := m.need_manual_review
+// Cid returns the value of the "cid" field in the mutation.
+func (m *TransactionMutation) Cid() (r string, exists bool) {
+	v := m.cid
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldNeedManualReview returns the old "need_manual_review" field's value of the Transaction entity.
+// OldCid returns the old "cid" field's value of the Transaction entity.
 // If the Transaction object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TransactionMutation) OldNeedManualReview(ctx context.Context) (v bool, err error) {
+func (m *TransactionMutation) OldCid(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldNeedManualReview is only allowed on UpdateOne operations")
+		return v, fmt.Errorf("OldCid is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldNeedManualReview requires an ID field in the mutation")
+		return v, fmt.Errorf("OldCid requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldNeedManualReview: %w", err)
+		return v, fmt.Errorf("querying old value for OldCid: %w", err)
 	}
-	return oldValue.NeedManualReview, nil
+	return oldValue.Cid, nil
 }
 
-// ResetNeedManualReview resets all changes to the "need_manual_review" field.
-func (m *TransactionMutation) ResetNeedManualReview() {
-	m.need_manual_review = nil
-}
-
-// SetType sets the "type" field.
-func (m *TransactionMutation) SetType(t transaction.Type) {
-	m._type = &t
-}
-
-// GetType returns the value of the "type" field in the mutation.
-func (m *TransactionMutation) GetType() (r transaction.Type, exists bool) {
-	v := m._type
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldType returns the old "type" field's value of the Transaction entity.
-// If the Transaction object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TransactionMutation) OldType(ctx context.Context) (v transaction.Type, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldType is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldType requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldType: %w", err)
-	}
-	return oldValue.Type, nil
-}
-
-// ResetType resets all changes to the "type" field.
-func (m *TransactionMutation) ResetType() {
-	m._type = nil
-}
-
-// SetTransactionIDInsite sets the "transaction_id_insite" field.
-func (m *TransactionMutation) SetTransactionIDInsite(s string) {
-	m.transaction_id_insite = &s
-}
-
-// TransactionIDInsite returns the value of the "transaction_id_insite" field in the mutation.
-func (m *TransactionMutation) TransactionIDInsite() (r string, exists bool) {
-	v := m.transaction_id_insite
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldTransactionIDInsite returns the old "transaction_id_insite" field's value of the Transaction entity.
-// If the Transaction object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TransactionMutation) OldTransactionIDInsite(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldTransactionIDInsite is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldTransactionIDInsite requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTransactionIDInsite: %w", err)
-	}
-	return oldValue.TransactionIDInsite, nil
-}
-
-// ResetTransactionIDInsite resets all changes to the "transaction_id_insite" field.
-func (m *TransactionMutation) ResetTransactionIDInsite() {
-	m.transaction_id_insite = nil
-}
-
-// SetTransactionIDChain sets the "transaction_id_chain" field.
-func (m *TransactionMutation) SetTransactionIDChain(s string) {
-	m.transaction_id_chain = &s
-}
-
-// TransactionIDChain returns the value of the "transaction_id_chain" field in the mutation.
-func (m *TransactionMutation) TransactionIDChain() (r string, exists bool) {
-	v := m.transaction_id_chain
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldTransactionIDChain returns the old "transaction_id_chain" field's value of the Transaction entity.
-// If the Transaction object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TransactionMutation) OldTransactionIDChain(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldTransactionIDChain is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldTransactionIDChain requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTransactionIDChain: %w", err)
-	}
-	return oldValue.TransactionIDChain, nil
-}
-
-// ResetTransactionIDChain resets all changes to the "transaction_id_chain" field.
-func (m *TransactionMutation) ResetTransactionIDChain() {
-	m.transaction_id_chain = nil
+// ResetCid resets all changes to the "cid" field.
+func (m *TransactionMutation) ResetCid() {
+	m.cid = nil
 }
 
 // SetStatus sets the "status" field.
@@ -2213,317 +409,172 @@ func (m *TransactionMutation) ResetStatus() {
 	m.status = nil
 }
 
-// SetMutex sets the "mutex" field.
-func (m *TransactionMutation) SetMutex(b bool) {
-	m.mutex = &b
+// SetCreatedAt sets the "created_at" field.
+func (m *TransactionMutation) SetCreatedAt(u uint32) {
+	m.created_at = &u
+	m.addcreated_at = nil
 }
 
-// Mutex returns the value of the "mutex" field in the mutation.
-func (m *TransactionMutation) Mutex() (r bool, exists bool) {
-	v := m.mutex
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *TransactionMutation) CreatedAt() (r uint32, exists bool) {
+	v := m.created_at
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldMutex returns the old "mutex" field's value of the Transaction entity.
+// OldCreatedAt returns the old "created_at" field's value of the Transaction entity.
 // If the Transaction object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TransactionMutation) OldMutex(ctx context.Context) (v bool, err error) {
+func (m *TransactionMutation) OldCreatedAt(ctx context.Context) (v uint32, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldMutex is only allowed on UpdateOne operations")
+		return v, fmt.Errorf("OldCreatedAt is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldMutex requires an ID field in the mutation")
+		return v, fmt.Errorf("OldCreatedAt requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldMutex: %w", err)
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
 	}
-	return oldValue.Mutex, nil
+	return oldValue.CreatedAt, nil
 }
 
-// ResetMutex resets all changes to the "mutex" field.
-func (m *TransactionMutation) ResetMutex() {
-	m.mutex = nil
-}
-
-// SetSignatureUser sets the "signature_user" field.
-func (m *TransactionMutation) SetSignatureUser(s string) {
-	m.signature_user = &s
-}
-
-// SignatureUser returns the value of the "signature_user" field in the mutation.
-func (m *TransactionMutation) SignatureUser() (r string, exists bool) {
-	v := m.signature_user
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldSignatureUser returns the old "signature_user" field's value of the Transaction entity.
-// If the Transaction object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TransactionMutation) OldSignatureUser(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldSignatureUser is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldSignatureUser requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldSignatureUser: %w", err)
-	}
-	return oldValue.SignatureUser, nil
-}
-
-// ResetSignatureUser resets all changes to the "signature_user" field.
-func (m *TransactionMutation) ResetSignatureUser() {
-	m.signature_user = nil
-}
-
-// SetSignaturePlatform sets the "signature_platform" field.
-func (m *TransactionMutation) SetSignaturePlatform(s string) {
-	m.signature_platform = &s
-}
-
-// SignaturePlatform returns the value of the "signature_platform" field in the mutation.
-func (m *TransactionMutation) SignaturePlatform() (r string, exists bool) {
-	v := m.signature_platform
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldSignaturePlatform returns the old "signature_platform" field's value of the Transaction entity.
-// If the Transaction object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TransactionMutation) OldSignaturePlatform(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldSignaturePlatform is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldSignaturePlatform requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldSignaturePlatform: %w", err)
-	}
-	return oldValue.SignaturePlatform, nil
-}
-
-// ResetSignaturePlatform resets all changes to the "signature_platform" field.
-func (m *TransactionMutation) ResetSignaturePlatform() {
-	m.signature_platform = nil
-}
-
-// SetCreatetimeUtc sets the "createtime_utc" field.
-func (m *TransactionMutation) SetCreatetimeUtc(i int64) {
-	m.createtime_utc = &i
-	m.addcreatetime_utc = nil
-}
-
-// CreatetimeUtc returns the value of the "createtime_utc" field in the mutation.
-func (m *TransactionMutation) CreatetimeUtc() (r int64, exists bool) {
-	v := m.createtime_utc
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCreatetimeUtc returns the old "createtime_utc" field's value of the Transaction entity.
-// If the Transaction object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TransactionMutation) OldCreatetimeUtc(ctx context.Context) (v int64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldCreatetimeUtc is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldCreatetimeUtc requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCreatetimeUtc: %w", err)
-	}
-	return oldValue.CreatetimeUtc, nil
-}
-
-// AddCreatetimeUtc adds i to the "createtime_utc" field.
-func (m *TransactionMutation) AddCreatetimeUtc(i int64) {
-	if m.addcreatetime_utc != nil {
-		*m.addcreatetime_utc += i
+// AddCreatedAt adds u to the "created_at" field.
+func (m *TransactionMutation) AddCreatedAt(u uint32) {
+	if m.addcreated_at != nil {
+		*m.addcreated_at += u
 	} else {
-		m.addcreatetime_utc = &i
+		m.addcreated_at = &u
 	}
 }
 
-// AddedCreatetimeUtc returns the value that was added to the "createtime_utc" field in this mutation.
-func (m *TransactionMutation) AddedCreatetimeUtc() (r int64, exists bool) {
-	v := m.addcreatetime_utc
+// AddedCreatedAt returns the value that was added to the "created_at" field in this mutation.
+func (m *TransactionMutation) AddedCreatedAt() (r uint32, exists bool) {
+	v := m.addcreated_at
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetCreatetimeUtc resets all changes to the "createtime_utc" field.
-func (m *TransactionMutation) ResetCreatetimeUtc() {
-	m.createtime_utc = nil
-	m.addcreatetime_utc = nil
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *TransactionMutation) ResetCreatedAt() {
+	m.created_at = nil
+	m.addcreated_at = nil
 }
 
-// SetUpdatetimeUtc sets the "updatetime_utc" field.
-func (m *TransactionMutation) SetUpdatetimeUtc(i int64) {
-	m.updatetime_utc = &i
-	m.addupdatetime_utc = nil
+// SetUpdatedAt sets the "updated_at" field.
+func (m *TransactionMutation) SetUpdatedAt(u uint32) {
+	m.updated_at = &u
+	m.addupdated_at = nil
 }
 
-// UpdatetimeUtc returns the value of the "updatetime_utc" field in the mutation.
-func (m *TransactionMutation) UpdatetimeUtc() (r int64, exists bool) {
-	v := m.updatetime_utc
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *TransactionMutation) UpdatedAt() (r uint32, exists bool) {
+	v := m.updated_at
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldUpdatetimeUtc returns the old "updatetime_utc" field's value of the Transaction entity.
+// OldUpdatedAt returns the old "updated_at" field's value of the Transaction entity.
 // If the Transaction object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TransactionMutation) OldUpdatetimeUtc(ctx context.Context) (v int64, err error) {
+func (m *TransactionMutation) OldUpdatedAt(ctx context.Context) (v uint32, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldUpdatetimeUtc is only allowed on UpdateOne operations")
+		return v, fmt.Errorf("OldUpdatedAt is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldUpdatetimeUtc requires an ID field in the mutation")
+		return v, fmt.Errorf("OldUpdatedAt requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUpdatetimeUtc: %w", err)
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
 	}
-	return oldValue.UpdatetimeUtc, nil
+	return oldValue.UpdatedAt, nil
 }
 
-// AddUpdatetimeUtc adds i to the "updatetime_utc" field.
-func (m *TransactionMutation) AddUpdatetimeUtc(i int64) {
-	if m.addupdatetime_utc != nil {
-		*m.addupdatetime_utc += i
+// AddUpdatedAt adds u to the "updated_at" field.
+func (m *TransactionMutation) AddUpdatedAt(u uint32) {
+	if m.addupdated_at != nil {
+		*m.addupdated_at += u
 	} else {
-		m.addupdatetime_utc = &i
+		m.addupdated_at = &u
 	}
 }
 
-// AddedUpdatetimeUtc returns the value that was added to the "updatetime_utc" field in this mutation.
-func (m *TransactionMutation) AddedUpdatetimeUtc() (r int64, exists bool) {
-	v := m.addupdatetime_utc
+// AddedUpdatedAt returns the value that was added to the "updated_at" field in this mutation.
+func (m *TransactionMutation) AddedUpdatedAt() (r uint32, exists bool) {
+	v := m.addupdated_at
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetUpdatetimeUtc resets all changes to the "updatetime_utc" field.
-func (m *TransactionMutation) ResetUpdatetimeUtc() {
-	m.updatetime_utc = nil
-	m.addupdatetime_utc = nil
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *TransactionMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+	m.addupdated_at = nil
 }
 
-// SetCoinID sets the "coin" edge to the CoinInfo entity by id.
-func (m *TransactionMutation) SetCoinID(id uuid.UUID) {
-	m.coin = &id
+// SetDeletedAt sets the "deleted_at" field.
+func (m *TransactionMutation) SetDeletedAt(u uint32) {
+	m.deleted_at = &u
+	m.adddeleted_at = nil
 }
 
-// ClearCoin clears the "coin" edge to the CoinInfo entity.
-func (m *TransactionMutation) ClearCoin() {
-	m.clearedcoin = true
-}
-
-// CoinCleared reports if the "coin" edge to the CoinInfo entity was cleared.
-func (m *TransactionMutation) CoinCleared() bool {
-	return m.clearedcoin
-}
-
-// CoinID returns the "coin" edge ID in the mutation.
-func (m *TransactionMutation) CoinID() (id uuid.UUID, exists bool) {
-	if m.coin != nil {
-		return *m.coin, true
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *TransactionMutation) DeletedAt() (r uint32, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
 	}
-	return
+	return *v, true
 }
 
-// CoinIDs returns the "coin" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// CoinID instead. It exists only for internal usage by the builders.
-func (m *TransactionMutation) CoinIDs() (ids []uuid.UUID) {
-	if id := m.coin; id != nil {
-		ids = append(ids, *id)
+// OldDeletedAt returns the old "deleted_at" field's value of the Transaction entity.
+// If the Transaction object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TransactionMutation) OldDeletedAt(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldDeletedAt is only allowed on UpdateOne operations")
 	}
-	return
-}
-
-// ResetCoin resets all changes to the "coin" edge.
-func (m *TransactionMutation) ResetCoin() {
-	m.coin = nil
-	m.clearedcoin = false
-}
-
-// AddReviewIDs adds the "review" edge to the Review entity by ids.
-func (m *TransactionMutation) AddReviewIDs(ids ...int32) {
-	if m.review == nil {
-		m.review = make(map[int32]struct{})
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldDeletedAt requires an ID field in the mutation")
 	}
-	for i := range ids {
-		m.review[ids[i]] = struct{}{}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// AddDeletedAt adds u to the "deleted_at" field.
+func (m *TransactionMutation) AddDeletedAt(u uint32) {
+	if m.adddeleted_at != nil {
+		*m.adddeleted_at += u
+	} else {
+		m.adddeleted_at = &u
 	}
 }
 
-// ClearReview clears the "review" edge to the Review entity.
-func (m *TransactionMutation) ClearReview() {
-	m.clearedreview = true
-}
-
-// ReviewCleared reports if the "review" edge to the Review entity was cleared.
-func (m *TransactionMutation) ReviewCleared() bool {
-	return m.clearedreview
-}
-
-// RemoveReviewIDs removes the "review" edge to the Review entity by IDs.
-func (m *TransactionMutation) RemoveReviewIDs(ids ...int32) {
-	if m.removedreview == nil {
-		m.removedreview = make(map[int32]struct{})
+// AddedDeletedAt returns the value that was added to the "deleted_at" field in this mutation.
+func (m *TransactionMutation) AddedDeletedAt() (r uint32, exists bool) {
+	v := m.adddeleted_at
+	if v == nil {
+		return
 	}
-	for i := range ids {
-		delete(m.review, ids[i])
-		m.removedreview[ids[i]] = struct{}{}
-	}
+	return *v, true
 }
 
-// RemovedReview returns the removed IDs of the "review" edge to the Review entity.
-func (m *TransactionMutation) RemovedReviewIDs() (ids []int32) {
-	for id := range m.removedreview {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ReviewIDs returns the "review" edge IDs in the mutation.
-func (m *TransactionMutation) ReviewIDs() (ids []int32) {
-	for id := range m.review {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetReview resets all changes to the "review" edge.
-func (m *TransactionMutation) ResetReview() {
-	m.review = nil
-	m.clearedreview = false
-	m.removedreview = nil
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *TransactionMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	m.adddeleted_at = nil
 }
 
 // Where appends a list predicates to the TransactionMutation builder.
@@ -2545,48 +596,36 @@ func (m *TransactionMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TransactionMutation) Fields() []string {
-	fields := make([]string, 0, 14)
-	if m.amount_uint64 != nil {
-		fields = append(fields, transaction.FieldAmountUint64)
+	fields := make([]string, 0, 10)
+	if m.name != nil {
+		fields = append(fields, transaction.FieldName)
 	}
-	if m.amount_float64 != nil {
-		fields = append(fields, transaction.FieldAmountFloat64)
+	if m.amount != nil {
+		fields = append(fields, transaction.FieldAmount)
 	}
-	if m.address_from != nil {
-		fields = append(fields, transaction.FieldAddressFrom)
+	if m.from != nil {
+		fields = append(fields, transaction.FieldFrom)
 	}
-	if m.address_to != nil {
-		fields = append(fields, transaction.FieldAddressTo)
+	if m.to != nil {
+		fields = append(fields, transaction.FieldTo)
 	}
-	if m.need_manual_review != nil {
-		fields = append(fields, transaction.FieldNeedManualReview)
+	if m.transaction_id != nil {
+		fields = append(fields, transaction.FieldTransactionID)
 	}
-	if m._type != nil {
-		fields = append(fields, transaction.FieldType)
-	}
-	if m.transaction_id_insite != nil {
-		fields = append(fields, transaction.FieldTransactionIDInsite)
-	}
-	if m.transaction_id_chain != nil {
-		fields = append(fields, transaction.FieldTransactionIDChain)
+	if m.cid != nil {
+		fields = append(fields, transaction.FieldCid)
 	}
 	if m.status != nil {
 		fields = append(fields, transaction.FieldStatus)
 	}
-	if m.mutex != nil {
-		fields = append(fields, transaction.FieldMutex)
+	if m.created_at != nil {
+		fields = append(fields, transaction.FieldCreatedAt)
 	}
-	if m.signature_user != nil {
-		fields = append(fields, transaction.FieldSignatureUser)
+	if m.updated_at != nil {
+		fields = append(fields, transaction.FieldUpdatedAt)
 	}
-	if m.signature_platform != nil {
-		fields = append(fields, transaction.FieldSignaturePlatform)
-	}
-	if m.createtime_utc != nil {
-		fields = append(fields, transaction.FieldCreatetimeUtc)
-	}
-	if m.updatetime_utc != nil {
-		fields = append(fields, transaction.FieldUpdatetimeUtc)
+	if m.deleted_at != nil {
+		fields = append(fields, transaction.FieldDeletedAt)
 	}
 	return fields
 }
@@ -2596,34 +635,26 @@ func (m *TransactionMutation) Fields() []string {
 // schema.
 func (m *TransactionMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case transaction.FieldAmountUint64:
-		return m.AmountUint64()
-	case transaction.FieldAmountFloat64:
-		return m.AmountFloat64()
-	case transaction.FieldAddressFrom:
-		return m.AddressFrom()
-	case transaction.FieldAddressTo:
-		return m.AddressTo()
-	case transaction.FieldNeedManualReview:
-		return m.NeedManualReview()
-	case transaction.FieldType:
-		return m.GetType()
-	case transaction.FieldTransactionIDInsite:
-		return m.TransactionIDInsite()
-	case transaction.FieldTransactionIDChain:
-		return m.TransactionIDChain()
+	case transaction.FieldName:
+		return m.Name()
+	case transaction.FieldAmount:
+		return m.Amount()
+	case transaction.FieldFrom:
+		return m.From()
+	case transaction.FieldTo:
+		return m.To()
+	case transaction.FieldTransactionID:
+		return m.TransactionID()
+	case transaction.FieldCid:
+		return m.Cid()
 	case transaction.FieldStatus:
 		return m.Status()
-	case transaction.FieldMutex:
-		return m.Mutex()
-	case transaction.FieldSignatureUser:
-		return m.SignatureUser()
-	case transaction.FieldSignaturePlatform:
-		return m.SignaturePlatform()
-	case transaction.FieldCreatetimeUtc:
-		return m.CreatetimeUtc()
-	case transaction.FieldUpdatetimeUtc:
-		return m.UpdatetimeUtc()
+	case transaction.FieldCreatedAt:
+		return m.CreatedAt()
+	case transaction.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case transaction.FieldDeletedAt:
+		return m.DeletedAt()
 	}
 	return nil, false
 }
@@ -2633,34 +664,26 @@ func (m *TransactionMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *TransactionMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case transaction.FieldAmountUint64:
-		return m.OldAmountUint64(ctx)
-	case transaction.FieldAmountFloat64:
-		return m.OldAmountFloat64(ctx)
-	case transaction.FieldAddressFrom:
-		return m.OldAddressFrom(ctx)
-	case transaction.FieldAddressTo:
-		return m.OldAddressTo(ctx)
-	case transaction.FieldNeedManualReview:
-		return m.OldNeedManualReview(ctx)
-	case transaction.FieldType:
-		return m.OldType(ctx)
-	case transaction.FieldTransactionIDInsite:
-		return m.OldTransactionIDInsite(ctx)
-	case transaction.FieldTransactionIDChain:
-		return m.OldTransactionIDChain(ctx)
+	case transaction.FieldName:
+		return m.OldName(ctx)
+	case transaction.FieldAmount:
+		return m.OldAmount(ctx)
+	case transaction.FieldFrom:
+		return m.OldFrom(ctx)
+	case transaction.FieldTo:
+		return m.OldTo(ctx)
+	case transaction.FieldTransactionID:
+		return m.OldTransactionID(ctx)
+	case transaction.FieldCid:
+		return m.OldCid(ctx)
 	case transaction.FieldStatus:
 		return m.OldStatus(ctx)
-	case transaction.FieldMutex:
-		return m.OldMutex(ctx)
-	case transaction.FieldSignatureUser:
-		return m.OldSignatureUser(ctx)
-	case transaction.FieldSignaturePlatform:
-		return m.OldSignaturePlatform(ctx)
-	case transaction.FieldCreatetimeUtc:
-		return m.OldCreatetimeUtc(ctx)
-	case transaction.FieldUpdatetimeUtc:
-		return m.OldUpdatetimeUtc(ctx)
+	case transaction.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case transaction.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case transaction.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
 	}
 	return nil, fmt.Errorf("unknown Transaction field %s", name)
 }
@@ -2670,61 +693,47 @@ func (m *TransactionMutation) OldField(ctx context.Context, name string) (ent.Va
 // type.
 func (m *TransactionMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case transaction.FieldAmountUint64:
+	case transaction.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case transaction.FieldAmount:
 		v, ok := value.(uint64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetAmountUint64(v)
+		m.SetAmount(v)
 		return nil
-	case transaction.FieldAmountFloat64:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetAmountFloat64(v)
-		return nil
-	case transaction.FieldAddressFrom:
+	case transaction.FieldFrom:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetAddressFrom(v)
+		m.SetFrom(v)
 		return nil
-	case transaction.FieldAddressTo:
+	case transaction.FieldTo:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetAddressTo(v)
+		m.SetTo(v)
 		return nil
-	case transaction.FieldNeedManualReview:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetNeedManualReview(v)
-		return nil
-	case transaction.FieldType:
-		v, ok := value.(transaction.Type)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetType(v)
-		return nil
-	case transaction.FieldTransactionIDInsite:
+	case transaction.FieldTransactionID:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetTransactionIDInsite(v)
+		m.SetTransactionID(v)
 		return nil
-	case transaction.FieldTransactionIDChain:
+	case transaction.FieldCid:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetTransactionIDChain(v)
+		m.SetCid(v)
 		return nil
 	case transaction.FieldStatus:
 		v, ok := value.(transaction.Status)
@@ -2733,40 +742,26 @@ func (m *TransactionMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetStatus(v)
 		return nil
-	case transaction.FieldMutex:
-		v, ok := value.(bool)
+	case transaction.FieldCreatedAt:
+		v, ok := value.(uint32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetMutex(v)
+		m.SetCreatedAt(v)
 		return nil
-	case transaction.FieldSignatureUser:
-		v, ok := value.(string)
+	case transaction.FieldUpdatedAt:
+		v, ok := value.(uint32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetSignatureUser(v)
+		m.SetUpdatedAt(v)
 		return nil
-	case transaction.FieldSignaturePlatform:
-		v, ok := value.(string)
+	case transaction.FieldDeletedAt:
+		v, ok := value.(uint32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetSignaturePlatform(v)
-		return nil
-	case transaction.FieldCreatetimeUtc:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCreatetimeUtc(v)
-		return nil
-	case transaction.FieldUpdatetimeUtc:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUpdatetimeUtc(v)
+		m.SetDeletedAt(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Transaction field %s", name)
@@ -2776,17 +771,17 @@ func (m *TransactionMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *TransactionMutation) AddedFields() []string {
 	var fields []string
-	if m.addamount_uint64 != nil {
-		fields = append(fields, transaction.FieldAmountUint64)
+	if m.addamount != nil {
+		fields = append(fields, transaction.FieldAmount)
 	}
-	if m.addamount_float64 != nil {
-		fields = append(fields, transaction.FieldAmountFloat64)
+	if m.addcreated_at != nil {
+		fields = append(fields, transaction.FieldCreatedAt)
 	}
-	if m.addcreatetime_utc != nil {
-		fields = append(fields, transaction.FieldCreatetimeUtc)
+	if m.addupdated_at != nil {
+		fields = append(fields, transaction.FieldUpdatedAt)
 	}
-	if m.addupdatetime_utc != nil {
-		fields = append(fields, transaction.FieldUpdatetimeUtc)
+	if m.adddeleted_at != nil {
+		fields = append(fields, transaction.FieldDeletedAt)
 	}
 	return fields
 }
@@ -2796,14 +791,14 @@ func (m *TransactionMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *TransactionMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case transaction.FieldAmountUint64:
-		return m.AddedAmountUint64()
-	case transaction.FieldAmountFloat64:
-		return m.AddedAmountFloat64()
-	case transaction.FieldCreatetimeUtc:
-		return m.AddedCreatetimeUtc()
-	case transaction.FieldUpdatetimeUtc:
-		return m.AddedUpdatetimeUtc()
+	case transaction.FieldAmount:
+		return m.AddedAmount()
+	case transaction.FieldCreatedAt:
+		return m.AddedCreatedAt()
+	case transaction.FieldUpdatedAt:
+		return m.AddedUpdatedAt()
+	case transaction.FieldDeletedAt:
+		return m.AddedDeletedAt()
 	}
 	return nil, false
 }
@@ -2813,33 +808,33 @@ func (m *TransactionMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *TransactionMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case transaction.FieldAmountUint64:
+	case transaction.FieldAmount:
 		v, ok := value.(uint64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddAmountUint64(v)
+		m.AddAmount(v)
 		return nil
-	case transaction.FieldAmountFloat64:
-		v, ok := value.(float64)
+	case transaction.FieldCreatedAt:
+		v, ok := value.(uint32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddAmountFloat64(v)
+		m.AddCreatedAt(v)
 		return nil
-	case transaction.FieldCreatetimeUtc:
-		v, ok := value.(int64)
+	case transaction.FieldUpdatedAt:
+		v, ok := value.(uint32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddCreatetimeUtc(v)
+		m.AddUpdatedAt(v)
 		return nil
-	case transaction.FieldUpdatetimeUtc:
-		v, ok := value.(int64)
+	case transaction.FieldDeletedAt:
+		v, ok := value.(uint32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddUpdatetimeUtc(v)
+		m.AddDeletedAt(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Transaction numeric field %s", name)
@@ -2868,47 +863,35 @@ func (m *TransactionMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *TransactionMutation) ResetField(name string) error {
 	switch name {
-	case transaction.FieldAmountUint64:
-		m.ResetAmountUint64()
+	case transaction.FieldName:
+		m.ResetName()
 		return nil
-	case transaction.FieldAmountFloat64:
-		m.ResetAmountFloat64()
+	case transaction.FieldAmount:
+		m.ResetAmount()
 		return nil
-	case transaction.FieldAddressFrom:
-		m.ResetAddressFrom()
+	case transaction.FieldFrom:
+		m.ResetFrom()
 		return nil
-	case transaction.FieldAddressTo:
-		m.ResetAddressTo()
+	case transaction.FieldTo:
+		m.ResetTo()
 		return nil
-	case transaction.FieldNeedManualReview:
-		m.ResetNeedManualReview()
+	case transaction.FieldTransactionID:
+		m.ResetTransactionID()
 		return nil
-	case transaction.FieldType:
-		m.ResetType()
-		return nil
-	case transaction.FieldTransactionIDInsite:
-		m.ResetTransactionIDInsite()
-		return nil
-	case transaction.FieldTransactionIDChain:
-		m.ResetTransactionIDChain()
+	case transaction.FieldCid:
+		m.ResetCid()
 		return nil
 	case transaction.FieldStatus:
 		m.ResetStatus()
 		return nil
-	case transaction.FieldMutex:
-		m.ResetMutex()
+	case transaction.FieldCreatedAt:
+		m.ResetCreatedAt()
 		return nil
-	case transaction.FieldSignatureUser:
-		m.ResetSignatureUser()
+	case transaction.FieldUpdatedAt:
+		m.ResetUpdatedAt()
 		return nil
-	case transaction.FieldSignaturePlatform:
-		m.ResetSignaturePlatform()
-		return nil
-	case transaction.FieldCreatetimeUtc:
-		m.ResetCreatetimeUtc()
-		return nil
-	case transaction.FieldUpdatetimeUtc:
-		m.ResetUpdatetimeUtc()
+	case transaction.FieldDeletedAt:
+		m.ResetDeletedAt()
 		return nil
 	}
 	return fmt.Errorf("unknown Transaction field %s", name)
@@ -2916,862 +899,48 @@ func (m *TransactionMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *TransactionMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.coin != nil {
-		edges = append(edges, transaction.EdgeCoin)
-	}
-	if m.review != nil {
-		edges = append(edges, transaction.EdgeReview)
-	}
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *TransactionMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case transaction.EdgeCoin:
-		if id := m.coin; id != nil {
-			return []ent.Value{*id}
-		}
-	case transaction.EdgeReview:
-		ids := make([]ent.Value, 0, len(m.review))
-		for id := range m.review {
-			ids = append(ids, id)
-		}
-		return ids
-	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *TransactionMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.removedreview != nil {
-		edges = append(edges, transaction.EdgeReview)
-	}
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *TransactionMutation) RemovedIDs(name string) []ent.Value {
-	switch name {
-	case transaction.EdgeReview:
-		ids := make([]ent.Value, 0, len(m.removedreview))
-		for id := range m.removedreview {
-			ids = append(ids, id)
-		}
-		return ids
-	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *TransactionMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.clearedcoin {
-		edges = append(edges, transaction.EdgeCoin)
-	}
-	if m.clearedreview {
-		edges = append(edges, transaction.EdgeReview)
-	}
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *TransactionMutation) EdgeCleared(name string) bool {
-	switch name {
-	case transaction.EdgeCoin:
-		return m.clearedcoin
-	case transaction.EdgeReview:
-		return m.clearedreview
-	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *TransactionMutation) ClearEdge(name string) error {
-	switch name {
-	case transaction.EdgeCoin:
-		m.ClearCoin()
-		return nil
-	}
 	return fmt.Errorf("unknown Transaction unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *TransactionMutation) ResetEdge(name string) error {
-	switch name {
-	case transaction.EdgeCoin:
-		m.ResetCoin()
-		return nil
-	case transaction.EdgeReview:
-		m.ResetReview()
-		return nil
-	}
 	return fmt.Errorf("unknown Transaction edge %s", name)
-}
-
-// WalletNodeMutation represents an operation that mutates the WalletNode nodes in the graph.
-type WalletNodeMutation struct {
-	config
-	op                      Op
-	typ                     string
-	id                      *int32
-	uuid                    *string
-	location                *string
-	host_vendor             *string
-	public_ip               *string
-	local_ip                *string
-	createtime_utc          *int64
-	addcreatetime_utc       *int64
-	last_online_time_utc    *int64
-	addlast_online_time_utc *int64
-	clearedFields           map[string]struct{}
-	coin                    *uuid.UUID
-	clearedcoin             bool
-	done                    bool
-	oldValue                func(context.Context) (*WalletNode, error)
-	predicates              []predicate.WalletNode
-}
-
-var _ ent.Mutation = (*WalletNodeMutation)(nil)
-
-// walletnodeOption allows management of the mutation configuration using functional options.
-type walletnodeOption func(*WalletNodeMutation)
-
-// newWalletNodeMutation creates new mutation for the WalletNode entity.
-func newWalletNodeMutation(c config, op Op, opts ...walletnodeOption) *WalletNodeMutation {
-	m := &WalletNodeMutation{
-		config:        c,
-		op:            op,
-		typ:           TypeWalletNode,
-		clearedFields: make(map[string]struct{}),
-	}
-	for _, opt := range opts {
-		opt(m)
-	}
-	return m
-}
-
-// withWalletNodeID sets the ID field of the mutation.
-func withWalletNodeID(id int32) walletnodeOption {
-	return func(m *WalletNodeMutation) {
-		var (
-			err   error
-			once  sync.Once
-			value *WalletNode
-		)
-		m.oldValue = func(ctx context.Context) (*WalletNode, error) {
-			once.Do(func() {
-				if m.done {
-					err = fmt.Errorf("querying old values post mutation is not allowed")
-				} else {
-					value, err = m.Client().WalletNode.Get(ctx, id)
-				}
-			})
-			return value, err
-		}
-		m.id = &id
-	}
-}
-
-// withWalletNode sets the old WalletNode of the mutation.
-func withWalletNode(node *WalletNode) walletnodeOption {
-	return func(m *WalletNodeMutation) {
-		m.oldValue = func(context.Context) (*WalletNode, error) {
-			return node, nil
-		}
-		m.id = &node.ID
-	}
-}
-
-// Client returns a new `ent.Client` from the mutation. If the mutation was
-// executed in a transaction (ent.Tx), a transactional client is returned.
-func (m WalletNodeMutation) Client() *Client {
-	client := &Client{config: m.config}
-	client.init()
-	return client
-}
-
-// Tx returns an `ent.Tx` for mutations that were executed in transactions;
-// it returns an error otherwise.
-func (m WalletNodeMutation) Tx() (*Tx, error) {
-	if _, ok := m.driver.(*txDriver); !ok {
-		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
-	}
-	tx := &Tx{config: m.config}
-	tx.init()
-	return tx, nil
-}
-
-// SetID sets the value of the id field. Note that this
-// operation is only accepted on creation of WalletNode entities.
-func (m *WalletNodeMutation) SetID(id int32) {
-	m.id = &id
-}
-
-// ID returns the ID value in the mutation. Note that the ID is only available
-// if it was provided to the builder or after it was returned from the database.
-func (m *WalletNodeMutation) ID() (id int32, exists bool) {
-	if m.id == nil {
-		return
-	}
-	return *m.id, true
-}
-
-// SetUUID sets the "uuid" field.
-func (m *WalletNodeMutation) SetUUID(s string) {
-	m.uuid = &s
-}
-
-// UUID returns the value of the "uuid" field in the mutation.
-func (m *WalletNodeMutation) UUID() (r string, exists bool) {
-	v := m.uuid
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUUID returns the old "uuid" field's value of the WalletNode entity.
-// If the WalletNode object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WalletNodeMutation) OldUUID(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldUUID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldUUID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUUID: %w", err)
-	}
-	return oldValue.UUID, nil
-}
-
-// ResetUUID resets all changes to the "uuid" field.
-func (m *WalletNodeMutation) ResetUUID() {
-	m.uuid = nil
-}
-
-// SetLocation sets the "location" field.
-func (m *WalletNodeMutation) SetLocation(s string) {
-	m.location = &s
-}
-
-// Location returns the value of the "location" field in the mutation.
-func (m *WalletNodeMutation) Location() (r string, exists bool) {
-	v := m.location
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldLocation returns the old "location" field's value of the WalletNode entity.
-// If the WalletNode object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WalletNodeMutation) OldLocation(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldLocation is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldLocation requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldLocation: %w", err)
-	}
-	return oldValue.Location, nil
-}
-
-// ResetLocation resets all changes to the "location" field.
-func (m *WalletNodeMutation) ResetLocation() {
-	m.location = nil
-}
-
-// SetHostVendor sets the "host_vendor" field.
-func (m *WalletNodeMutation) SetHostVendor(s string) {
-	m.host_vendor = &s
-}
-
-// HostVendor returns the value of the "host_vendor" field in the mutation.
-func (m *WalletNodeMutation) HostVendor() (r string, exists bool) {
-	v := m.host_vendor
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldHostVendor returns the old "host_vendor" field's value of the WalletNode entity.
-// If the WalletNode object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WalletNodeMutation) OldHostVendor(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldHostVendor is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldHostVendor requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldHostVendor: %w", err)
-	}
-	return oldValue.HostVendor, nil
-}
-
-// ResetHostVendor resets all changes to the "host_vendor" field.
-func (m *WalletNodeMutation) ResetHostVendor() {
-	m.host_vendor = nil
-}
-
-// SetPublicIP sets the "public_ip" field.
-func (m *WalletNodeMutation) SetPublicIP(s string) {
-	m.public_ip = &s
-}
-
-// PublicIP returns the value of the "public_ip" field in the mutation.
-func (m *WalletNodeMutation) PublicIP() (r string, exists bool) {
-	v := m.public_ip
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldPublicIP returns the old "public_ip" field's value of the WalletNode entity.
-// If the WalletNode object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WalletNodeMutation) OldPublicIP(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldPublicIP is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldPublicIP requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPublicIP: %w", err)
-	}
-	return oldValue.PublicIP, nil
-}
-
-// ResetPublicIP resets all changes to the "public_ip" field.
-func (m *WalletNodeMutation) ResetPublicIP() {
-	m.public_ip = nil
-}
-
-// SetLocalIP sets the "local_ip" field.
-func (m *WalletNodeMutation) SetLocalIP(s string) {
-	m.local_ip = &s
-}
-
-// LocalIP returns the value of the "local_ip" field in the mutation.
-func (m *WalletNodeMutation) LocalIP() (r string, exists bool) {
-	v := m.local_ip
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldLocalIP returns the old "local_ip" field's value of the WalletNode entity.
-// If the WalletNode object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WalletNodeMutation) OldLocalIP(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldLocalIP is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldLocalIP requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldLocalIP: %w", err)
-	}
-	return oldValue.LocalIP, nil
-}
-
-// ResetLocalIP resets all changes to the "local_ip" field.
-func (m *WalletNodeMutation) ResetLocalIP() {
-	m.local_ip = nil
-}
-
-// SetCreatetimeUtc sets the "createtime_utc" field.
-func (m *WalletNodeMutation) SetCreatetimeUtc(i int64) {
-	m.createtime_utc = &i
-	m.addcreatetime_utc = nil
-}
-
-// CreatetimeUtc returns the value of the "createtime_utc" field in the mutation.
-func (m *WalletNodeMutation) CreatetimeUtc() (r int64, exists bool) {
-	v := m.createtime_utc
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCreatetimeUtc returns the old "createtime_utc" field's value of the WalletNode entity.
-// If the WalletNode object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WalletNodeMutation) OldCreatetimeUtc(ctx context.Context) (v int64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldCreatetimeUtc is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldCreatetimeUtc requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCreatetimeUtc: %w", err)
-	}
-	return oldValue.CreatetimeUtc, nil
-}
-
-// AddCreatetimeUtc adds i to the "createtime_utc" field.
-func (m *WalletNodeMutation) AddCreatetimeUtc(i int64) {
-	if m.addcreatetime_utc != nil {
-		*m.addcreatetime_utc += i
-	} else {
-		m.addcreatetime_utc = &i
-	}
-}
-
-// AddedCreatetimeUtc returns the value that was added to the "createtime_utc" field in this mutation.
-func (m *WalletNodeMutation) AddedCreatetimeUtc() (r int64, exists bool) {
-	v := m.addcreatetime_utc
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetCreatetimeUtc resets all changes to the "createtime_utc" field.
-func (m *WalletNodeMutation) ResetCreatetimeUtc() {
-	m.createtime_utc = nil
-	m.addcreatetime_utc = nil
-}
-
-// SetLastOnlineTimeUtc sets the "last_online_time_utc" field.
-func (m *WalletNodeMutation) SetLastOnlineTimeUtc(i int64) {
-	m.last_online_time_utc = &i
-	m.addlast_online_time_utc = nil
-}
-
-// LastOnlineTimeUtc returns the value of the "last_online_time_utc" field in the mutation.
-func (m *WalletNodeMutation) LastOnlineTimeUtc() (r int64, exists bool) {
-	v := m.last_online_time_utc
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldLastOnlineTimeUtc returns the old "last_online_time_utc" field's value of the WalletNode entity.
-// If the WalletNode object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WalletNodeMutation) OldLastOnlineTimeUtc(ctx context.Context) (v int64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldLastOnlineTimeUtc is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldLastOnlineTimeUtc requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldLastOnlineTimeUtc: %w", err)
-	}
-	return oldValue.LastOnlineTimeUtc, nil
-}
-
-// AddLastOnlineTimeUtc adds i to the "last_online_time_utc" field.
-func (m *WalletNodeMutation) AddLastOnlineTimeUtc(i int64) {
-	if m.addlast_online_time_utc != nil {
-		*m.addlast_online_time_utc += i
-	} else {
-		m.addlast_online_time_utc = &i
-	}
-}
-
-// AddedLastOnlineTimeUtc returns the value that was added to the "last_online_time_utc" field in this mutation.
-func (m *WalletNodeMutation) AddedLastOnlineTimeUtc() (r int64, exists bool) {
-	v := m.addlast_online_time_utc
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetLastOnlineTimeUtc resets all changes to the "last_online_time_utc" field.
-func (m *WalletNodeMutation) ResetLastOnlineTimeUtc() {
-	m.last_online_time_utc = nil
-	m.addlast_online_time_utc = nil
-}
-
-// SetCoinID sets the "coin" edge to the CoinInfo entity by id.
-func (m *WalletNodeMutation) SetCoinID(id uuid.UUID) {
-	m.coin = &id
-}
-
-// ClearCoin clears the "coin" edge to the CoinInfo entity.
-func (m *WalletNodeMutation) ClearCoin() {
-	m.clearedcoin = true
-}
-
-// CoinCleared reports if the "coin" edge to the CoinInfo entity was cleared.
-func (m *WalletNodeMutation) CoinCleared() bool {
-	return m.clearedcoin
-}
-
-// CoinID returns the "coin" edge ID in the mutation.
-func (m *WalletNodeMutation) CoinID() (id uuid.UUID, exists bool) {
-	if m.coin != nil {
-		return *m.coin, true
-	}
-	return
-}
-
-// CoinIDs returns the "coin" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// CoinID instead. It exists only for internal usage by the builders.
-func (m *WalletNodeMutation) CoinIDs() (ids []uuid.UUID) {
-	if id := m.coin; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetCoin resets all changes to the "coin" edge.
-func (m *WalletNodeMutation) ResetCoin() {
-	m.coin = nil
-	m.clearedcoin = false
-}
-
-// Where appends a list predicates to the WalletNodeMutation builder.
-func (m *WalletNodeMutation) Where(ps ...predicate.WalletNode) {
-	m.predicates = append(m.predicates, ps...)
-}
-
-// Op returns the operation name.
-func (m *WalletNodeMutation) Op() Op {
-	return m.op
-}
-
-// Type returns the node type of this mutation (WalletNode).
-func (m *WalletNodeMutation) Type() string {
-	return m.typ
-}
-
-// Fields returns all fields that were changed during this mutation. Note that in
-// order to get all numeric fields that were incremented/decremented, call
-// AddedFields().
-func (m *WalletNodeMutation) Fields() []string {
-	fields := make([]string, 0, 7)
-	if m.uuid != nil {
-		fields = append(fields, walletnode.FieldUUID)
-	}
-	if m.location != nil {
-		fields = append(fields, walletnode.FieldLocation)
-	}
-	if m.host_vendor != nil {
-		fields = append(fields, walletnode.FieldHostVendor)
-	}
-	if m.public_ip != nil {
-		fields = append(fields, walletnode.FieldPublicIP)
-	}
-	if m.local_ip != nil {
-		fields = append(fields, walletnode.FieldLocalIP)
-	}
-	if m.createtime_utc != nil {
-		fields = append(fields, walletnode.FieldCreatetimeUtc)
-	}
-	if m.last_online_time_utc != nil {
-		fields = append(fields, walletnode.FieldLastOnlineTimeUtc)
-	}
-	return fields
-}
-
-// Field returns the value of a field with the given name. The second boolean
-// return value indicates that this field was not set, or was not defined in the
-// schema.
-func (m *WalletNodeMutation) Field(name string) (ent.Value, bool) {
-	switch name {
-	case walletnode.FieldUUID:
-		return m.UUID()
-	case walletnode.FieldLocation:
-		return m.Location()
-	case walletnode.FieldHostVendor:
-		return m.HostVendor()
-	case walletnode.FieldPublicIP:
-		return m.PublicIP()
-	case walletnode.FieldLocalIP:
-		return m.LocalIP()
-	case walletnode.FieldCreatetimeUtc:
-		return m.CreatetimeUtc()
-	case walletnode.FieldLastOnlineTimeUtc:
-		return m.LastOnlineTimeUtc()
-	}
-	return nil, false
-}
-
-// OldField returns the old value of the field from the database. An error is
-// returned if the mutation operation is not UpdateOne, or the query to the
-// database failed.
-func (m *WalletNodeMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	switch name {
-	case walletnode.FieldUUID:
-		return m.OldUUID(ctx)
-	case walletnode.FieldLocation:
-		return m.OldLocation(ctx)
-	case walletnode.FieldHostVendor:
-		return m.OldHostVendor(ctx)
-	case walletnode.FieldPublicIP:
-		return m.OldPublicIP(ctx)
-	case walletnode.FieldLocalIP:
-		return m.OldLocalIP(ctx)
-	case walletnode.FieldCreatetimeUtc:
-		return m.OldCreatetimeUtc(ctx)
-	case walletnode.FieldLastOnlineTimeUtc:
-		return m.OldLastOnlineTimeUtc(ctx)
-	}
-	return nil, fmt.Errorf("unknown WalletNode field %s", name)
-}
-
-// SetField sets the value of a field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *WalletNodeMutation) SetField(name string, value ent.Value) error {
-	switch name {
-	case walletnode.FieldUUID:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUUID(v)
-		return nil
-	case walletnode.FieldLocation:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetLocation(v)
-		return nil
-	case walletnode.FieldHostVendor:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetHostVendor(v)
-		return nil
-	case walletnode.FieldPublicIP:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetPublicIP(v)
-		return nil
-	case walletnode.FieldLocalIP:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetLocalIP(v)
-		return nil
-	case walletnode.FieldCreatetimeUtc:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCreatetimeUtc(v)
-		return nil
-	case walletnode.FieldLastOnlineTimeUtc:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetLastOnlineTimeUtc(v)
-		return nil
-	}
-	return fmt.Errorf("unknown WalletNode field %s", name)
-}
-
-// AddedFields returns all numeric fields that were incremented/decremented during
-// this mutation.
-func (m *WalletNodeMutation) AddedFields() []string {
-	var fields []string
-	if m.addcreatetime_utc != nil {
-		fields = append(fields, walletnode.FieldCreatetimeUtc)
-	}
-	if m.addlast_online_time_utc != nil {
-		fields = append(fields, walletnode.FieldLastOnlineTimeUtc)
-	}
-	return fields
-}
-
-// AddedField returns the numeric value that was incremented/decremented on a field
-// with the given name. The second boolean return value indicates that this field
-// was not set, or was not defined in the schema.
-func (m *WalletNodeMutation) AddedField(name string) (ent.Value, bool) {
-	switch name {
-	case walletnode.FieldCreatetimeUtc:
-		return m.AddedCreatetimeUtc()
-	case walletnode.FieldLastOnlineTimeUtc:
-		return m.AddedLastOnlineTimeUtc()
-	}
-	return nil, false
-}
-
-// AddField adds the value to the field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *WalletNodeMutation) AddField(name string, value ent.Value) error {
-	switch name {
-	case walletnode.FieldCreatetimeUtc:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddCreatetimeUtc(v)
-		return nil
-	case walletnode.FieldLastOnlineTimeUtc:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddLastOnlineTimeUtc(v)
-		return nil
-	}
-	return fmt.Errorf("unknown WalletNode numeric field %s", name)
-}
-
-// ClearedFields returns all nullable fields that were cleared during this
-// mutation.
-func (m *WalletNodeMutation) ClearedFields() []string {
-	return nil
-}
-
-// FieldCleared returns a boolean indicating if a field with the given name was
-// cleared in this mutation.
-func (m *WalletNodeMutation) FieldCleared(name string) bool {
-	_, ok := m.clearedFields[name]
-	return ok
-}
-
-// ClearField clears the value of the field with the given name. It returns an
-// error if the field is not defined in the schema.
-func (m *WalletNodeMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown WalletNode nullable field %s", name)
-}
-
-// ResetField resets all changes in the mutation for the field with the given name.
-// It returns an error if the field is not defined in the schema.
-func (m *WalletNodeMutation) ResetField(name string) error {
-	switch name {
-	case walletnode.FieldUUID:
-		m.ResetUUID()
-		return nil
-	case walletnode.FieldLocation:
-		m.ResetLocation()
-		return nil
-	case walletnode.FieldHostVendor:
-		m.ResetHostVendor()
-		return nil
-	case walletnode.FieldPublicIP:
-		m.ResetPublicIP()
-		return nil
-	case walletnode.FieldLocalIP:
-		m.ResetLocalIP()
-		return nil
-	case walletnode.FieldCreatetimeUtc:
-		m.ResetCreatetimeUtc()
-		return nil
-	case walletnode.FieldLastOnlineTimeUtc:
-		m.ResetLastOnlineTimeUtc()
-		return nil
-	}
-	return fmt.Errorf("unknown WalletNode field %s", name)
-}
-
-// AddedEdges returns all edge names that were set/added in this mutation.
-func (m *WalletNodeMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.coin != nil {
-		edges = append(edges, walletnode.EdgeCoin)
-	}
-	return edges
-}
-
-// AddedIDs returns all IDs (to other nodes) that were added for the given edge
-// name in this mutation.
-func (m *WalletNodeMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case walletnode.EdgeCoin:
-		if id := m.coin; id != nil {
-			return []ent.Value{*id}
-		}
-	}
-	return nil
-}
-
-// RemovedEdges returns all edge names that were removed in this mutation.
-func (m *WalletNodeMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
-	return edges
-}
-
-// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
-// the given name in this mutation.
-func (m *WalletNodeMutation) RemovedIDs(name string) []ent.Value {
-	switch name {
-	}
-	return nil
-}
-
-// ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *WalletNodeMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.clearedcoin {
-		edges = append(edges, walletnode.EdgeCoin)
-	}
-	return edges
-}
-
-// EdgeCleared returns a boolean which indicates if the edge with the given name
-// was cleared in this mutation.
-func (m *WalletNodeMutation) EdgeCleared(name string) bool {
-	switch name {
-	case walletnode.EdgeCoin:
-		return m.clearedcoin
-	}
-	return false
-}
-
-// ClearEdge clears the value of the edge with the given name. It returns an error
-// if that edge is not defined in the schema.
-func (m *WalletNodeMutation) ClearEdge(name string) error {
-	switch name {
-	case walletnode.EdgeCoin:
-		m.ClearCoin()
-		return nil
-	}
-	return fmt.Errorf("unknown WalletNode unique edge %s", name)
-}
-
-// ResetEdge resets all changes to the edge with the given name in this mutation.
-// It returns an error if the edge is not defined in the schema.
-func (m *WalletNodeMutation) ResetEdge(name string) error {
-	switch name {
-	case walletnode.EdgeCoin:
-		m.ResetCoin()
-		return nil
-	}
-	return fmt.Errorf("unknown WalletNode edge %s", name)
 }

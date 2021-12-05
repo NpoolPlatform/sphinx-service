@@ -4,7 +4,6 @@ package ent
 
 import (
 	"context"
-	"database/sql/driver"
 	"errors"
 	"fmt"
 	"math"
@@ -12,9 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/predicate"
-	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/review"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
 	"github.com/google/uuid"
 )
@@ -28,10 +25,6 @@ type TransactionQuery struct {
 	order      []OrderFunc
 	fields     []string
 	predicates []predicate.Transaction
-	// eager-loading edges.
-	withCoin   *CoinInfoQuery
-	withReview *ReviewQuery
-	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -68,50 +61,6 @@ func (tq *TransactionQuery) Order(o ...OrderFunc) *TransactionQuery {
 	return tq
 }
 
-// QueryCoin chains the current query on the "coin" edge.
-func (tq *TransactionQuery) QueryCoin() *CoinInfoQuery {
-	query := &CoinInfoQuery{config: tq.config}
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := tq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := tq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(transaction.Table, transaction.FieldID, selector),
-			sqlgraph.To(coininfo.Table, coininfo.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, transaction.CoinTable, transaction.CoinColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryReview chains the current query on the "review" edge.
-func (tq *TransactionQuery) QueryReview() *ReviewQuery {
-	query := &ReviewQuery{config: tq.config}
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := tq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := tq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(transaction.Table, transaction.FieldID, selector),
-			sqlgraph.To(review.Table, review.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, transaction.ReviewTable, transaction.ReviewColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
 // First returns the first Transaction entity from the query.
 // Returns a *NotFoundError when no Transaction was found.
 func (tq *TransactionQuery) First(ctx context.Context) (*Transaction, error) {
@@ -136,8 +85,8 @@ func (tq *TransactionQuery) FirstX(ctx context.Context) *Transaction {
 
 // FirstID returns the first Transaction ID from the query.
 // Returns a *NotFoundError when no Transaction ID was found.
-func (tq *TransactionQuery) FirstID(ctx context.Context) (id int32, err error) {
-	var ids []int32
+func (tq *TransactionQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = tq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -149,7 +98,7 @@ func (tq *TransactionQuery) FirstID(ctx context.Context) (id int32, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (tq *TransactionQuery) FirstIDX(ctx context.Context) int32 {
+func (tq *TransactionQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := tq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -187,8 +136,8 @@ func (tq *TransactionQuery) OnlyX(ctx context.Context) *Transaction {
 // OnlyID is like Only, but returns the only Transaction ID in the query.
 // Returns a *NotSingularError when exactly one Transaction ID is not found.
 // Returns a *NotFoundError when no entities are found.
-func (tq *TransactionQuery) OnlyID(ctx context.Context) (id int32, err error) {
-	var ids []int32
+func (tq *TransactionQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = tq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -204,7 +153,7 @@ func (tq *TransactionQuery) OnlyID(ctx context.Context) (id int32, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (tq *TransactionQuery) OnlyIDX(ctx context.Context) int32 {
+func (tq *TransactionQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := tq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -230,8 +179,8 @@ func (tq *TransactionQuery) AllX(ctx context.Context) []*Transaction {
 }
 
 // IDs executes the query and returns a list of Transaction IDs.
-func (tq *TransactionQuery) IDs(ctx context.Context) ([]int32, error) {
-	var ids []int32
+func (tq *TransactionQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	var ids []uuid.UUID
 	if err := tq.Select(transaction.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -239,7 +188,7 @@ func (tq *TransactionQuery) IDs(ctx context.Context) ([]int32, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (tq *TransactionQuery) IDsX(ctx context.Context) []int32 {
+func (tq *TransactionQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := tq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -293,34 +242,10 @@ func (tq *TransactionQuery) Clone() *TransactionQuery {
 		offset:     tq.offset,
 		order:      append([]OrderFunc{}, tq.order...),
 		predicates: append([]predicate.Transaction{}, tq.predicates...),
-		withCoin:   tq.withCoin.Clone(),
-		withReview: tq.withReview.Clone(),
 		// clone intermediate query.
 		sql:  tq.sql.Clone(),
 		path: tq.path,
 	}
-}
-
-// WithCoin tells the query-builder to eager-load the nodes that are connected to
-// the "coin" edge. The optional arguments are used to configure the query builder of the edge.
-func (tq *TransactionQuery) WithCoin(opts ...func(*CoinInfoQuery)) *TransactionQuery {
-	query := &CoinInfoQuery{config: tq.config}
-	for _, opt := range opts {
-		opt(query)
-	}
-	tq.withCoin = query
-	return tq
-}
-
-// WithReview tells the query-builder to eager-load the nodes that are connected to
-// the "review" edge. The optional arguments are used to configure the query builder of the edge.
-func (tq *TransactionQuery) WithReview(opts ...func(*ReviewQuery)) *TransactionQuery {
-	query := &ReviewQuery{config: tq.config}
-	for _, opt := range opts {
-		opt(query)
-	}
-	tq.withReview = query
-	return tq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -329,12 +254,12 @@ func (tq *TransactionQuery) WithReview(opts ...func(*ReviewQuery)) *TransactionQ
 // Example:
 //
 //	var v []struct {
-//		AmountUint64 uint64 `json:"amount_uint64,omitempty"`
+//		Name string `json:"name,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Transaction.Query().
-//		GroupBy(transaction.FieldAmountUint64).
+//		GroupBy(transaction.FieldName).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -356,11 +281,11 @@ func (tq *TransactionQuery) GroupBy(field string, fields ...string) *Transaction
 // Example:
 //
 //	var v []struct {
-//		AmountUint64 uint64 `json:"amount_uint64,omitempty"`
+//		Name string `json:"name,omitempty"`
 //	}
 //
 //	client.Transaction.Query().
-//		Select(transaction.FieldAmountUint64).
+//		Select(transaction.FieldName).
 //		Scan(ctx, &v)
 //
 func (tq *TransactionQuery) Select(fields ...string) *TransactionSelect {
@@ -386,20 +311,9 @@ func (tq *TransactionQuery) prepareQuery(ctx context.Context) error {
 
 func (tq *TransactionQuery) sqlAll(ctx context.Context) ([]*Transaction, error) {
 	var (
-		nodes       = []*Transaction{}
-		withFKs     = tq.withFKs
-		_spec       = tq.querySpec()
-		loadedTypes = [2]bool{
-			tq.withCoin != nil,
-			tq.withReview != nil,
-		}
+		nodes = []*Transaction{}
+		_spec = tq.querySpec()
 	)
-	if tq.withCoin != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, transaction.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
 		node := &Transaction{config: tq.config}
 		nodes = append(nodes, node)
@@ -410,7 +324,6 @@ func (tq *TransactionQuery) sqlAll(ctx context.Context) ([]*Transaction, error) 
 			return fmt.Errorf("ent: Assign called without calling ScanValues")
 		}
 		node := nodes[len(nodes)-1]
-		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	if err := sqlgraph.QueryNodes(ctx, tq.driver, _spec); err != nil {
@@ -419,65 +332,6 @@ func (tq *TransactionQuery) sqlAll(ctx context.Context) ([]*Transaction, error) 
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-
-	if query := tq.withCoin; query != nil {
-		ids := make([]uuid.UUID, 0, len(nodes))
-		nodeids := make(map[uuid.UUID][]*Transaction)
-		for i := range nodes {
-			if nodes[i].coin_info_transactions == nil {
-				continue
-			}
-			fk := *nodes[i].coin_info_transactions
-			if _, ok := nodeids[fk]; !ok {
-				ids = append(ids, fk)
-			}
-			nodeids[fk] = append(nodeids[fk], nodes[i])
-		}
-		query.Where(coininfo.IDIn(ids...))
-		neighbors, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, n := range neighbors {
-			nodes, ok := nodeids[n.ID]
-			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "coin_info_transactions" returned %v`, n.ID)
-			}
-			for i := range nodes {
-				nodes[i].Edges.Coin = n
-			}
-		}
-	}
-
-	if query := tq.withReview; query != nil {
-		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[int32]*Transaction)
-		for i := range nodes {
-			fks = append(fks, nodes[i].ID)
-			nodeids[nodes[i].ID] = nodes[i]
-			nodes[i].Edges.Review = []*Review{}
-		}
-		query.withFKs = true
-		query.Where(predicate.Review(func(s *sql.Selector) {
-			s.Where(sql.InValues(transaction.ReviewColumn, fks...))
-		}))
-		neighbors, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, n := range neighbors {
-			fk := n.transaction_review
-			if fk == nil {
-				return nil, fmt.Errorf(`foreign-key "transaction_review" is nil for node %v`, n.ID)
-			}
-			node, ok := nodeids[*fk]
-			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "transaction_review" returned %v for node %v`, *fk, n.ID)
-			}
-			node.Edges.Review = append(node.Edges.Review, n)
-		}
-	}
-
 	return nodes, nil
 }
 
@@ -500,7 +354,7 @@ func (tq *TransactionQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   transaction.Table,
 			Columns: transaction.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt32,
+				Type:   field.TypeUUID,
 				Column: transaction.FieldID,
 			},
 		},

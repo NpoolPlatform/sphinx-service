@@ -14,6 +14,6 @@ func Version() (*npool.VersionResponse, error) {
 		return nil, xerrors.Errorf("get service version error: %w", err)
 	}
 	return &npool.VersionResponse{
-		Info: info + " 1124-2252",
+		Info: info,
 	}, nil
 }

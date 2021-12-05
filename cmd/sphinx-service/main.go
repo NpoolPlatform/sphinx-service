@@ -8,7 +8,6 @@ import (
 	"github.com/NpoolPlatform/go-service-framework/pkg/config"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	mysqlconst "github.com/NpoolPlatform/go-service-framework/pkg/mysql/const"
-	rabbitmqconst "github.com/NpoolPlatform/go-service-framework/pkg/rabbitmq/const"
 	redisconst "github.com/NpoolPlatform/go-service-framework/pkg/redis/const"
 	servicename "github.com/NpoolPlatform/sphinx-service/pkg/service-name"
 	cli "github.com/urfave/cli/v2"
@@ -28,7 +27,7 @@ func main() {
 	err := app.Init(serviceName, description, "", "", "./", nil, commands,
 		config.ServiceNameToNamespace(mysqlconst.MysqlServiceName),
 		config.ServiceNameToNamespace(redisconst.RedisServiceName),
-		config.ServiceNameToNamespace(rabbitmqconst.RabbitMQServiceName))
+	)
 	if err != nil {
 		logger.Sugar().Errorf("fail to create %v: %v", serviceName, err)
 		return

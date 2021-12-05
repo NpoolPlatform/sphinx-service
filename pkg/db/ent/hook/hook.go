@@ -9,45 +9,6 @@ import (
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent"
 )
 
-// The CoinInfoFunc type is an adapter to allow the use of ordinary
-// function as CoinInfo mutator.
-type CoinInfoFunc func(context.Context, *ent.CoinInfoMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f CoinInfoFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.CoinInfoMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CoinInfoMutation", m)
-	}
-	return f(ctx, mv)
-}
-
-// The EmptyFunc type is an adapter to allow the use of ordinary
-// function as Empty mutator.
-type EmptyFunc func(context.Context, *ent.EmptyMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f EmptyFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.EmptyMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EmptyMutation", m)
-	}
-	return f(ctx, mv)
-}
-
-// The ReviewFunc type is an adapter to allow the use of ordinary
-// function as Review mutator.
-type ReviewFunc func(context.Context, *ent.ReviewMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f ReviewFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.ReviewMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ReviewMutation", m)
-	}
-	return f(ctx, mv)
-}
-
 // The TransactionFunc type is an adapter to allow the use of ordinary
 // function as Transaction mutator.
 type TransactionFunc func(context.Context, *ent.TransactionMutation) (ent.Value, error)
@@ -57,19 +18,6 @@ func (f TransactionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value,
 	mv, ok := m.(*ent.TransactionMutation)
 	if !ok {
 		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TransactionMutation", m)
-	}
-	return f(ctx, mv)
-}
-
-// The WalletNodeFunc type is an adapter to allow the use of ordinary
-// function as WalletNode mutator.
-type WalletNodeFunc func(context.Context, *ent.WalletNodeMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f WalletNodeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.WalletNodeMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.WalletNodeMutation", m)
 	}
 	return f(ctx, mv)
 }

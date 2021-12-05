@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
 	"github.com/google/uuid"
 )
@@ -16,73 +15,27 @@ import (
 type Transaction struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int32 `json:"id,omitempty"`
-	// AmountUint64 holds the value of the "amount_uint64" field.
-	AmountUint64 uint64 `json:"amount_uint64,omitempty"`
-	// AmountFloat64 holds the value of the "amount_float64" field.
-	AmountFloat64 float64 `json:"amount_float64,omitempty"`
-	// AddressFrom holds the value of the "address_from" field.
-	AddressFrom string `json:"address_from,omitempty"`
-	// AddressTo holds the value of the "address_to" field.
-	AddressTo string `json:"address_to,omitempty"`
-	// NeedManualReview holds the value of the "need_manual_review" field.
-	NeedManualReview bool `json:"need_manual_review,omitempty"`
-	// Type holds the value of the "type" field.
-	Type transaction.Type `json:"type,omitempty"`
-	// TransactionIDInsite holds the value of the "transaction_id_insite" field.
-	TransactionIDInsite string `json:"transaction_id_insite,omitempty"`
-	// TransactionIDChain holds the value of the "transaction_id_chain" field.
-	TransactionIDChain string `json:"transaction_id_chain,omitempty"`
+	ID uuid.UUID `json:"id,omitempty"`
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
+	// Amount holds the value of the "amount" field.
+	Amount uint64 `json:"amount,omitempty"`
+	// From holds the value of the "from" field.
+	From string `json:"from,omitempty"`
+	// To holds the value of the "to" field.
+	To string `json:"to,omitempty"`
+	// TransactionID holds the value of the "transaction_id" field.
+	TransactionID string `json:"transaction_id,omitempty"`
+	// Cid holds the value of the "cid" field.
+	Cid string `json:"cid,omitempty"`
 	// Status holds the value of the "status" field.
 	Status transaction.Status `json:"status,omitempty"`
-	// Mutex holds the value of the "mutex" field.
-	Mutex bool `json:"mutex,omitempty"`
-	// SignatureUser holds the value of the "signature_user" field.
-	SignatureUser string `json:"signature_user,omitempty"`
-	// SignaturePlatform holds the value of the "signature_platform" field.
-	SignaturePlatform string `json:"signature_platform,omitempty"`
-	// CreatetimeUtc holds the value of the "createtime_utc" field.
-	CreatetimeUtc int64 `json:"createtime_utc,omitempty"`
-	// UpdatetimeUtc holds the value of the "updatetime_utc" field.
-	UpdatetimeUtc int64 `json:"updatetime_utc,omitempty"`
-	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the TransactionQuery when eager-loading is set.
-	Edges                  TransactionEdges `json:"edges"`
-	coin_info_transactions *uuid.UUID
-}
-
-// TransactionEdges holds the relations/edges for other nodes in the graph.
-type TransactionEdges struct {
-	// Coin holds the value of the coin edge.
-	Coin *CoinInfo `json:"coin,omitempty"`
-	// Review holds the value of the review edge.
-	Review []*Review `json:"review,omitempty"`
-	// loadedTypes holds the information for reporting if a
-	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
-}
-
-// CoinOrErr returns the Coin value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e TransactionEdges) CoinOrErr() (*CoinInfo, error) {
-	if e.loadedTypes[0] {
-		if e.Coin == nil {
-			// The edge coin was loaded in eager-loading,
-			// but was not found.
-			return nil, &NotFoundError{label: coininfo.Label}
-		}
-		return e.Coin, nil
-	}
-	return nil, &NotLoadedError{edge: "coin"}
-}
-
-// ReviewOrErr returns the Review value or an error if the edge
-// was not loaded in eager-loading.
-func (e TransactionEdges) ReviewOrErr() ([]*Review, error) {
-	if e.loadedTypes[1] {
-		return e.Review, nil
-	}
-	return nil, &NotLoadedError{edge: "review"}
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt uint32 `json:"created_at,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt uint32 `json:"updated_at,omitempty"`
+	// DeletedAt holds the value of the "deleted_at" field.
+	DeletedAt uint32 `json:"deleted_at,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -90,16 +43,12 @@ func (*Transaction) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case transaction.FieldNeedManualReview, transaction.FieldMutex:
-			values[i] = new(sql.NullBool)
-		case transaction.FieldAmountFloat64:
-			values[i] = new(sql.NullFloat64)
-		case transaction.FieldID, transaction.FieldAmountUint64, transaction.FieldCreatetimeUtc, transaction.FieldUpdatetimeUtc:
+		case transaction.FieldAmount, transaction.FieldCreatedAt, transaction.FieldUpdatedAt, transaction.FieldDeletedAt:
 			values[i] = new(sql.NullInt64)
-		case transaction.FieldAddressFrom, transaction.FieldAddressTo, transaction.FieldType, transaction.FieldTransactionIDInsite, transaction.FieldTransactionIDChain, transaction.FieldStatus, transaction.FieldSignatureUser, transaction.FieldSignaturePlatform:
+		case transaction.FieldName, transaction.FieldFrom, transaction.FieldTo, transaction.FieldTransactionID, transaction.FieldCid, transaction.FieldStatus:
 			values[i] = new(sql.NullString)
-		case transaction.ForeignKeys[0]: // coin_info_transactions
-			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
+		case transaction.FieldID:
+			values[i] = new(uuid.UUID)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Transaction", columns[i])
 		}
@@ -116,58 +65,46 @@ func (t *Transaction) assignValues(columns []string, values []interface{}) error
 	for i := range columns {
 		switch columns[i] {
 		case transaction.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
+			} else if value != nil {
+				t.ID = *value
 			}
-			t.ID = int32(value.Int64)
-		case transaction.FieldAmountUint64:
+		case transaction.FieldName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field name", values[i])
+			} else if value.Valid {
+				t.Name = value.String
+			}
+		case transaction.FieldAmount:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field amount_uint64", values[i])
+				return fmt.Errorf("unexpected type %T for field amount", values[i])
 			} else if value.Valid {
-				t.AmountUint64 = uint64(value.Int64)
+				t.Amount = uint64(value.Int64)
 			}
-		case transaction.FieldAmountFloat64:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
-				return fmt.Errorf("unexpected type %T for field amount_float64", values[i])
-			} else if value.Valid {
-				t.AmountFloat64 = value.Float64
-			}
-		case transaction.FieldAddressFrom:
+		case transaction.FieldFrom:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field address_from", values[i])
+				return fmt.Errorf("unexpected type %T for field from", values[i])
 			} else if value.Valid {
-				t.AddressFrom = value.String
+				t.From = value.String
 			}
-		case transaction.FieldAddressTo:
+		case transaction.FieldTo:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field address_to", values[i])
+				return fmt.Errorf("unexpected type %T for field to", values[i])
 			} else if value.Valid {
-				t.AddressTo = value.String
+				t.To = value.String
 			}
-		case transaction.FieldNeedManualReview:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field need_manual_review", values[i])
-			} else if value.Valid {
-				t.NeedManualReview = value.Bool
-			}
-		case transaction.FieldType:
+		case transaction.FieldTransactionID:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field type", values[i])
+				return fmt.Errorf("unexpected type %T for field transaction_id", values[i])
 			} else if value.Valid {
-				t.Type = transaction.Type(value.String)
+				t.TransactionID = value.String
 			}
-		case transaction.FieldTransactionIDInsite:
+		case transaction.FieldCid:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field transaction_id_insite", values[i])
+				return fmt.Errorf("unexpected type %T for field cid", values[i])
 			} else if value.Valid {
-				t.TransactionIDInsite = value.String
-			}
-		case transaction.FieldTransactionIDChain:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field transaction_id_chain", values[i])
-			} else if value.Valid {
-				t.TransactionIDChain = value.String
+				t.Cid = value.String
 			}
 		case transaction.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -175,56 +112,27 @@ func (t *Transaction) assignValues(columns []string, values []interface{}) error
 			} else if value.Valid {
 				t.Status = transaction.Status(value.String)
 			}
-		case transaction.FieldMutex:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field mutex", values[i])
-			} else if value.Valid {
-				t.Mutex = value.Bool
-			}
-		case transaction.FieldSignatureUser:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field signature_user", values[i])
-			} else if value.Valid {
-				t.SignatureUser = value.String
-			}
-		case transaction.FieldSignaturePlatform:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field signature_platform", values[i])
-			} else if value.Valid {
-				t.SignaturePlatform = value.String
-			}
-		case transaction.FieldCreatetimeUtc:
+		case transaction.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field createtime_utc", values[i])
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				t.CreatetimeUtc = value.Int64
+				t.CreatedAt = uint32(value.Int64)
 			}
-		case transaction.FieldUpdatetimeUtc:
+		case transaction.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field updatetime_utc", values[i])
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				t.UpdatetimeUtc = value.Int64
+				t.UpdatedAt = uint32(value.Int64)
 			}
-		case transaction.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullScanner); !ok {
-				return fmt.Errorf("unexpected type %T for field coin_info_transactions", values[i])
+		case transaction.FieldDeletedAt:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
 			} else if value.Valid {
-				t.coin_info_transactions = new(uuid.UUID)
-				*t.coin_info_transactions = *value.S.(*uuid.UUID)
+				t.DeletedAt = uint32(value.Int64)
 			}
 		}
 	}
 	return nil
-}
-
-// QueryCoin queries the "coin" edge of the Transaction entity.
-func (t *Transaction) QueryCoin() *CoinInfoQuery {
-	return (&TransactionClient{config: t.config}).QueryCoin(t)
-}
-
-// QueryReview queries the "review" edge of the Transaction entity.
-func (t *Transaction) QueryReview() *ReviewQuery {
-	return (&TransactionClient{config: t.config}).QueryReview(t)
 }
 
 // Update returns a builder for updating this Transaction.
@@ -250,34 +158,26 @@ func (t *Transaction) String() string {
 	var builder strings.Builder
 	builder.WriteString("Transaction(")
 	builder.WriteString(fmt.Sprintf("id=%v", t.ID))
-	builder.WriteString(", amount_uint64=")
-	builder.WriteString(fmt.Sprintf("%v", t.AmountUint64))
-	builder.WriteString(", amount_float64=")
-	builder.WriteString(fmt.Sprintf("%v", t.AmountFloat64))
-	builder.WriteString(", address_from=")
-	builder.WriteString(t.AddressFrom)
-	builder.WriteString(", address_to=")
-	builder.WriteString(t.AddressTo)
-	builder.WriteString(", need_manual_review=")
-	builder.WriteString(fmt.Sprintf("%v", t.NeedManualReview))
-	builder.WriteString(", type=")
-	builder.WriteString(fmt.Sprintf("%v", t.Type))
-	builder.WriteString(", transaction_id_insite=")
-	builder.WriteString(t.TransactionIDInsite)
-	builder.WriteString(", transaction_id_chain=")
-	builder.WriteString(t.TransactionIDChain)
+	builder.WriteString(", name=")
+	builder.WriteString(t.Name)
+	builder.WriteString(", amount=")
+	builder.WriteString(fmt.Sprintf("%v", t.Amount))
+	builder.WriteString(", from=")
+	builder.WriteString(t.From)
+	builder.WriteString(", to=")
+	builder.WriteString(t.To)
+	builder.WriteString(", transaction_id=")
+	builder.WriteString(t.TransactionID)
+	builder.WriteString(", cid=")
+	builder.WriteString(t.Cid)
 	builder.WriteString(", status=")
 	builder.WriteString(fmt.Sprintf("%v", t.Status))
-	builder.WriteString(", mutex=")
-	builder.WriteString(fmt.Sprintf("%v", t.Mutex))
-	builder.WriteString(", signature_user=")
-	builder.WriteString(t.SignatureUser)
-	builder.WriteString(", signature_platform=")
-	builder.WriteString(t.SignaturePlatform)
-	builder.WriteString(", createtime_utc=")
-	builder.WriteString(fmt.Sprintf("%v", t.CreatetimeUtc))
-	builder.WriteString(", updatetime_utc=")
-	builder.WriteString(fmt.Sprintf("%v", t.UpdatetimeUtc))
+	builder.WriteString(", created_at=")
+	builder.WriteString(fmt.Sprintf("%v", t.CreatedAt))
+	builder.WriteString(", updated_at=")
+	builder.WriteString(fmt.Sprintf("%v", t.UpdatedAt))
+	builder.WriteString(", deleted_at=")
+	builder.WriteString(fmt.Sprintf("%v", t.DeletedAt))
 	builder.WriteByte(')')
 	return builder.String()
 }

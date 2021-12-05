@@ -5,18 +5,17 @@ import (
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	"github.com/NpoolPlatform/message/npool/trading"
-	"github.com/NpoolPlatform/sphinx-service/pkg/app"
+	"github.com/NpoolPlatform/sphinx-service/pkg/version"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// ping pong
 func (s *Server) Version(ctx context.Context, in *emptypb.Empty) (*trading.VersionResponse, error) {
-	resp, err := app.Version()
+	v, err := version.Version()
 	if err != nil {
-		logger.Sugar().Errorw("[Version] get service version error: %w", err)
-		return &trading.VersionResponse{}, status.Error(codes.Internal, "internal server error")
+		logger.Sugar().Errorf("Version call Version error: %v", err)
+		return &trading.VersionResponse{}, status.Errorf(codes.Internal, "internal server error")
 	}
-	return resp, nil
+	return v, nil
 }

@@ -4,6 +4,8 @@ package transaction
 
 import (
 	"fmt"
+
+	"github.com/google/uuid"
 )
 
 const (
@@ -11,79 +13,43 @@ const (
 	Label = "transaction"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldAmountUint64 holds the string denoting the amount_uint64 field in the database.
-	FieldAmountUint64 = "amount_uint64"
-	// FieldAmountFloat64 holds the string denoting the amount_float64 field in the database.
-	FieldAmountFloat64 = "amount_float64"
-	// FieldAddressFrom holds the string denoting the address_from field in the database.
-	FieldAddressFrom = "address_from"
-	// FieldAddressTo holds the string denoting the address_to field in the database.
-	FieldAddressTo = "address_to"
-	// FieldNeedManualReview holds the string denoting the need_manual_review field in the database.
-	FieldNeedManualReview = "need_manual_review"
-	// FieldType holds the string denoting the type field in the database.
-	FieldType = "type"
-	// FieldTransactionIDInsite holds the string denoting the transaction_id_insite field in the database.
-	FieldTransactionIDInsite = "transaction_id_insite"
-	// FieldTransactionIDChain holds the string denoting the transaction_id_chain field in the database.
-	FieldTransactionIDChain = "transaction_id_chain"
+	// FieldName holds the string denoting the name field in the database.
+	FieldName = "name"
+	// FieldAmount holds the string denoting the amount field in the database.
+	FieldAmount = "amount"
+	// FieldFrom holds the string denoting the from field in the database.
+	FieldFrom = "from"
+	// FieldTo holds the string denoting the to field in the database.
+	FieldTo = "to"
+	// FieldTransactionID holds the string denoting the transaction_id field in the database.
+	FieldTransactionID = "transaction_id"
+	// FieldCid holds the string denoting the cid field in the database.
+	FieldCid = "cid"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
-	// FieldMutex holds the string denoting the mutex field in the database.
-	FieldMutex = "mutex"
-	// FieldSignatureUser holds the string denoting the signature_user field in the database.
-	FieldSignatureUser = "signature_user"
-	// FieldSignaturePlatform holds the string denoting the signature_platform field in the database.
-	FieldSignaturePlatform = "signature_platform"
-	// FieldCreatetimeUtc holds the string denoting the createtime_utc field in the database.
-	FieldCreatetimeUtc = "createtime_utc"
-	// FieldUpdatetimeUtc holds the string denoting the updatetime_utc field in the database.
-	FieldUpdatetimeUtc = "updatetime_utc"
-	// EdgeCoin holds the string denoting the coin edge name in mutations.
-	EdgeCoin = "coin"
-	// EdgeReview holds the string denoting the review edge name in mutations.
-	EdgeReview = "review"
+	// FieldCreatedAt holds the string denoting the created_at field in the database.
+	FieldCreatedAt = "created_at"
+	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
+	FieldUpdatedAt = "updated_at"
+	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
+	FieldDeletedAt = "deleted_at"
 	// Table holds the table name of the transaction in the database.
 	Table = "transactions"
-	// CoinTable is the table that holds the coin relation/edge.
-	CoinTable = "transactions"
-	// CoinInverseTable is the table name for the CoinInfo entity.
-	// It exists in this package in order to avoid circular dependency with the "coininfo" package.
-	CoinInverseTable = "coin_infos"
-	// CoinColumn is the table column denoting the coin relation/edge.
-	CoinColumn = "coin_info_transactions"
-	// ReviewTable is the table that holds the review relation/edge.
-	ReviewTable = "reviews"
-	// ReviewInverseTable is the table name for the Review entity.
-	// It exists in this package in order to avoid circular dependency with the "review" package.
-	ReviewInverseTable = "reviews"
-	// ReviewColumn is the table column denoting the review relation/edge.
-	ReviewColumn = "transaction_review"
 )
 
 // Columns holds all SQL columns for transaction fields.
 var Columns = []string{
 	FieldID,
-	FieldAmountUint64,
-	FieldAmountFloat64,
-	FieldAddressFrom,
-	FieldAddressTo,
-	FieldNeedManualReview,
-	FieldType,
-	FieldTransactionIDInsite,
-	FieldTransactionIDChain,
+	FieldName,
+	FieldAmount,
+	FieldFrom,
+	FieldTo,
+	FieldTransactionID,
+	FieldCid,
 	FieldStatus,
-	FieldMutex,
-	FieldSignatureUser,
-	FieldSignaturePlatform,
-	FieldCreatetimeUtc,
-	FieldUpdatetimeUtc,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "transactions"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"coin_info_transactions",
+	FieldCreatedAt,
+	FieldUpdatedAt,
+	FieldDeletedAt,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -93,73 +59,50 @@ func ValidColumn(column string) bool {
 			return true
 		}
 	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
-			return true
-		}
-	}
 	return false
 }
 
 var (
-	// AddressFromValidator is a validator for the "address_from" field. It is called by the builders before save.
-	AddressFromValidator func(string) error
-	// AddressToValidator is a validator for the "address_to" field. It is called by the builders before save.
-	AddressToValidator func(string) error
-	// DefaultNeedManualReview holds the default value on creation for the "need_manual_review" field.
-	DefaultNeedManualReview bool
-	// TransactionIDInsiteValidator is a validator for the "transaction_id_insite" field. It is called by the builders before save.
-	TransactionIDInsiteValidator func(string) error
-	// TransactionIDChainValidator is a validator for the "transaction_id_chain" field. It is called by the builders before save.
-	TransactionIDChainValidator func(string) error
-	// DefaultMutex holds the default value on creation for the "mutex" field.
-	DefaultMutex bool
-	// SignatureUserValidator is a validator for the "signature_user" field. It is called by the builders before save.
-	SignatureUserValidator func(string) error
-	// SignaturePlatformValidator is a validator for the "signature_platform" field. It is called by the builders before save.
-	SignaturePlatformValidator func(string) error
+	// DefaultName holds the default value on creation for the "name" field.
+	DefaultName string
+	// DefaultAmount holds the default value on creation for the "amount" field.
+	DefaultAmount uint64
+	// DefaultFrom holds the default value on creation for the "from" field.
+	DefaultFrom string
+	// FromValidator is a validator for the "from" field. It is called by the builders before save.
+	FromValidator func(string) error
+	// DefaultTo holds the default value on creation for the "to" field.
+	DefaultTo string
+	// ToValidator is a validator for the "to" field. It is called by the builders before save.
+	ToValidator func(string) error
+	// TransactionIDValidator is a validator for the "transaction_id" field. It is called by the builders before save.
+	TransactionIDValidator func(string) error
+	// DefaultCid holds the default value on creation for the "cid" field.
+	DefaultCid string
+	// CidValidator is a validator for the "cid" field. It is called by the builders before save.
+	CidValidator func(string) error
+	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
+	DefaultCreatedAt func() uint32
+	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
+	DefaultUpdatedAt func() uint32
+	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
+	UpdateDefaultUpdatedAt func() uint32
+	// DefaultDeletedAt holds the default value on creation for the "deleted_at" field.
+	DefaultDeletedAt func() uint32
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID func() uuid.UUID
 )
-
-// Type defines the type for the "type" enum field.
-type Type string
-
-// Type values.
-const (
-	TypeRecharge Type = "recharge"
-	TypePayment  Type = "payment"
-	TypeWithdraw Type = "withdraw"
-	TypeUnknown  Type = "unknown"
-)
-
-func (_type Type) String() string {
-	return string(_type)
-}
-
-// TypeValidator is a validator for the "type" field enum values. It is called by the builders before save.
-func TypeValidator(_type Type) error {
-	switch _type {
-	case TypeRecharge, TypePayment, TypeWithdraw, TypeUnknown:
-		return nil
-	default:
-		return fmt.Errorf("transaction: invalid enum value for type field: %q", _type)
-	}
-}
 
 // Status defines the type for the "status" enum field.
 type Status string
 
 // Status values.
 const (
-	StatusPendingReview    Status = "pending_review"
-	StatusPendingProcess   Status = "pending_process"
-	StatusPendingSigninfo  Status = "pending_signinfo"
-	StatusPendingSign      Status = "pending_sign"
-	StatusPendingBroadcast Status = "pending_broadcast"
-	StatusPendingConfirm   Status = "pending_confirm"
-	StatusDone             Status = "done"
-	StatusRejected         Status = "rejected"
-	StatusError            Status = "error"
-	StatusErrorExpected    Status = "error_expected"
+	StatusPendingReview      Status = "pending_review"
+	StatusConfirm            Status = "confirm"
+	StatusRejected           Status = "rejected"
+	StatusPendingTransaction Status = "pending_transaction"
+	StatusDone               Status = "done"
 )
 
 func (s Status) String() string {
@@ -169,7 +112,7 @@ func (s Status) String() string {
 // StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
 func StatusValidator(s Status) error {
 	switch s {
-	case StatusPendingReview, StatusPendingProcess, StatusPendingSigninfo, StatusPendingSign, StatusPendingBroadcast, StatusPendingConfirm, StatusDone, StatusRejected, StatusError, StatusErrorExpected:
+	case StatusPendingReview, StatusConfirm, StatusRejected, StatusPendingTransaction, StatusDone:
 		return nil
 	default:
 		return fmt.Errorf("transaction: invalid enum value for status field: %q", s)

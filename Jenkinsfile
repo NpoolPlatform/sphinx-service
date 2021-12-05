@@ -38,20 +38,6 @@ pipeline {
       }
     }
 
-    stage('Compile') {
-      when {
-        expression { BUILD_TARGET == 'true' }
-      }
-      steps {
-        sh (returnStdout: false, script: '''
-          make -C tools/grpc install
-          make verify-build
-          git clone https://github.com/NpoolPlatform/message.git message
-          PATH=$PATH:/usr/go/bin:$HOME/go/bin make -C message clean proto
-        '''.stripIndent())
-      }
-    }
-
     stage('Switch to current cluster') {
         steps {
             sh 'cd /etc/kubeasz; ./ezctl checkout $TARGET_ENV'
@@ -91,9 +77,6 @@ pipeline {
 
           kubectl exec --namespace kube-system $devboxpod -- make -C /tmp/$servicename deps before-test test after-test
           kubectl exec --namespace kube-system $devboxpod -- rm -rf /tmp/$servicename
-
-          swaggeruipod=`kubectl get pods -A | grep swagger | awk '{print $2}'`
-          kubectl cp message/npool/*.swagger.json kube-system/$swaggeruipod:/usr/share/nginx/html || true
         '''.stripIndent())
       }
     }

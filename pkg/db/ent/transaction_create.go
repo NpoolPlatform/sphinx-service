@@ -7,10 +7,10 @@ import (
 	"errors"
 	"fmt"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/coininfo"
-	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/review"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
 	"github.com/google/uuid"
 )
@@ -20,61 +20,82 @@ type TransactionCreate struct {
 	config
 	mutation *TransactionMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
-// SetAmountUint64 sets the "amount_uint64" field.
-func (tc *TransactionCreate) SetAmountUint64(u uint64) *TransactionCreate {
-	tc.mutation.SetAmountUint64(u)
+// SetName sets the "name" field.
+func (tc *TransactionCreate) SetName(s string) *TransactionCreate {
+	tc.mutation.SetName(s)
 	return tc
 }
 
-// SetAmountFloat64 sets the "amount_float64" field.
-func (tc *TransactionCreate) SetAmountFloat64(f float64) *TransactionCreate {
-	tc.mutation.SetAmountFloat64(f)
-	return tc
-}
-
-// SetAddressFrom sets the "address_from" field.
-func (tc *TransactionCreate) SetAddressFrom(s string) *TransactionCreate {
-	tc.mutation.SetAddressFrom(s)
-	return tc
-}
-
-// SetAddressTo sets the "address_to" field.
-func (tc *TransactionCreate) SetAddressTo(s string) *TransactionCreate {
-	tc.mutation.SetAddressTo(s)
-	return tc
-}
-
-// SetNeedManualReview sets the "need_manual_review" field.
-func (tc *TransactionCreate) SetNeedManualReview(b bool) *TransactionCreate {
-	tc.mutation.SetNeedManualReview(b)
-	return tc
-}
-
-// SetNillableNeedManualReview sets the "need_manual_review" field if the given value is not nil.
-func (tc *TransactionCreate) SetNillableNeedManualReview(b *bool) *TransactionCreate {
-	if b != nil {
-		tc.SetNeedManualReview(*b)
+// SetNillableName sets the "name" field if the given value is not nil.
+func (tc *TransactionCreate) SetNillableName(s *string) *TransactionCreate {
+	if s != nil {
+		tc.SetName(*s)
 	}
 	return tc
 }
 
-// SetType sets the "type" field.
-func (tc *TransactionCreate) SetType(t transaction.Type) *TransactionCreate {
-	tc.mutation.SetType(t)
+// SetAmount sets the "amount" field.
+func (tc *TransactionCreate) SetAmount(u uint64) *TransactionCreate {
+	tc.mutation.SetAmount(u)
 	return tc
 }
 
-// SetTransactionIDInsite sets the "transaction_id_insite" field.
-func (tc *TransactionCreate) SetTransactionIDInsite(s string) *TransactionCreate {
-	tc.mutation.SetTransactionIDInsite(s)
+// SetNillableAmount sets the "amount" field if the given value is not nil.
+func (tc *TransactionCreate) SetNillableAmount(u *uint64) *TransactionCreate {
+	if u != nil {
+		tc.SetAmount(*u)
+	}
 	return tc
 }
 
-// SetTransactionIDChain sets the "transaction_id_chain" field.
-func (tc *TransactionCreate) SetTransactionIDChain(s string) *TransactionCreate {
-	tc.mutation.SetTransactionIDChain(s)
+// SetFrom sets the "from" field.
+func (tc *TransactionCreate) SetFrom(s string) *TransactionCreate {
+	tc.mutation.SetFrom(s)
+	return tc
+}
+
+// SetNillableFrom sets the "from" field if the given value is not nil.
+func (tc *TransactionCreate) SetNillableFrom(s *string) *TransactionCreate {
+	if s != nil {
+		tc.SetFrom(*s)
+	}
+	return tc
+}
+
+// SetTo sets the "to" field.
+func (tc *TransactionCreate) SetTo(s string) *TransactionCreate {
+	tc.mutation.SetTo(s)
+	return tc
+}
+
+// SetNillableTo sets the "to" field if the given value is not nil.
+func (tc *TransactionCreate) SetNillableTo(s *string) *TransactionCreate {
+	if s != nil {
+		tc.SetTo(*s)
+	}
+	return tc
+}
+
+// SetTransactionID sets the "transaction_id" field.
+func (tc *TransactionCreate) SetTransactionID(s string) *TransactionCreate {
+	tc.mutation.SetTransactionID(s)
+	return tc
+}
+
+// SetCid sets the "cid" field.
+func (tc *TransactionCreate) SetCid(s string) *TransactionCreate {
+	tc.mutation.SetCid(s)
+	return tc
+}
+
+// SetNillableCid sets the "cid" field if the given value is not nil.
+func (tc *TransactionCreate) SetNillableCid(s *string) *TransactionCreate {
+	if s != nil {
+		tc.SetCid(*s)
+	}
 	return tc
 }
 
@@ -84,74 +105,52 @@ func (tc *TransactionCreate) SetStatus(t transaction.Status) *TransactionCreate 
 	return tc
 }
 
-// SetMutex sets the "mutex" field.
-func (tc *TransactionCreate) SetMutex(b bool) *TransactionCreate {
-	tc.mutation.SetMutex(b)
+// SetCreatedAt sets the "created_at" field.
+func (tc *TransactionCreate) SetCreatedAt(u uint32) *TransactionCreate {
+	tc.mutation.SetCreatedAt(u)
 	return tc
 }
 
-// SetNillableMutex sets the "mutex" field if the given value is not nil.
-func (tc *TransactionCreate) SetNillableMutex(b *bool) *TransactionCreate {
-	if b != nil {
-		tc.SetMutex(*b)
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (tc *TransactionCreate) SetNillableCreatedAt(u *uint32) *TransactionCreate {
+	if u != nil {
+		tc.SetCreatedAt(*u)
 	}
 	return tc
 }
 
-// SetSignatureUser sets the "signature_user" field.
-func (tc *TransactionCreate) SetSignatureUser(s string) *TransactionCreate {
-	tc.mutation.SetSignatureUser(s)
+// SetUpdatedAt sets the "updated_at" field.
+func (tc *TransactionCreate) SetUpdatedAt(u uint32) *TransactionCreate {
+	tc.mutation.SetUpdatedAt(u)
 	return tc
 }
 
-// SetSignaturePlatform sets the "signature_platform" field.
-func (tc *TransactionCreate) SetSignaturePlatform(s string) *TransactionCreate {
-	tc.mutation.SetSignaturePlatform(s)
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (tc *TransactionCreate) SetNillableUpdatedAt(u *uint32) *TransactionCreate {
+	if u != nil {
+		tc.SetUpdatedAt(*u)
+	}
 	return tc
 }
 
-// SetCreatetimeUtc sets the "createtime_utc" field.
-func (tc *TransactionCreate) SetCreatetimeUtc(i int64) *TransactionCreate {
-	tc.mutation.SetCreatetimeUtc(i)
+// SetDeletedAt sets the "deleted_at" field.
+func (tc *TransactionCreate) SetDeletedAt(u uint32) *TransactionCreate {
+	tc.mutation.SetDeletedAt(u)
 	return tc
 }
 
-// SetUpdatetimeUtc sets the "updatetime_utc" field.
-func (tc *TransactionCreate) SetUpdatetimeUtc(i int64) *TransactionCreate {
-	tc.mutation.SetUpdatetimeUtc(i)
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (tc *TransactionCreate) SetNillableDeletedAt(u *uint32) *TransactionCreate {
+	if u != nil {
+		tc.SetDeletedAt(*u)
+	}
 	return tc
 }
 
 // SetID sets the "id" field.
-func (tc *TransactionCreate) SetID(i int32) *TransactionCreate {
-	tc.mutation.SetID(i)
+func (tc *TransactionCreate) SetID(u uuid.UUID) *TransactionCreate {
+	tc.mutation.SetID(u)
 	return tc
-}
-
-// SetCoinID sets the "coin" edge to the CoinInfo entity by ID.
-func (tc *TransactionCreate) SetCoinID(id uuid.UUID) *TransactionCreate {
-	tc.mutation.SetCoinID(id)
-	return tc
-}
-
-// SetCoin sets the "coin" edge to the CoinInfo entity.
-func (tc *TransactionCreate) SetCoin(c *CoinInfo) *TransactionCreate {
-	return tc.SetCoinID(c.ID)
-}
-
-// AddReviewIDs adds the "review" edge to the Review entity by IDs.
-func (tc *TransactionCreate) AddReviewIDs(ids ...int32) *TransactionCreate {
-	tc.mutation.AddReviewIDs(ids...)
-	return tc
-}
-
-// AddReview adds the "review" edges to the Review entity.
-func (tc *TransactionCreate) AddReview(r ...*Review) *TransactionCreate {
-	ids := make([]int32, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
-	}
-	return tc.AddReviewIDs(ids...)
 }
 
 // Mutation returns the TransactionMutation object of the builder.
@@ -225,65 +224,82 @@ func (tc *TransactionCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (tc *TransactionCreate) defaults() {
-	if _, ok := tc.mutation.NeedManualReview(); !ok {
-		v := transaction.DefaultNeedManualReview
-		tc.mutation.SetNeedManualReview(v)
+	if _, ok := tc.mutation.Name(); !ok {
+		v := transaction.DefaultName
+		tc.mutation.SetName(v)
 	}
-	if _, ok := tc.mutation.Mutex(); !ok {
-		v := transaction.DefaultMutex
-		tc.mutation.SetMutex(v)
+	if _, ok := tc.mutation.Amount(); !ok {
+		v := transaction.DefaultAmount
+		tc.mutation.SetAmount(v)
+	}
+	if _, ok := tc.mutation.From(); !ok {
+		v := transaction.DefaultFrom
+		tc.mutation.SetFrom(v)
+	}
+	if _, ok := tc.mutation.To(); !ok {
+		v := transaction.DefaultTo
+		tc.mutation.SetTo(v)
+	}
+	if _, ok := tc.mutation.Cid(); !ok {
+		v := transaction.DefaultCid
+		tc.mutation.SetCid(v)
+	}
+	if _, ok := tc.mutation.CreatedAt(); !ok {
+		v := transaction.DefaultCreatedAt()
+		tc.mutation.SetCreatedAt(v)
+	}
+	if _, ok := tc.mutation.UpdatedAt(); !ok {
+		v := transaction.DefaultUpdatedAt()
+		tc.mutation.SetUpdatedAt(v)
+	}
+	if _, ok := tc.mutation.DeletedAt(); !ok {
+		v := transaction.DefaultDeletedAt()
+		tc.mutation.SetDeletedAt(v)
+	}
+	if _, ok := tc.mutation.ID(); !ok {
+		v := transaction.DefaultID()
+		tc.mutation.SetID(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (tc *TransactionCreate) check() error {
-	if _, ok := tc.mutation.AmountUint64(); !ok {
-		return &ValidationError{Name: "amount_uint64", err: errors.New(`ent: missing required field "amount_uint64"`)}
+	if _, ok := tc.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "name"`)}
 	}
-	if _, ok := tc.mutation.AmountFloat64(); !ok {
-		return &ValidationError{Name: "amount_float64", err: errors.New(`ent: missing required field "amount_float64"`)}
+	if _, ok := tc.mutation.Amount(); !ok {
+		return &ValidationError{Name: "amount", err: errors.New(`ent: missing required field "amount"`)}
 	}
-	if _, ok := tc.mutation.AddressFrom(); !ok {
-		return &ValidationError{Name: "address_from", err: errors.New(`ent: missing required field "address_from"`)}
+	if _, ok := tc.mutation.From(); !ok {
+		return &ValidationError{Name: "from", err: errors.New(`ent: missing required field "from"`)}
 	}
-	if v, ok := tc.mutation.AddressFrom(); ok {
-		if err := transaction.AddressFromValidator(v); err != nil {
-			return &ValidationError{Name: "address_from", err: fmt.Errorf(`ent: validator failed for field "address_from": %w`, err)}
+	if v, ok := tc.mutation.From(); ok {
+		if err := transaction.FromValidator(v); err != nil {
+			return &ValidationError{Name: "from", err: fmt.Errorf(`ent: validator failed for field "from": %w`, err)}
 		}
 	}
-	if _, ok := tc.mutation.AddressTo(); !ok {
-		return &ValidationError{Name: "address_to", err: errors.New(`ent: missing required field "address_to"`)}
+	if _, ok := tc.mutation.To(); !ok {
+		return &ValidationError{Name: "to", err: errors.New(`ent: missing required field "to"`)}
 	}
-	if v, ok := tc.mutation.AddressTo(); ok {
-		if err := transaction.AddressToValidator(v); err != nil {
-			return &ValidationError{Name: "address_to", err: fmt.Errorf(`ent: validator failed for field "address_to": %w`, err)}
+	if v, ok := tc.mutation.To(); ok {
+		if err := transaction.ToValidator(v); err != nil {
+			return &ValidationError{Name: "to", err: fmt.Errorf(`ent: validator failed for field "to": %w`, err)}
 		}
 	}
-	if _, ok := tc.mutation.NeedManualReview(); !ok {
-		return &ValidationError{Name: "need_manual_review", err: errors.New(`ent: missing required field "need_manual_review"`)}
+	if _, ok := tc.mutation.TransactionID(); !ok {
+		return &ValidationError{Name: "transaction_id", err: errors.New(`ent: missing required field "transaction_id"`)}
 	}
-	if _, ok := tc.mutation.GetType(); !ok {
-		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "type"`)}
-	}
-	if v, ok := tc.mutation.GetType(); ok {
-		if err := transaction.TypeValidator(v); err != nil {
-			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "type": %w`, err)}
+	if v, ok := tc.mutation.TransactionID(); ok {
+		if err := transaction.TransactionIDValidator(v); err != nil {
+			return &ValidationError{Name: "transaction_id", err: fmt.Errorf(`ent: validator failed for field "transaction_id": %w`, err)}
 		}
 	}
-	if _, ok := tc.mutation.TransactionIDInsite(); !ok {
-		return &ValidationError{Name: "transaction_id_insite", err: errors.New(`ent: missing required field "transaction_id_insite"`)}
+	if _, ok := tc.mutation.Cid(); !ok {
+		return &ValidationError{Name: "cid", err: errors.New(`ent: missing required field "cid"`)}
 	}
-	if v, ok := tc.mutation.TransactionIDInsite(); ok {
-		if err := transaction.TransactionIDInsiteValidator(v); err != nil {
-			return &ValidationError{Name: "transaction_id_insite", err: fmt.Errorf(`ent: validator failed for field "transaction_id_insite": %w`, err)}
-		}
-	}
-	if _, ok := tc.mutation.TransactionIDChain(); !ok {
-		return &ValidationError{Name: "transaction_id_chain", err: errors.New(`ent: missing required field "transaction_id_chain"`)}
-	}
-	if v, ok := tc.mutation.TransactionIDChain(); ok {
-		if err := transaction.TransactionIDChainValidator(v); err != nil {
-			return &ValidationError{Name: "transaction_id_chain", err: fmt.Errorf(`ent: validator failed for field "transaction_id_chain": %w`, err)}
+	if v, ok := tc.mutation.Cid(); ok {
+		if err := transaction.CidValidator(v); err != nil {
+			return &ValidationError{Name: "cid", err: fmt.Errorf(`ent: validator failed for field "cid": %w`, err)}
 		}
 	}
 	if _, ok := tc.mutation.Status(); !ok {
@@ -294,33 +310,14 @@ func (tc *TransactionCreate) check() error {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "status": %w`, err)}
 		}
 	}
-	if _, ok := tc.mutation.Mutex(); !ok {
-		return &ValidationError{Name: "mutex", err: errors.New(`ent: missing required field "mutex"`)}
+	if _, ok := tc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "created_at"`)}
 	}
-	if _, ok := tc.mutation.SignatureUser(); !ok {
-		return &ValidationError{Name: "signature_user", err: errors.New(`ent: missing required field "signature_user"`)}
+	if _, ok := tc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "updated_at"`)}
 	}
-	if v, ok := tc.mutation.SignatureUser(); ok {
-		if err := transaction.SignatureUserValidator(v); err != nil {
-			return &ValidationError{Name: "signature_user", err: fmt.Errorf(`ent: validator failed for field "signature_user": %w`, err)}
-		}
-	}
-	if _, ok := tc.mutation.SignaturePlatform(); !ok {
-		return &ValidationError{Name: "signature_platform", err: errors.New(`ent: missing required field "signature_platform"`)}
-	}
-	if v, ok := tc.mutation.SignaturePlatform(); ok {
-		if err := transaction.SignaturePlatformValidator(v); err != nil {
-			return &ValidationError{Name: "signature_platform", err: fmt.Errorf(`ent: validator failed for field "signature_platform": %w`, err)}
-		}
-	}
-	if _, ok := tc.mutation.CreatetimeUtc(); !ok {
-		return &ValidationError{Name: "createtime_utc", err: errors.New(`ent: missing required field "createtime_utc"`)}
-	}
-	if _, ok := tc.mutation.UpdatetimeUtc(); !ok {
-		return &ValidationError{Name: "updatetime_utc", err: errors.New(`ent: missing required field "updatetime_utc"`)}
-	}
-	if _, ok := tc.mutation.CoinID(); !ok {
-		return &ValidationError{Name: "coin", err: errors.New("ent: missing required edge \"coin\"")}
+	if _, ok := tc.mutation.DeletedAt(); !ok {
+		return &ValidationError{Name: "deleted_at", err: errors.New(`ent: missing required field "deleted_at"`)}
 	}
 	return nil
 }
@@ -333,9 +330,8 @@ func (tc *TransactionCreate) sqlSave(ctx context.Context) (*Transaction, error) 
 		}
 		return nil, err
 	}
-	if _spec.ID.Value != _node.ID {
-		id := _spec.ID.Value.(int64)
-		_node.ID = int32(id)
+	if _spec.ID.Value != nil {
+		_node.ID = _spec.ID.Value.(uuid.UUID)
 	}
 	return _node, nil
 }
@@ -346,78 +342,63 @@ func (tc *TransactionCreate) createSpec() (*Transaction, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: transaction.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt32,
+				Type:   field.TypeUUID,
 				Column: transaction.FieldID,
 			},
 		}
 	)
+	_spec.OnConflict = tc.conflict
 	if id, ok := tc.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := tc.mutation.AmountUint64(); ok {
+	if value, ok := tc.mutation.Name(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: transaction.FieldName,
+		})
+		_node.Name = value
+	}
+	if value, ok := tc.mutation.Amount(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeUint64,
 			Value:  value,
-			Column: transaction.FieldAmountUint64,
+			Column: transaction.FieldAmount,
 		})
-		_node.AmountUint64 = value
+		_node.Amount = value
 	}
-	if value, ok := tc.mutation.AmountFloat64(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeFloat64,
-			Value:  value,
-			Column: transaction.FieldAmountFloat64,
-		})
-		_node.AmountFloat64 = value
-	}
-	if value, ok := tc.mutation.AddressFrom(); ok {
+	if value, ok := tc.mutation.From(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
-			Column: transaction.FieldAddressFrom,
+			Column: transaction.FieldFrom,
 		})
-		_node.AddressFrom = value
+		_node.From = value
 	}
-	if value, ok := tc.mutation.AddressTo(); ok {
+	if value, ok := tc.mutation.To(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
-			Column: transaction.FieldAddressTo,
+			Column: transaction.FieldTo,
 		})
-		_node.AddressTo = value
+		_node.To = value
 	}
-	if value, ok := tc.mutation.NeedManualReview(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeBool,
-			Value:  value,
-			Column: transaction.FieldNeedManualReview,
-		})
-		_node.NeedManualReview = value
-	}
-	if value, ok := tc.mutation.GetType(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeEnum,
-			Value:  value,
-			Column: transaction.FieldType,
-		})
-		_node.Type = value
-	}
-	if value, ok := tc.mutation.TransactionIDInsite(); ok {
+	if value, ok := tc.mutation.TransactionID(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
-			Column: transaction.FieldTransactionIDInsite,
+			Column: transaction.FieldTransactionID,
 		})
-		_node.TransactionIDInsite = value
+		_node.TransactionID = value
 	}
-	if value, ok := tc.mutation.TransactionIDChain(); ok {
+	if value, ok := tc.mutation.Cid(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
-			Column: transaction.FieldTransactionIDChain,
+			Column: transaction.FieldCid,
 		})
-		_node.TransactionIDChain = value
+		_node.Cid = value
 	}
 	if value, ok := tc.mutation.Status(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -427,92 +408,437 @@ func (tc *TransactionCreate) createSpec() (*Transaction, *sqlgraph.CreateSpec) {
 		})
 		_node.Status = value
 	}
-	if value, ok := tc.mutation.Mutex(); ok {
+	if value, ok := tc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeBool,
+			Type:   field.TypeUint32,
 			Value:  value,
-			Column: transaction.FieldMutex,
+			Column: transaction.FieldCreatedAt,
 		})
-		_node.Mutex = value
+		_node.CreatedAt = value
 	}
-	if value, ok := tc.mutation.SignatureUser(); ok {
+	if value, ok := tc.mutation.UpdatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeUint32,
 			Value:  value,
-			Column: transaction.FieldSignatureUser,
+			Column: transaction.FieldUpdatedAt,
 		})
-		_node.SignatureUser = value
+		_node.UpdatedAt = value
 	}
-	if value, ok := tc.mutation.SignaturePlatform(); ok {
+	if value, ok := tc.mutation.DeletedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeUint32,
 			Value:  value,
-			Column: transaction.FieldSignaturePlatform,
+			Column: transaction.FieldDeletedAt,
 		})
-		_node.SignaturePlatform = value
-	}
-	if value, ok := tc.mutation.CreatetimeUtc(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt64,
-			Value:  value,
-			Column: transaction.FieldCreatetimeUtc,
-		})
-		_node.CreatetimeUtc = value
-	}
-	if value, ok := tc.mutation.UpdatetimeUtc(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt64,
-			Value:  value,
-			Column: transaction.FieldUpdatetimeUtc,
-		})
-		_node.UpdatetimeUtc = value
-	}
-	if nodes := tc.mutation.CoinIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   transaction.CoinTable,
-			Columns: []string{transaction.CoinColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: coininfo.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.coin_info_transactions = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := tc.mutation.ReviewIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   transaction.ReviewTable,
-			Columns: []string{transaction.ReviewColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt32,
-					Column: review.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
+		_node.DeletedAt = value
 	}
 	return _node, _spec
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.Transaction.Create().
+//		SetName(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.TransactionUpsert) {
+//			SetName(v+v).
+//		}).
+//		Exec(ctx)
+//
+func (tc *TransactionCreate) OnConflict(opts ...sql.ConflictOption) *TransactionUpsertOne {
+	tc.conflict = opts
+	return &TransactionUpsertOne{
+		create: tc,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.Transaction.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+//
+func (tc *TransactionCreate) OnConflictColumns(columns ...string) *TransactionUpsertOne {
+	tc.conflict = append(tc.conflict, sql.ConflictColumns(columns...))
+	return &TransactionUpsertOne{
+		create: tc,
+	}
+}
+
+type (
+	// TransactionUpsertOne is the builder for "upsert"-ing
+	//  one Transaction node.
+	TransactionUpsertOne struct {
+		create *TransactionCreate
+	}
+
+	// TransactionUpsert is the "OnConflict" setter.
+	TransactionUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetName sets the "name" field.
+func (u *TransactionUpsert) SetName(v string) *TransactionUpsert {
+	u.Set(transaction.FieldName, v)
+	return u
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *TransactionUpsert) UpdateName() *TransactionUpsert {
+	u.SetExcluded(transaction.FieldName)
+	return u
+}
+
+// SetAmount sets the "amount" field.
+func (u *TransactionUpsert) SetAmount(v uint64) *TransactionUpsert {
+	u.Set(transaction.FieldAmount, v)
+	return u
+}
+
+// UpdateAmount sets the "amount" field to the value that was provided on create.
+func (u *TransactionUpsert) UpdateAmount() *TransactionUpsert {
+	u.SetExcluded(transaction.FieldAmount)
+	return u
+}
+
+// SetFrom sets the "from" field.
+func (u *TransactionUpsert) SetFrom(v string) *TransactionUpsert {
+	u.Set(transaction.FieldFrom, v)
+	return u
+}
+
+// UpdateFrom sets the "from" field to the value that was provided on create.
+func (u *TransactionUpsert) UpdateFrom() *TransactionUpsert {
+	u.SetExcluded(transaction.FieldFrom)
+	return u
+}
+
+// SetTo sets the "to" field.
+func (u *TransactionUpsert) SetTo(v string) *TransactionUpsert {
+	u.Set(transaction.FieldTo, v)
+	return u
+}
+
+// UpdateTo sets the "to" field to the value that was provided on create.
+func (u *TransactionUpsert) UpdateTo() *TransactionUpsert {
+	u.SetExcluded(transaction.FieldTo)
+	return u
+}
+
+// SetTransactionID sets the "transaction_id" field.
+func (u *TransactionUpsert) SetTransactionID(v string) *TransactionUpsert {
+	u.Set(transaction.FieldTransactionID, v)
+	return u
+}
+
+// UpdateTransactionID sets the "transaction_id" field to the value that was provided on create.
+func (u *TransactionUpsert) UpdateTransactionID() *TransactionUpsert {
+	u.SetExcluded(transaction.FieldTransactionID)
+	return u
+}
+
+// SetCid sets the "cid" field.
+func (u *TransactionUpsert) SetCid(v string) *TransactionUpsert {
+	u.Set(transaction.FieldCid, v)
+	return u
+}
+
+// UpdateCid sets the "cid" field to the value that was provided on create.
+func (u *TransactionUpsert) UpdateCid() *TransactionUpsert {
+	u.SetExcluded(transaction.FieldCid)
+	return u
+}
+
+// SetStatus sets the "status" field.
+func (u *TransactionUpsert) SetStatus(v transaction.Status) *TransactionUpsert {
+	u.Set(transaction.FieldStatus, v)
+	return u
+}
+
+// UpdateStatus sets the "status" field to the value that was provided on create.
+func (u *TransactionUpsert) UpdateStatus() *TransactionUpsert {
+	u.SetExcluded(transaction.FieldStatus)
+	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *TransactionUpsert) SetCreatedAt(v uint32) *TransactionUpsert {
+	u.Set(transaction.FieldCreatedAt, v)
+	return u
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *TransactionUpsert) UpdateCreatedAt() *TransactionUpsert {
+	u.SetExcluded(transaction.FieldCreatedAt)
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *TransactionUpsert) SetUpdatedAt(v uint32) *TransactionUpsert {
+	u.Set(transaction.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *TransactionUpsert) UpdateUpdatedAt() *TransactionUpsert {
+	u.SetExcluded(transaction.FieldUpdatedAt)
+	return u
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *TransactionUpsert) SetDeletedAt(v uint32) *TransactionUpsert {
+	u.Set(transaction.FieldDeletedAt, v)
+	return u
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *TransactionUpsert) UpdateDeletedAt() *TransactionUpsert {
+	u.SetExcluded(transaction.FieldDeletedAt)
+	return u
+}
+
+// UpdateNewValues updates the fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.Transaction.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(transaction.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+//
+func (u *TransactionUpsertOne) UpdateNewValues() *TransactionUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(transaction.FieldID)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//  client.Transaction.Create().
+//      OnConflict(sql.ResolveWithIgnore()).
+//      Exec(ctx)
+//
+func (u *TransactionUpsertOne) Ignore() *TransactionUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *TransactionUpsertOne) DoNothing() *TransactionUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the TransactionCreate.OnConflict
+// documentation for more info.
+func (u *TransactionUpsertOne) Update(set func(*TransactionUpsert)) *TransactionUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&TransactionUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetName sets the "name" field.
+func (u *TransactionUpsertOne) SetName(v string) *TransactionUpsertOne {
+	return u.Update(func(s *TransactionUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *TransactionUpsertOne) UpdateName() *TransactionUpsertOne {
+	return u.Update(func(s *TransactionUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetAmount sets the "amount" field.
+func (u *TransactionUpsertOne) SetAmount(v uint64) *TransactionUpsertOne {
+	return u.Update(func(s *TransactionUpsert) {
+		s.SetAmount(v)
+	})
+}
+
+// UpdateAmount sets the "amount" field to the value that was provided on create.
+func (u *TransactionUpsertOne) UpdateAmount() *TransactionUpsertOne {
+	return u.Update(func(s *TransactionUpsert) {
+		s.UpdateAmount()
+	})
+}
+
+// SetFrom sets the "from" field.
+func (u *TransactionUpsertOne) SetFrom(v string) *TransactionUpsertOne {
+	return u.Update(func(s *TransactionUpsert) {
+		s.SetFrom(v)
+	})
+}
+
+// UpdateFrom sets the "from" field to the value that was provided on create.
+func (u *TransactionUpsertOne) UpdateFrom() *TransactionUpsertOne {
+	return u.Update(func(s *TransactionUpsert) {
+		s.UpdateFrom()
+	})
+}
+
+// SetTo sets the "to" field.
+func (u *TransactionUpsertOne) SetTo(v string) *TransactionUpsertOne {
+	return u.Update(func(s *TransactionUpsert) {
+		s.SetTo(v)
+	})
+}
+
+// UpdateTo sets the "to" field to the value that was provided on create.
+func (u *TransactionUpsertOne) UpdateTo() *TransactionUpsertOne {
+	return u.Update(func(s *TransactionUpsert) {
+		s.UpdateTo()
+	})
+}
+
+// SetTransactionID sets the "transaction_id" field.
+func (u *TransactionUpsertOne) SetTransactionID(v string) *TransactionUpsertOne {
+	return u.Update(func(s *TransactionUpsert) {
+		s.SetTransactionID(v)
+	})
+}
+
+// UpdateTransactionID sets the "transaction_id" field to the value that was provided on create.
+func (u *TransactionUpsertOne) UpdateTransactionID() *TransactionUpsertOne {
+	return u.Update(func(s *TransactionUpsert) {
+		s.UpdateTransactionID()
+	})
+}
+
+// SetCid sets the "cid" field.
+func (u *TransactionUpsertOne) SetCid(v string) *TransactionUpsertOne {
+	return u.Update(func(s *TransactionUpsert) {
+		s.SetCid(v)
+	})
+}
+
+// UpdateCid sets the "cid" field to the value that was provided on create.
+func (u *TransactionUpsertOne) UpdateCid() *TransactionUpsertOne {
+	return u.Update(func(s *TransactionUpsert) {
+		s.UpdateCid()
+	})
+}
+
+// SetStatus sets the "status" field.
+func (u *TransactionUpsertOne) SetStatus(v transaction.Status) *TransactionUpsertOne {
+	return u.Update(func(s *TransactionUpsert) {
+		s.SetStatus(v)
+	})
+}
+
+// UpdateStatus sets the "status" field to the value that was provided on create.
+func (u *TransactionUpsertOne) UpdateStatus() *TransactionUpsertOne {
+	return u.Update(func(s *TransactionUpsert) {
+		s.UpdateStatus()
+	})
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *TransactionUpsertOne) SetCreatedAt(v uint32) *TransactionUpsertOne {
+	return u.Update(func(s *TransactionUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *TransactionUpsertOne) UpdateCreatedAt() *TransactionUpsertOne {
+	return u.Update(func(s *TransactionUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *TransactionUpsertOne) SetUpdatedAt(v uint32) *TransactionUpsertOne {
+	return u.Update(func(s *TransactionUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *TransactionUpsertOne) UpdateUpdatedAt() *TransactionUpsertOne {
+	return u.Update(func(s *TransactionUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *TransactionUpsertOne) SetDeletedAt(v uint32) *TransactionUpsertOne {
+	return u.Update(func(s *TransactionUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *TransactionUpsertOne) UpdateDeletedAt() *TransactionUpsertOne {
+	return u.Update(func(s *TransactionUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// Exec executes the query.
+func (u *TransactionUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for TransactionCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *TransactionUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *TransactionUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
+	if u.create.driver.Dialect() == dialect.MySQL {
+		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
+		// fields from the database since MySQL does not support the RETURNING clause.
+		return id, errors.New("ent: TransactionUpsertOne.ID is not supported by MySQL driver. Use TransactionUpsertOne.Exec instead")
+	}
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *TransactionUpsertOne) IDX(ctx context.Context) uuid.UUID {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
 }
 
 // TransactionCreateBulk is the builder for creating many Transaction entities in bulk.
 type TransactionCreateBulk struct {
 	config
 	builders []*TransactionCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the Transaction entities in the database.
@@ -539,6 +865,7 @@ func (tcb *TransactionCreateBulk) Save(ctx context.Context) ([]*Transaction, err
 					_, err = mutators[i+1].Mutate(root, tcb.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = tcb.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, tcb.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -551,10 +878,6 @@ func (tcb *TransactionCreateBulk) Save(ctx context.Context) ([]*Transaction, err
 				}
 				mutation.id = &nodes[i].ID
 				mutation.done = true
-				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int32(id)
-				}
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {
@@ -589,6 +912,262 @@ func (tcb *TransactionCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (tcb *TransactionCreateBulk) ExecX(ctx context.Context) {
 	if err := tcb.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.Transaction.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.TransactionUpsert) {
+//			SetName(v+v).
+//		}).
+//		Exec(ctx)
+//
+func (tcb *TransactionCreateBulk) OnConflict(opts ...sql.ConflictOption) *TransactionUpsertBulk {
+	tcb.conflict = opts
+	return &TransactionUpsertBulk{
+		create: tcb,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.Transaction.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+//
+func (tcb *TransactionCreateBulk) OnConflictColumns(columns ...string) *TransactionUpsertBulk {
+	tcb.conflict = append(tcb.conflict, sql.ConflictColumns(columns...))
+	return &TransactionUpsertBulk{
+		create: tcb,
+	}
+}
+
+// TransactionUpsertBulk is the builder for "upsert"-ing
+// a bulk of Transaction nodes.
+type TransactionUpsertBulk struct {
+	create *TransactionCreateBulk
+}
+
+// UpdateNewValues updates the fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.Transaction.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(transaction.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+//
+func (u *TransactionUpsertBulk) UpdateNewValues() *TransactionUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(transaction.FieldID)
+				return
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.Transaction.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+//
+func (u *TransactionUpsertBulk) Ignore() *TransactionUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *TransactionUpsertBulk) DoNothing() *TransactionUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the TransactionCreateBulk.OnConflict
+// documentation for more info.
+func (u *TransactionUpsertBulk) Update(set func(*TransactionUpsert)) *TransactionUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&TransactionUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetName sets the "name" field.
+func (u *TransactionUpsertBulk) SetName(v string) *TransactionUpsertBulk {
+	return u.Update(func(s *TransactionUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *TransactionUpsertBulk) UpdateName() *TransactionUpsertBulk {
+	return u.Update(func(s *TransactionUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetAmount sets the "amount" field.
+func (u *TransactionUpsertBulk) SetAmount(v uint64) *TransactionUpsertBulk {
+	return u.Update(func(s *TransactionUpsert) {
+		s.SetAmount(v)
+	})
+}
+
+// UpdateAmount sets the "amount" field to the value that was provided on create.
+func (u *TransactionUpsertBulk) UpdateAmount() *TransactionUpsertBulk {
+	return u.Update(func(s *TransactionUpsert) {
+		s.UpdateAmount()
+	})
+}
+
+// SetFrom sets the "from" field.
+func (u *TransactionUpsertBulk) SetFrom(v string) *TransactionUpsertBulk {
+	return u.Update(func(s *TransactionUpsert) {
+		s.SetFrom(v)
+	})
+}
+
+// UpdateFrom sets the "from" field to the value that was provided on create.
+func (u *TransactionUpsertBulk) UpdateFrom() *TransactionUpsertBulk {
+	return u.Update(func(s *TransactionUpsert) {
+		s.UpdateFrom()
+	})
+}
+
+// SetTo sets the "to" field.
+func (u *TransactionUpsertBulk) SetTo(v string) *TransactionUpsertBulk {
+	return u.Update(func(s *TransactionUpsert) {
+		s.SetTo(v)
+	})
+}
+
+// UpdateTo sets the "to" field to the value that was provided on create.
+func (u *TransactionUpsertBulk) UpdateTo() *TransactionUpsertBulk {
+	return u.Update(func(s *TransactionUpsert) {
+		s.UpdateTo()
+	})
+}
+
+// SetTransactionID sets the "transaction_id" field.
+func (u *TransactionUpsertBulk) SetTransactionID(v string) *TransactionUpsertBulk {
+	return u.Update(func(s *TransactionUpsert) {
+		s.SetTransactionID(v)
+	})
+}
+
+// UpdateTransactionID sets the "transaction_id" field to the value that was provided on create.
+func (u *TransactionUpsertBulk) UpdateTransactionID() *TransactionUpsertBulk {
+	return u.Update(func(s *TransactionUpsert) {
+		s.UpdateTransactionID()
+	})
+}
+
+// SetCid sets the "cid" field.
+func (u *TransactionUpsertBulk) SetCid(v string) *TransactionUpsertBulk {
+	return u.Update(func(s *TransactionUpsert) {
+		s.SetCid(v)
+	})
+}
+
+// UpdateCid sets the "cid" field to the value that was provided on create.
+func (u *TransactionUpsertBulk) UpdateCid() *TransactionUpsertBulk {
+	return u.Update(func(s *TransactionUpsert) {
+		s.UpdateCid()
+	})
+}
+
+// SetStatus sets the "status" field.
+func (u *TransactionUpsertBulk) SetStatus(v transaction.Status) *TransactionUpsertBulk {
+	return u.Update(func(s *TransactionUpsert) {
+		s.SetStatus(v)
+	})
+}
+
+// UpdateStatus sets the "status" field to the value that was provided on create.
+func (u *TransactionUpsertBulk) UpdateStatus() *TransactionUpsertBulk {
+	return u.Update(func(s *TransactionUpsert) {
+		s.UpdateStatus()
+	})
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *TransactionUpsertBulk) SetCreatedAt(v uint32) *TransactionUpsertBulk {
+	return u.Update(func(s *TransactionUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *TransactionUpsertBulk) UpdateCreatedAt() *TransactionUpsertBulk {
+	return u.Update(func(s *TransactionUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *TransactionUpsertBulk) SetUpdatedAt(v uint32) *TransactionUpsertBulk {
+	return u.Update(func(s *TransactionUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *TransactionUpsertBulk) UpdateUpdatedAt() *TransactionUpsertBulk {
+	return u.Update(func(s *TransactionUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *TransactionUpsertBulk) SetDeletedAt(v uint32) *TransactionUpsertBulk {
+	return u.Update(func(s *TransactionUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *TransactionUpsertBulk) UpdateDeletedAt() *TransactionUpsertBulk {
+	return u.Update(func(s *TransactionUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// Exec executes the query.
+func (u *TransactionUpsertBulk) Exec(ctx context.Context) error {
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the TransactionCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for TransactionCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *TransactionUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
