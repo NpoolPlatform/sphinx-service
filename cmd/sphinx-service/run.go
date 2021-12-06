@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/NpoolPlatform/sphinx-service/api"
 	db "github.com/NpoolPlatform/sphinx-service/pkg/db"
+	"github.com/NpoolPlatform/sphinx-service/pkg/tasks"
 
 	grpc2 "github.com/NpoolPlatform/go-service-framework/pkg/grpc"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
@@ -29,7 +30,7 @@ var runCmd = &cli.Command{
 		if err := db.Init(); err != nil {
 			return err
 		}
-
+		tasks.Run()
 		go func() {
 			if err := grpc2.RunGRPC(rpcRegister); err != nil {
 				logger.Sugar().Errorf("fail to run grpc server: %v", err)

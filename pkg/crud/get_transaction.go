@@ -3,14 +3,14 @@ package crud
 import (
 	"context"
 
-	"github.com/NpoolPlatform/message/npool/trading"
+	"github.com/NpoolPlatform/message/npool/sphinxservice"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent"
 	"github.com/NpoolPlatform/sphinx-service/pkg/db/ent/transaction"
 	sconstant "github.com/NpoolPlatform/sphinx-service/pkg/message/const"
 )
 
-func GetTransaction(ctx context.Context, in *trading.GetTransactionRequest) (resp *ent.Transaction, err error) {
+func GetTransaction(ctx context.Context, in *sphinxservice.GetTransactionRequest) (resp *ent.Transaction, err error) {
 	resp, err = db.Client().Transaction.Query().Where(
 		transaction.TransactionID(in.TransactionID),
 	).Only(ctx)
@@ -18,37 +18,37 @@ func GetTransaction(ctx context.Context, in *trading.GetTransactionRequest) (res
 }
 
 type GetTransactionsParams struct {
-	name   string
-	state  transaction.Status
-	from   string
-	to     string
-	offset int
-	limit  int
+	Name   string
+	State  transaction.Status
+	From   string
+	To     string
+	Offset int
+	Limit  int
 }
 
 func GetTransactions(ctx context.Context, params *GetTransactionsParams) ([]*ent.Transaction, int, error) {
-	if params.limit == 0 {
-		params.limit = sconstant.PageSize
+	if params.Limit == 0 {
+		params.Limit = sconstant.PageSize
 	}
 
 	stm := db.Client().
 		Transaction.
 		Query()
 
-	if params.name != "" {
-		stm.Where(transaction.NameEQ(params.name))
+	if params.Name != "" {
+		stm.Where(transaction.NameEQ(params.Name))
 	}
 
-	if params.from != "" {
-		stm.Where(transaction.FromEQ(params.from))
+	if params.From != "" {
+		stm.Where(transaction.FromEQ(params.From))
 	}
 
-	if params.to != "" {
-		stm.Where(transaction.ToEQ(params.to))
+	if params.To != "" {
+		stm.Where(transaction.ToEQ(params.To))
 	}
 
-	if params.state != "" {
-		stm.Where(transaction.StatusEQ(params.state))
+	if len(params.State) > 0 {
+		stm.Where(transaction.StatusEQ(params.State))
 	}
 
 	// total
@@ -59,9 +59,9 @@ func GetTransactions(ctx context.Context, params *GetTransactionsParams) ([]*ent
 
 	// infos
 	trans, err := stm.
-		Order(ent.Desc(transaction.FieldCreatedAt)).
-		Offset(params.offset).
-		Limit(params.limit).
+		Order(ent.Asc(transaction.FieldCreatedAt)).
+		Offset(params.Offset).
+		Limit(params.Limit).
 		All(ctx)
 
 	return trans, total, err

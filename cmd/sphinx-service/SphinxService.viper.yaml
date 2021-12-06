@@ -3,10 +3,8 @@ config:
   hostname: "sphinx-service.npool.top"
   http_port: 50160
   grpc_port: 50161
-  healthz_port: 50162
   prometheus_port: 50163
   appid: "89089012783789789719823798127398"
-  logdir: "./"
+  serviceid: "554041dc-41df-43b8-8348-c07f4189cc87"
+  logdir: "/var/log"
   apolloAccessKey: "0147fb70b815403790e8634b899fac07"
-  ack_listen_interval_ms: 50
-  ack_listen_timeout_ms: 6000

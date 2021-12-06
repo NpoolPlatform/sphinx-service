@@ -10,8 +10,10 @@ const (
 )
 
 const (
-	GrpcTimeout = time.Second * 10
-	PageSize    = 10
+	GrpcTimeout  = time.Second * 10
+	TaskDuration = time.Second * 1
+
+	PageSize = 100
 )
 
 func GetMQChannel() string {

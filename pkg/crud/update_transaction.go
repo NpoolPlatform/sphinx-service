@@ -8,15 +8,15 @@ import (
 )
 
 type UpdateTransactionStatusParams struct {
-	transactionID string
-	state         transaction.Status
+	TransactionID string
+	State         transaction.Status
 }
 
 func UpdateTransactionStatus(ctx context.Context, params UpdateTransactionStatusParams) error {
 	return db.Client().
 		Transaction.
 		Update().
-		Where(transaction.TransactionIDEQ(params.transactionID)).
-		SetStatus(params.state).
+		Where(transaction.TransactionIDEQ(params.TransactionID)).
+		SetStatus(params.State).
 		Exec(ctx)
 }
