@@ -39,9 +39,13 @@ pipeline {
     }
 
     stage('Switch to current cluster') {
-        steps {
-            sh 'cd /etc/kubeasz; ./ezctl checkout $TARGET_ENV'
-        }
+      when {
+        expression { BUILD_TARGET == 'true' }
+        expression { DEPLOY_TARGET == 'true' }
+      }
+      steps {
+          sh 'cd /etc/kubeasz; ./ezctl checkout $TARGET_ENV'
+      }
     }
 
     stage('Unit Tests') {
@@ -64,8 +68,8 @@ pipeline {
 
           username=`helm status rabbitmq --namespace kube-system | grep Username | awk -F ' : ' '{print $2}' | sed 's/"//g'`
           for vhost in `cat cmd/*/*.viper.yaml | grep hostname | awk '{print $2}' | sed 's/"//g' | sed 's/\\./-/g'`; do
-            kubectl exec -it --namespace kube-system rabbitmq-0 -- rabbitmqctl add_vhost $vhost
-            kubectl exec -it --namespace kube-system rabbitmq-0 -- rabbitmqctl set_permissions -p $vhost $username ".*" ".*" ".*"
+            kubectl exec --namespace kube-system rabbitmq-0 -- rabbitmqctl add_vhost $vhost
+            kubectl exec --namespace kube-system rabbitmq-0 -- rabbitmqctl set_permissions -p $vhost $username ".*" ".*" ".*"
 
             cd .apollo-base-config
             ./apollo-base-config.sh $APP_ID $TARGET_ENV $vhost
@@ -81,31 +85,194 @@ pipeline {
       }
     }
 
-    stage('Generate docker image') {
+    stage('Generate docker image for development') {
       when {
         expression { BUILD_TARGET == 'true' }
       }
       steps {
         sh(returnStdout: true, script: '''
-          images=`docker images | grep entropypool | grep sphinx-service | awk '{ print $3 }'`
+          images=`docker images | grep entropypool | grep sphinx-proxy | grep latest | awk '{ print $3 }'`
           for image in $images; do
             docker rmi $image
           done
         '''.stripIndent())
-        sh 'make generate-docker-images'
+        sh 'DEVELOPMENT=development make generate-docker-images'
       }
     }
 
-    stage('Release docker image') {
+    stage('Tag patch') {
+      when {
+        expression { TAG_PATCH == 'true' }
+      }
+      steps {
+        sh(returnStdout: true, script: '''
+          set +e
+          revlist=`git rev-list --tags --max-count=1`
+          rc=$?
+          set -e
+          if [ 0 -eq $rc ]; then
+            tag=`git describe --tags $revlist`
+            major=`echo $tag | awk -F '.' '{ print $1 }'`
+            minor=`echo $tag | awk -F '.' '{ print $2 }'`
+            patch=`echo $tag | awk -F '.' '{ print $3 }'`
+            case $TAG_FOR in
+              testing)
+                patch=$(( $patch + $patch % 2 + 1 ))
+                ;;
+              production)
+                patch=$(( $patch + 1 ))
+                git checkout $tag
+                ;;
+            esac
+            tag=$major.$minor.$patch
+          else
+            tag=0.1.1
+          fi
+          git tag -a $tag -m "Bump version to $tag"
+        '''.stripIndent())
+
+        withCredentials([gitUsernamePassword(credentialsId: 'KK-github-key', gitToolName: 'git-tool')]) {
+          sh 'git push --tag'
+        }
+      }
+    }
+
+    stage('Tag minor') {
+      when {
+        expression { TAG_MINOR == 'true' }
+      }
+      steps {
+        sh(returnStdout: true, script: '''
+          set +e
+          revlist=`git rev-list --tags --max-count=1`
+          rc=$?
+          set -e
+          if [ 0 -eq $rc ]; then
+            tag=`git describe --tags $revlist`
+            major=`echo $tag | awk -F '.' '{ print $1 }'`
+            minor=`echo $tag | awk -F '.' '{ print $2 }'`
+            patch=`echo $tag | awk -F '.' '{ print $3 }'`
+            minor=$(( $minor + 1 ))
+            patch=1
+            tag=$major.$minor.$patch
+          else
+            tag=0.1.1
+          fi
+          git tag -a $tag -m "Bump version to $tag"
+        '''.stripIndent())
+
+        withCredentials([gitUsernamePassword(credentialsId: 'KK-github-key', gitToolName: 'git-tool')]) {
+          sh 'git push --tag'
+        }
+      }
+    }
+
+    stage('Tag major') {
+      when {
+        expression { TAG_MAJOR == 'true' }
+      }
+      steps {
+        sh(returnStdout: true, script: '''
+          set +e
+          revlist=`git rev-list --tags --max-count=1`
+          rc=$?
+          set -e
+          if [ 0 -eq $rc ]; then
+            tag=`git describe --tags $revlist`
+            major=`echo $tag | awk -F '.' '{ print $1 }'`
+            minor=`echo $tag | awk -F '.' '{ print $2 }'`
+            patch=`echo $tag | awk -F '.' '{ print $3 }'`
+            major=$(( $major + 1 ))
+            minor=0
+            patch=1
+            tag=$major.$minor.$patch
+          else
+            tag=0.1.1
+          fi
+          git tag -a $tag -m "Bump version to $tag"
+        '''.stripIndent())
+
+        withCredentials([gitUsernamePassword(credentialsId: 'KK-github-key', gitToolName: 'git-tool')]) {
+          sh 'git push --tag'
+        }
+      }
+    }
+
+    stage('Generate docker image for testing or production') {
+      when {
+        expression { BUILD_TARGET == 'true' }
+      }
+      steps {
+        sh(returnStdout: true, script: '''
+          revlist=`git rev-list --tags --max-count=1`
+          tag=`git describe --tags $revlist`
+          git checkout $tag
+          images=`docker images | grep entropypool | grep sphinx-proxy | grep $tag | awk '{ print $3 }'`
+          for image in $images; do
+            docker rmi $image -f
+          done
+        '''.stripIndent())
+        sh 'DEVELOPMENT=other make generate-docker-images'
+      }
+    }
+
+    stage('Release docker image for development') {
       when {
         expression { RELEASE_TARGET == 'true' }
       }
       steps {
-        sh 'make release-docker-images'
+        sh 'DEVELOPMENT=development make release-docker-images'
       }
     }
 
-    stage('Deploy') {
+    stage('Deploy for development') {
+      when {
+        expression { DEPLOY_TARGET == 'true' }
+        expression { TARGET_ENV == 'development' }
+      }
+      steps {
+        sh 'TAG=latest make deploy-to-k8s-cluster'
+      }
+    }
+
+    stage('Deploy for testing') {
+      when {
+        expression { DEPLOY_TARGET == 'true' }
+        expression { TARGET_ENV == 'testing' }
+      }
+      steps {
+        sh(returnStdout: true, script: '''
+          revlist=`git rev-list --tags --max-count=1`
+          tag=`git describe --tags $revlist`
+          git checkout $tag
+          sed -i "s/sphinx-proxy:latest/sphinx-proxy:$tag/g" cmd/sphinx-proxy/k8s/01-sphinx-proxy.yaml
+          TAG=$tag make deploy-to-k8s-cluster
+        '''.stripIndent())
+      }
+    }
+
+    stage('Deploy for production') {
+      when {
+        expression { DEPLOY_TARGET == 'true' }
+        expression { TARGET_ENV ==~ /.*production.*/ }
+      }
+      steps {
+        sh(returnStdout: true, script: '''
+          revlist=`git rev-list --tags --max-count=1`
+          tag=`git describe --tags $revlist`
+          major=`echo $tag | awk -F '.' '{ print $1 }'`
+          minor=`echo $tag | awk -F '.' '{ print $2 }'`
+          patch=`echo $tag | awk -F '.' '{ print $3 }'`
+          patch=$(( $patch - $patch % 2 ))
+          tag=$major.$minor.$patch
+          git checkout $tag
+          sed -i "s/sphinx-proxy:latest/sphinx-proxy:$tag/g" cmd/sphinx-proxy/k8s/01-sphinx-proxy.yaml
+          TAG=$tag make deploy-to-k8s-cluster
+        '''.stripIndent())
+      }
+    }
+
+    stage('Config target') {
       when {
         expression { DEPLOY_TARGET == 'true' }
       }
@@ -118,13 +285,14 @@ pipeline {
           kubectl -n kube-system exec mysql-0 -- mysql -h 127.0.0.1 -uroot -p$PASSWORD -P3306 -e "create database if not exists sphinx_service;"
           username=`helm status rabbitmq --namespace kube-system | grep Username | awk -F ' : ' '{print $2}' | sed 's/"//g'`
           for vhost in `cat cmd/*/*.viper.yaml | grep hostname | awk '{print $2}' | sed 's/"//g' | sed 's/\\./-/g'`; do
-            kubectl exec -it --namespace kube-system rabbitmq-0 -- rabbitmqctl add_vhost $vhost
-            kubectl exec -it --namespace kube-system rabbitmq-0 -- rabbitmqctl set_permissions -p $vhost $username ".*" ".*" ".*"
+            kubectl exec --namespace kube-system rabbitmq-0 -- rabbitmqctl add_vhost $vhost
+            kubectl exec --namespace kube-system rabbitmq-0 -- rabbitmqctl set_permissions -p $vhost $username ".*" ".*" ".*"
             cd .apollo-base-config
             ./apollo-base-config.sh $APP_ID $TARGET_ENV $vhost
             ./apollo-item-config.sh $APP_ID $TARGET_ENV $vhost database_name sphinx_service
             ./apollo-item-config.sh $APP_ID $TARGET_ENV $vhost ack_listen_interval_ms 50
             ./apollo-item-config.sh $APP_ID $TARGET_ENV $vhost ack_listen_timeout_ms 6000
+            cd -
           done
         '''.stripIndent())
       }
