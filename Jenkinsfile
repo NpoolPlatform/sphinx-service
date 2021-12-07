@@ -48,23 +48,19 @@ pipeline {
       }
     }
 
-    stage('Unit Tests') {
+    stage('Config target') {
       when {
-        expression { BUILD_TARGET == 'true' }
+        anyOf {
+          expression { BUILD_TARGET == 'true' }
+          expression { DEPLOY_TARGET == 'true' }
+        }
       }
       steps {
         sh 'rm .apollo-base-config -rf'
         sh 'git clone https://github.com/NpoolPlatform/apollo-base-config.git .apollo-base-config'
         sh (returnStdout: false, script: '''
-          devboxpod=`kubectl get pods -A | grep development-box | awk '{print $2}'`
-          servicename="sphinx-service"
-
           PASSWORD=`kubectl get secret --namespace "kube-system" mysql-password-secret -o jsonpath="{.data.rootpassword}" | base64 --decode`
-          kubectl -n kube-system exec mysql-0 -- mysql -h 127.0.0.1 -uroot -p$PASSWORD -P3306 -e "create database if not exists sphinx_service;"
-
-          kubectl exec --namespace kube-system $devboxpod -- make -C /tmp/$servicename after-test || true
-          kubectl exec --namespace kube-system $devboxpod -- rm -rf /tmp/$servicename || true
-          kubectl cp ./ kube-system/$devboxpod:/tmp/$servicename
+          kubectl exec --namespace kube-system mysql-0 -- mysql -h 127.0.0.1 -uroot -p$PASSWORD -P3306 -e "create database if not exists sphinx_service;"
 
           username=`helm status rabbitmq --namespace kube-system | grep Username | awk -F ' : ' '{print $2}' | sed 's/"//g'`
           for vhost in `cat cmd/*/*.viper.yaml | grep hostname | awk '{print $2}' | sed 's/"//g' | sed 's/\\./-/g'`; do
@@ -78,6 +74,22 @@ pipeline {
             ./apollo-item-config.sh $APP_ID $TARGET_ENV $vhost ack_listen_timeout_ms 6000
             cd -
           done
+        '''.stripIndent())
+      }
+    }
+
+    stage('Unit Tests') {
+      when {
+        expression { BUILD_TARGET == 'true' }
+      }
+      steps {
+        sh (returnStdout: false, script: '''
+          devboxpod=`kubectl get pods -A | grep development-box | awk '{print $2}'`
+          servicename="sphinx-service"
+
+          kubectl exec --namespace kube-system $devboxpod -- make -C /tmp/$servicename after-test || true
+          kubectl exec --namespace kube-system $devboxpod -- rm -rf /tmp/$servicename || true
+          kubectl cp ./ kube-system/$devboxpod:/tmp/$servicename
 
           kubectl exec --namespace kube-system $devboxpod -- make -C /tmp/$servicename deps before-test test after-test
           kubectl exec --namespace kube-system $devboxpod -- rm -rf /tmp/$servicename
@@ -121,6 +133,7 @@ pipeline {
                 ;;
               production)
                 patch=$(( $patch + 1 ))
+                git reset --hard
                 git checkout $tag
                 ;;
             esac
@@ -206,6 +219,7 @@ pipeline {
         sh(returnStdout: true, script: '''
           revlist=`git rev-list --tags --max-count=1`
           tag=`git describe --tags $revlist`
+          git reset --hard
           git checkout $tag
           images=`docker images | grep entropypool | grep sphinx-proxy | grep $tag | awk '{ print $3 }'`
           for image in $images; do
@@ -244,6 +258,7 @@ pipeline {
         sh(returnStdout: true, script: '''
           revlist=`git rev-list --tags --max-count=1`
           tag=`git describe --tags $revlist`
+          git reset --hard
           git checkout $tag
           sed -i "s/sphinx-proxy:latest/sphinx-proxy:$tag/g" cmd/sphinx-proxy/k8s/01-sphinx-proxy.yaml
           TAG=$tag make deploy-to-k8s-cluster
@@ -265,35 +280,10 @@ pipeline {
           patch=`echo $tag | awk -F '.' '{ print $3 }'`
           patch=$(( $patch - $patch % 2 ))
           tag=$major.$minor.$patch
+          git reset --hard
           git checkout $tag
           sed -i "s/sphinx-proxy:latest/sphinx-proxy:$tag/g" cmd/sphinx-proxy/k8s/01-sphinx-proxy.yaml
           TAG=$tag make deploy-to-k8s-cluster
-        '''.stripIndent())
-      }
-    }
-
-    stage('Config target') {
-      when {
-        expression { DEPLOY_TARGET == 'true' }
-      }
-      steps {
-        sh 'rm .apollo-base-config -rf'
-        sh 'git clone https://github.com/NpoolPlatform/apollo-base-config.git .apollo-base-config'
-        sh 'make deploy-to-k8s-cluster'
-        sh (returnStdout: false, script: '''
-          PASSWORD=`kubectl get secret --namespace "kube-system" mysql-password-secret -o jsonpath="{.data.rootpassword}" | base64 --decode`
-          kubectl -n kube-system exec mysql-0 -- mysql -h 127.0.0.1 -uroot -p$PASSWORD -P3306 -e "create database if not exists sphinx_service;"
-          username=`helm status rabbitmq --namespace kube-system | grep Username | awk -F ' : ' '{print $2}' | sed 's/"//g'`
-          for vhost in `cat cmd/*/*.viper.yaml | grep hostname | awk '{print $2}' | sed 's/"//g' | sed 's/\\./-/g'`; do
-            kubectl exec --namespace kube-system rabbitmq-0 -- rabbitmqctl add_vhost $vhost
-            kubectl exec --namespace kube-system rabbitmq-0 -- rabbitmqctl set_permissions -p $vhost $username ".*" ".*" ".*"
-            cd .apollo-base-config
-            ./apollo-base-config.sh $APP_ID $TARGET_ENV $vhost
-            ./apollo-item-config.sh $APP_ID $TARGET_ENV $vhost database_name sphinx_service
-            ./apollo-item-config.sh $APP_ID $TARGET_ENV $vhost ack_listen_interval_ms 50
-            ./apollo-item-config.sh $APP_ID $TARGET_ENV $vhost ack_listen_timeout_ms 6000
-            cd -
-          done
         '''.stripIndent())
       }
     }
