@@ -102,12 +102,6 @@ pipeline {
         expression { BUILD_TARGET == 'true' }
       }
       steps {
-        sh(returnStdout: true, script: '''
-          images=`docker images | grep entropypool | grep sphinx-proxy | grep latest | awk '{ print $3 }'`
-          for image in $images; do
-            docker rmi $image
-          done
-        '''.stripIndent())
         sh 'DEVELOPMENT=development make generate-docker-images'
       }
     }
@@ -221,10 +215,6 @@ pipeline {
           tag=`git describe --tags $revlist`
           git reset --hard
           git checkout $tag
-          images=`docker images | grep entropypool | grep sphinx-proxy | grep $tag | awk '{ print $3 }'`
-          for image in $images; do
-            docker rmi $image -f
-          done
         '''.stripIndent())
         sh 'DEVELOPMENT=other make generate-docker-images'
       }
@@ -236,6 +226,21 @@ pipeline {
       }
       steps {
         sh 'DEVELOPMENT=development make release-docker-images'
+        sh(returnStdout: true, script: '''
+          images=`docker images | grep entropypool | grep sphinx-service | grep none | awk '{ print $3 }'`
+          for image in $images; do
+            docker rmi $image -f
+          done
+        '''.stripIndent())
+      }
+    }
+
+    stage('Release docker image for testing or production') {
+      when {
+        expression { RELEASE_TARGET == 'true' }
+      }
+      steps {
+        sh 'DEVELOPMENT=other make release-docker-images'
       }
     }
 
@@ -260,7 +265,7 @@ pipeline {
           tag=`git describe --tags $revlist`
           git reset --hard
           git checkout $tag
-          sed -i "s/sphinx-proxy:latest/sphinx-proxy:$tag/g" cmd/sphinx-proxy/k8s/01-sphinx-proxy.yaml
+          sed -i "s/sphinx-service:latest/sphinx-service:$tag/g" cmd/sphinx-service/k8s/01-sphinx-service.yaml
           TAG=$tag make deploy-to-k8s-cluster
         '''.stripIndent())
       }
@@ -282,7 +287,7 @@ pipeline {
           tag=$major.$minor.$patch
           git reset --hard
           git checkout $tag
-          sed -i "s/sphinx-proxy:latest/sphinx-proxy:$tag/g" cmd/sphinx-proxy/k8s/01-sphinx-proxy.yaml
+          sed -i "s/sphinx-service:latest/sphinx-service:$tag/g" cmd/sphinx-service/k8s/01-sphinx-service.yaml
           TAG=$tag make deploy-to-k8s-cluster
         '''.stripIndent())
       }
