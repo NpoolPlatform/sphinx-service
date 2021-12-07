@@ -3,7 +3,7 @@ config:
   hostname: "sphinx-service.npool.top"
   http_port: 50160
   grpc_port: 50161
-  prometheus_port: 50163
+  prometheus_port: 50162
   appid: "89089012783789789719823798127398"
   serviceid: "554041dc-41df-43b8-8348-c07f4189cc87"
   logdir: "/var/log"
