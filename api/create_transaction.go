@@ -66,14 +66,15 @@ func (s *Server) CreateTransaction(ctx context.Context, in *sphinxservice.Create
 		return &sphinxservice.CreateTransactionResponse{}, status.Errorf(codes.InvalidArgument, "Name: %v not support", in.GetName())
 	}
 
-	if _, err := crud.CreateTransaction(ctx, crud.CreateTransactionParams{
+	params := crud.CreateTransactionParams{
 		TransactionID: in.GetTransactionID(),
 		Name:          in.GetName(),
 		Amount:        in.GetAmount(),
 		From:          in.GetFrom(),
 		To:            in.GetTo(),
-	}); err != nil {
-		logger.Sugar().Errorf("CreateTransaction call db CreateTransaction error: %v", err)
+	}
+	if _, err := crud.CreateTransaction(ctx, params); err != nil {
+		logger.Sugar().Errorf("CreateTransaction call db CreateTransaction params: %v error: %v", params, err)
 		return &sphinxservice.CreateTransactionResponse{}, status.Error(codes.Internal, "internal server error")
 	}
 
