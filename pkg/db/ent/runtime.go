@@ -42,8 +42,6 @@ func init() {
 	transactionDescCid := transactionFields[6].Descriptor()
 	// transaction.DefaultCid holds the default value on creation for the cid field.
 	transaction.DefaultCid = transactionDescCid.Default.(string)
-	// transaction.CidValidator is a validator for the "cid" field. It is called by the builders before save.
-	transaction.CidValidator = transactionDescCid.Validators[0].(func(string) error)
 	// transactionDescCreatedAt is the schema descriptor for created_at field.
 	transactionDescCreatedAt := transactionFields[8].Descriptor()
 	// transaction.DefaultCreatedAt holds the default value on creation for the created_at field.

@@ -261,11 +261,6 @@ func (tu *TransactionUpdate) check() error {
 			return &ValidationError{Name: "transaction_id", err: fmt.Errorf("ent: validator failed for field \"transaction_id\": %w", err)}
 		}
 	}
-	if v, ok := tu.mutation.Cid(); ok {
-		if err := transaction.CidValidator(v); err != nil {
-			return &ValidationError{Name: "cid", err: fmt.Errorf("ent: validator failed for field \"cid\": %w", err)}
-		}
-	}
 	if v, ok := tu.mutation.Status(); ok {
 		if err := transaction.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf("ent: validator failed for field \"status\": %w", err)}
@@ -649,11 +644,6 @@ func (tuo *TransactionUpdateOne) check() error {
 	if v, ok := tuo.mutation.TransactionID(); ok {
 		if err := transaction.TransactionIDValidator(v); err != nil {
 			return &ValidationError{Name: "transaction_id", err: fmt.Errorf("ent: validator failed for field \"transaction_id\": %w", err)}
-		}
-	}
-	if v, ok := tuo.mutation.Cid(); ok {
-		if err := transaction.CidValidator(v); err != nil {
-			return &ValidationError{Name: "cid", err: fmt.Errorf("ent: validator failed for field \"cid\": %w", err)}
 		}
 	}
 	if v, ok := tuo.mutation.Status(); ok {

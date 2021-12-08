@@ -85,8 +85,8 @@ github.com/NpoolPlatform/go-service-framework v0.0.0-20211207121121-adb2402676f0
 github.com/NpoolPlatform/message v0.0.0-20211118031636-e8c78a0a0c3f/go.mod h1:TpqErU/o7lECBW1gcmbUsbrQkpVj27cgzi7qpVbZHzk=
 github.com/NpoolPlatform/message v0.0.0-20211204095120-d48a7c636167/go.mod h1:1sfQHL02lIkzK1ObQRbNi0UAkSZWcBw/rsK5hn9Perg=
 github.com/NpoolPlatform/message v0.0.0-20211205081017-ab60b7824077/go.mod h1:1sfQHL02lIkzK1ObQRbNi0UAkSZWcBw/rsK5hn9Perg=
-github.com/NpoolPlatform/message v0.0.0-20211206113744-0a03f0f0d536 h1:mUREVdbMc1qEuMdcddCrjtce3EAqSKNjh0Cc4OdfzDg=
-github.com/NpoolPlatform/message v0.0.0-20211206113744-0a03f0f0d536/go.mod h1:1sfQHL02lIkzK1ObQRbNi0UAkSZWcBw/rsK5hn9Perg=
+github.com/NpoolPlatform/message v0.0.0-20211208020751-4a6fed0981cb h1:kGNmUDGtIWZeqMF0Mj0ZThOie7I5WIrft/z9qbC8OQk=
+github.com/NpoolPlatform/message v0.0.0-20211208020751-4a6fed0981cb/go.mod h1:1sfQHL02lIkzK1ObQRbNi0UAkSZWcBw/rsK5hn9Perg=
 github.com/NpoolPlatform/sphinx-coininfo v0.0.0-20211118034400-6a6ad84fc182/go.mod h1:thfXaTHeXovzHCtBraM3eZLgo+iswE8ViiYSfs+e0tk=
 github.com/NpoolPlatform/sphinx-coininfo v0.0.0-20211205081309-f78a3a8955cf h1:6x6f51WOUD3fbLhqQtM8GcK3+RUyvuoAIrY9lX911rc=
 github.com/NpoolPlatform/sphinx-coininfo v0.0.0-20211205081309-f78a3a8955cf/go.mod h1:fLIl8ojvb01kADJkf3UZPsTtr7734tMAv5JiPBsL6kQ=

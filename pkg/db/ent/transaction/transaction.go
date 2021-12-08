@@ -79,8 +79,6 @@ var (
 	TransactionIDValidator func(string) error
 	// DefaultCid holds the default value on creation for the "cid" field.
 	DefaultCid string
-	// CidValidator is a validator for the "cid" field. It is called by the builders before save.
-	CidValidator func(string) error
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() uint32
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.

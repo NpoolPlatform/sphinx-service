@@ -297,11 +297,6 @@ func (tc *TransactionCreate) check() error {
 	if _, ok := tc.mutation.Cid(); !ok {
 		return &ValidationError{Name: "cid", err: errors.New(`ent: missing required field "cid"`)}
 	}
-	if v, ok := tc.mutation.Cid(); ok {
-		if err := transaction.CidValidator(v); err != nil {
-			return &ValidationError{Name: "cid", err: fmt.Errorf(`ent: validator failed for field "cid": %w`, err)}
-		}
-	}
 	if _, ok := tc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "status"`)}
 	}
