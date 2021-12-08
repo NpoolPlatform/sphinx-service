@@ -28,6 +28,8 @@ type Transaction struct {
 	TransactionID string `json:"transaction_id,omitempty"`
 	// Cid holds the value of the "cid" field.
 	Cid string `json:"cid,omitempty"`
+	// ExitCode holds the value of the "exit_code" field.
+	ExitCode int64 `json:"exit_code,omitempty"`
 	// Status holds the value of the "status" field.
 	Status transaction.Status `json:"status,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
@@ -43,7 +45,7 @@ func (*Transaction) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case transaction.FieldAmount, transaction.FieldCreatedAt, transaction.FieldUpdatedAt, transaction.FieldDeletedAt:
+		case transaction.FieldAmount, transaction.FieldExitCode, transaction.FieldCreatedAt, transaction.FieldUpdatedAt, transaction.FieldDeletedAt:
 			values[i] = new(sql.NullInt64)
 		case transaction.FieldName, transaction.FieldFrom, transaction.FieldTo, transaction.FieldTransactionID, transaction.FieldCid, transaction.FieldStatus:
 			values[i] = new(sql.NullString)
@@ -105,6 +107,12 @@ func (t *Transaction) assignValues(columns []string, values []interface{}) error
 				return fmt.Errorf("unexpected type %T for field cid", values[i])
 			} else if value.Valid {
 				t.Cid = value.String
+			}
+		case transaction.FieldExitCode:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field exit_code", values[i])
+			} else if value.Valid {
+				t.ExitCode = value.Int64
 			}
 		case transaction.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -170,6 +178,8 @@ func (t *Transaction) String() string {
 	builder.WriteString(t.TransactionID)
 	builder.WriteString(", cid=")
 	builder.WriteString(t.Cid)
+	builder.WriteString(", exit_code=")
+	builder.WriteString(fmt.Sprintf("%v", t.ExitCode))
 	builder.WriteString(", status=")
 	builder.WriteString(fmt.Sprintf("%v", t.Status))
 	builder.WriteString(", created_at=")

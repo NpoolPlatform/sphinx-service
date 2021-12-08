@@ -109,6 +109,27 @@ func (tu *TransactionUpdate) SetNillableCid(s *string) *TransactionUpdate {
 	return tu
 }
 
+// SetExitCode sets the "exit_code" field.
+func (tu *TransactionUpdate) SetExitCode(i int64) *TransactionUpdate {
+	tu.mutation.ResetExitCode()
+	tu.mutation.SetExitCode(i)
+	return tu
+}
+
+// SetNillableExitCode sets the "exit_code" field if the given value is not nil.
+func (tu *TransactionUpdate) SetNillableExitCode(i *int64) *TransactionUpdate {
+	if i != nil {
+		tu.SetExitCode(*i)
+	}
+	return tu
+}
+
+// AddExitCode adds i to the "exit_code" field.
+func (tu *TransactionUpdate) AddExitCode(i int64) *TransactionUpdate {
+	tu.mutation.AddExitCode(i)
+	return tu
+}
+
 // SetStatus sets the "status" field.
 func (tu *TransactionUpdate) SetStatus(t transaction.Status) *TransactionUpdate {
 	tu.mutation.SetStatus(t)
@@ -341,6 +362,20 @@ func (tu *TransactionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: transaction.FieldCid,
 		})
 	}
+	if value, ok := tu.mutation.ExitCode(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt64,
+			Value:  value,
+			Column: transaction.FieldExitCode,
+		})
+	}
+	if value, ok := tu.mutation.AddedExitCode(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt64,
+			Value:  value,
+			Column: transaction.FieldExitCode,
+		})
+	}
 	if value, ok := tu.mutation.Status(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeEnum,
@@ -489,6 +524,27 @@ func (tuo *TransactionUpdateOne) SetNillableCid(s *string) *TransactionUpdateOne
 	if s != nil {
 		tuo.SetCid(*s)
 	}
+	return tuo
+}
+
+// SetExitCode sets the "exit_code" field.
+func (tuo *TransactionUpdateOne) SetExitCode(i int64) *TransactionUpdateOne {
+	tuo.mutation.ResetExitCode()
+	tuo.mutation.SetExitCode(i)
+	return tuo
+}
+
+// SetNillableExitCode sets the "exit_code" field if the given value is not nil.
+func (tuo *TransactionUpdateOne) SetNillableExitCode(i *int64) *TransactionUpdateOne {
+	if i != nil {
+		tuo.SetExitCode(*i)
+	}
+	return tuo
+}
+
+// AddExitCode adds i to the "exit_code" field.
+func (tuo *TransactionUpdateOne) AddExitCode(i int64) *TransactionUpdateOne {
+	tuo.mutation.AddExitCode(i)
 	return tuo
 }
 
@@ -746,6 +802,20 @@ func (tuo *TransactionUpdateOne) sqlSave(ctx context.Context) (_node *Transactio
 			Type:   field.TypeString,
 			Value:  value,
 			Column: transaction.FieldCid,
+		})
+	}
+	if value, ok := tuo.mutation.ExitCode(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt64,
+			Value:  value,
+			Column: transaction.FieldExitCode,
+		})
+	}
+	if value, ok := tuo.mutation.AddedExitCode(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt64,
+			Value:  value,
+			Column: transaction.FieldExitCode,
 		})
 	}
 	if value, ok := tuo.mutation.Status(); ok {

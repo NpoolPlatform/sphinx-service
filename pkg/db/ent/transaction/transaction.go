@@ -25,6 +25,8 @@ const (
 	FieldTransactionID = "transaction_id"
 	// FieldCid holds the string denoting the cid field in the database.
 	FieldCid = "cid"
+	// FieldExitCode holds the string denoting the exit_code field in the database.
+	FieldExitCode = "exit_code"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
@@ -46,6 +48,7 @@ var Columns = []string{
 	FieldTo,
 	FieldTransactionID,
 	FieldCid,
+	FieldExitCode,
 	FieldStatus,
 	FieldCreatedAt,
 	FieldUpdatedAt,
@@ -81,6 +84,8 @@ var (
 	TransactionIDValidator func(string) error
 	// DefaultCid holds the default value on creation for the "cid" field.
 	DefaultCid string
+	// DefaultExitCode holds the default value on creation for the "exit_code" field.
+	DefaultExitCode int64
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() uint32
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.

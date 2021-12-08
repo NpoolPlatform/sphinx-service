@@ -99,6 +99,20 @@ func (tc *TransactionCreate) SetNillableCid(s *string) *TransactionCreate {
 	return tc
 }
 
+// SetExitCode sets the "exit_code" field.
+func (tc *TransactionCreate) SetExitCode(i int64) *TransactionCreate {
+	tc.mutation.SetExitCode(i)
+	return tc
+}
+
+// SetNillableExitCode sets the "exit_code" field if the given value is not nil.
+func (tc *TransactionCreate) SetNillableExitCode(i *int64) *TransactionCreate {
+	if i != nil {
+		tc.SetExitCode(*i)
+	}
+	return tc
+}
+
 // SetStatus sets the "status" field.
 func (tc *TransactionCreate) SetStatus(t transaction.Status) *TransactionCreate {
 	tc.mutation.SetStatus(t)
@@ -244,6 +258,10 @@ func (tc *TransactionCreate) defaults() {
 		v := transaction.DefaultCid
 		tc.mutation.SetCid(v)
 	}
+	if _, ok := tc.mutation.ExitCode(); !ok {
+		v := transaction.DefaultExitCode
+		tc.mutation.SetExitCode(v)
+	}
 	if _, ok := tc.mutation.CreatedAt(); !ok {
 		v := transaction.DefaultCreatedAt()
 		tc.mutation.SetCreatedAt(v)
@@ -301,6 +319,9 @@ func (tc *TransactionCreate) check() error {
 	}
 	if _, ok := tc.mutation.Cid(); !ok {
 		return &ValidationError{Name: "cid", err: errors.New(`ent: missing required field "cid"`)}
+	}
+	if _, ok := tc.mutation.ExitCode(); !ok {
+		return &ValidationError{Name: "exit_code", err: errors.New(`ent: missing required field "exit_code"`)}
 	}
 	if _, ok := tc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "status"`)}
@@ -399,6 +420,14 @@ func (tc *TransactionCreate) createSpec() (*Transaction, *sqlgraph.CreateSpec) {
 			Column: transaction.FieldCid,
 		})
 		_node.Cid = value
+	}
+	if value, ok := tc.mutation.ExitCode(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt64,
+			Value:  value,
+			Column: transaction.FieldExitCode,
+		})
+		_node.ExitCode = value
 	}
 	if value, ok := tc.mutation.Status(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -555,6 +584,18 @@ func (u *TransactionUpsert) SetCid(v string) *TransactionUpsert {
 // UpdateCid sets the "cid" field to the value that was provided on create.
 func (u *TransactionUpsert) UpdateCid() *TransactionUpsert {
 	u.SetExcluded(transaction.FieldCid)
+	return u
+}
+
+// SetExitCode sets the "exit_code" field.
+func (u *TransactionUpsert) SetExitCode(v int64) *TransactionUpsert {
+	u.Set(transaction.FieldExitCode, v)
+	return u
+}
+
+// UpdateExitCode sets the "exit_code" field to the value that was provided on create.
+func (u *TransactionUpsert) UpdateExitCode() *TransactionUpsert {
+	u.SetExcluded(transaction.FieldExitCode)
 	return u
 }
 
@@ -737,6 +778,20 @@ func (u *TransactionUpsertOne) SetCid(v string) *TransactionUpsertOne {
 func (u *TransactionUpsertOne) UpdateCid() *TransactionUpsertOne {
 	return u.Update(func(s *TransactionUpsert) {
 		s.UpdateCid()
+	})
+}
+
+// SetExitCode sets the "exit_code" field.
+func (u *TransactionUpsertOne) SetExitCode(v int64) *TransactionUpsertOne {
+	return u.Update(func(s *TransactionUpsert) {
+		s.SetExitCode(v)
+	})
+}
+
+// UpdateExitCode sets the "exit_code" field to the value that was provided on create.
+func (u *TransactionUpsertOne) UpdateExitCode() *TransactionUpsertOne {
+	return u.Update(func(s *TransactionUpsert) {
+		s.UpdateExitCode()
 	})
 }
 
@@ -1093,6 +1148,20 @@ func (u *TransactionUpsertBulk) SetCid(v string) *TransactionUpsertBulk {
 func (u *TransactionUpsertBulk) UpdateCid() *TransactionUpsertBulk {
 	return u.Update(func(s *TransactionUpsert) {
 		s.UpdateCid()
+	})
+}
+
+// SetExitCode sets the "exit_code" field.
+func (u *TransactionUpsertBulk) SetExitCode(v int64) *TransactionUpsertBulk {
+	return u.Update(func(s *TransactionUpsert) {
+		s.SetExitCode(v)
+	})
+}
+
+// UpdateExitCode sets the "exit_code" field to the value that was provided on create.
+func (u *TransactionUpsertBulk) UpdateExitCode() *TransactionUpsertBulk {
+	return u.Update(func(s *TransactionUpsert) {
+		s.UpdateExitCode()
 	})
 }
 

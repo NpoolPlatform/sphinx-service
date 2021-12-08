@@ -17,6 +17,7 @@ var (
 		{Name: "to", Type: field.TypeString, Default: ""},
 		{Name: "transaction_id", Type: field.TypeString, Unique: true},
 		{Name: "cid", Type: field.TypeString, Default: ""},
+		{Name: "exit_code", Type: field.TypeInt64, Default: -1},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"pending_review", "confirm", "rejected", "pending_transaction", "done"}},
 		{Name: "created_at", Type: field.TypeUint32},
 		{Name: "updated_at", Type: field.TypeUint32},
@@ -46,17 +47,17 @@ var (
 			{
 				Name:    "transaction_status",
 				Unique:  false,
-				Columns: []*schema.Column{TransactionsColumns[7]},
+				Columns: []*schema.Column{TransactionsColumns[8]},
 			},
 			{
 				Name:    "transaction_created_at",
 				Unique:  false,
-				Columns: []*schema.Column{TransactionsColumns[8]},
+				Columns: []*schema.Column{TransactionsColumns[9]},
 			},
 			{
 				Name:    "transaction_updated_at",
 				Unique:  false,
-				Columns: []*schema.Column{TransactionsColumns[9]},
+				Columns: []*schema.Column{TransactionsColumns[10]},
 			},
 		},
 	}

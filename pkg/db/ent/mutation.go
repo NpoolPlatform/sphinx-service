@@ -39,6 +39,8 @@ type TransactionMutation struct {
 	to             *string
 	transaction_id *string
 	cid            *string
+	exit_code      *int64
+	addexit_code   *int64
 	status         *transaction.Status
 	created_at     *uint32
 	addcreated_at  *uint32
@@ -373,6 +375,62 @@ func (m *TransactionMutation) ResetCid() {
 	m.cid = nil
 }
 
+// SetExitCode sets the "exit_code" field.
+func (m *TransactionMutation) SetExitCode(i int64) {
+	m.exit_code = &i
+	m.addexit_code = nil
+}
+
+// ExitCode returns the value of the "exit_code" field in the mutation.
+func (m *TransactionMutation) ExitCode() (r int64, exists bool) {
+	v := m.exit_code
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldExitCode returns the old "exit_code" field's value of the Transaction entity.
+// If the Transaction object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TransactionMutation) OldExitCode(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldExitCode is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldExitCode requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldExitCode: %w", err)
+	}
+	return oldValue.ExitCode, nil
+}
+
+// AddExitCode adds i to the "exit_code" field.
+func (m *TransactionMutation) AddExitCode(i int64) {
+	if m.addexit_code != nil {
+		*m.addexit_code += i
+	} else {
+		m.addexit_code = &i
+	}
+}
+
+// AddedExitCode returns the value that was added to the "exit_code" field in this mutation.
+func (m *TransactionMutation) AddedExitCode() (r int64, exists bool) {
+	v := m.addexit_code
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetExitCode resets all changes to the "exit_code" field.
+func (m *TransactionMutation) ResetExitCode() {
+	m.exit_code = nil
+	m.addexit_code = nil
+}
+
 // SetStatus sets the "status" field.
 func (m *TransactionMutation) SetStatus(t transaction.Status) {
 	m.status = &t
@@ -596,7 +654,7 @@ func (m *TransactionMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TransactionMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 11)
 	if m.name != nil {
 		fields = append(fields, transaction.FieldName)
 	}
@@ -614,6 +672,9 @@ func (m *TransactionMutation) Fields() []string {
 	}
 	if m.cid != nil {
 		fields = append(fields, transaction.FieldCid)
+	}
+	if m.exit_code != nil {
+		fields = append(fields, transaction.FieldExitCode)
 	}
 	if m.status != nil {
 		fields = append(fields, transaction.FieldStatus)
@@ -647,6 +708,8 @@ func (m *TransactionMutation) Field(name string) (ent.Value, bool) {
 		return m.TransactionID()
 	case transaction.FieldCid:
 		return m.Cid()
+	case transaction.FieldExitCode:
+		return m.ExitCode()
 	case transaction.FieldStatus:
 		return m.Status()
 	case transaction.FieldCreatedAt:
@@ -676,6 +739,8 @@ func (m *TransactionMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldTransactionID(ctx)
 	case transaction.FieldCid:
 		return m.OldCid(ctx)
+	case transaction.FieldExitCode:
+		return m.OldExitCode(ctx)
 	case transaction.FieldStatus:
 		return m.OldStatus(ctx)
 	case transaction.FieldCreatedAt:
@@ -735,6 +800,13 @@ func (m *TransactionMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetCid(v)
 		return nil
+	case transaction.FieldExitCode:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExitCode(v)
+		return nil
 	case transaction.FieldStatus:
 		v, ok := value.(transaction.Status)
 		if !ok {
@@ -774,6 +846,9 @@ func (m *TransactionMutation) AddedFields() []string {
 	if m.addamount != nil {
 		fields = append(fields, transaction.FieldAmount)
 	}
+	if m.addexit_code != nil {
+		fields = append(fields, transaction.FieldExitCode)
+	}
 	if m.addcreated_at != nil {
 		fields = append(fields, transaction.FieldCreatedAt)
 	}
@@ -793,6 +868,8 @@ func (m *TransactionMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case transaction.FieldAmount:
 		return m.AddedAmount()
+	case transaction.FieldExitCode:
+		return m.AddedExitCode()
 	case transaction.FieldCreatedAt:
 		return m.AddedCreatedAt()
 	case transaction.FieldUpdatedAt:
@@ -814,6 +891,13 @@ func (m *TransactionMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddAmount(v)
+		return nil
+	case transaction.FieldExitCode:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddExitCode(v)
 		return nil
 	case transaction.FieldCreatedAt:
 		v, ok := value.(uint32)
@@ -880,6 +964,9 @@ func (m *TransactionMutation) ResetField(name string) error {
 		return nil
 	case transaction.FieldCid:
 		m.ResetCid()
+		return nil
+	case transaction.FieldExitCode:
+		m.ResetExitCode()
 		return nil
 	case transaction.FieldStatus:
 		m.ResetStatus()

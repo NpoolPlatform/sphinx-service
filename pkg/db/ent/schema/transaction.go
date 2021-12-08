@@ -25,6 +25,7 @@ func (Transaction) Fields() []ent.Field {
 		field.String("transaction_id").NotEmpty().
 			Unique(),
 		field.String("cid").Default(""),
+		field.Int64("exit_code").Default(-1),
 		field.Enum("status").
 			Values("pending_review", "confirm", "rejected", "pending_transaction", "done"),
 		field.Uint32("created_at").

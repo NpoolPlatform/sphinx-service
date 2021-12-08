@@ -24,6 +24,6 @@ func CreateTransaction(ctx context.Context, params CreateTransactionParams) (inf
 		SetAmount(price.VisualPriceToDBPrice(params.Amount)).
 		SetFrom(params.From).
 		SetTo(params.To).
-		SetStatus(transaction.StatusPendingTransaction).
+		SetStatus(transaction.StatusConfirm).
 		Save(ctx)
 }
