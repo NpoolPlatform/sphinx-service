@@ -31,14 +31,14 @@ func createTransaction() {
 				State: transaction.StatusConfirm,
 			})
 			if err != nil {
-				logger.Sugar().Error("call GetTransactions error: %v", err)
+				logger.Sugar().Errorf("call GetTransactions error: %v", err)
 				return
 			}
 
 			for _, transInfo := range transactionInfos {
 				conn, err := grpc.GetGRPCConn(pconst.ServiceName, grpc.GRPCTAG)
 				if err != nil {
-					logger.Sugar().Error("call GetGRPCConn error: %v", err)
+					logger.Sugar().Errorf("call GetGRPCConn error: %v", err)
 					continue
 				}
 
@@ -50,7 +50,7 @@ func createTransaction() {
 					To:            transInfo.To,
 					Value:         price.DBPriceToVisualPrice(transInfo.Amount),
 				}); err != nil {
-					logger.Sugar().Error("call CreateTransaction error: %v", err)
+					logger.Sugar().Errorf("call CreateTransaction error: %v", err)
 					continue
 				}
 
@@ -58,7 +58,7 @@ func createTransaction() {
 					TransactionID: transInfo.TransactionID,
 					State:         transaction.StatusPendingTransaction,
 				}); err != nil {
-					logger.Sugar().Error("call UpdateTransactionStatus error: %v", err)
+					logger.Sugar().Errorf("call UpdateTransactionStatus error: %v", err)
 					continue
 				}
 

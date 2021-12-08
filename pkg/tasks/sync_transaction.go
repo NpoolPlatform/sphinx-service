@@ -47,7 +47,7 @@ func handle(trans *ent.Transaction) {
 
 	conn, err := grpc.GetGRPCConn(pconst.ServiceName, grpc.GRPCTAG)
 	if err != nil {
-		logger.Sugar().Error("call GetGRPCConn error: %v", err)
+		logger.Sugar().Errorf("call GetGRPCConn error: %v", err)
 		return
 	}
 
@@ -56,7 +56,7 @@ func handle(trans *ent.Transaction) {
 		TransactionID: trans.TransactionID,
 	})
 	if err != nil {
-		logger.Sugar().Error("call GetTransaction error: %v", err)
+		logger.Sugar().Errorf("call GetTransaction error: %v", err)
 		return
 	}
 
@@ -68,7 +68,7 @@ func handle(trans *ent.Transaction) {
 			CID:           info.GetCID(),
 			ExitCode:      info.GetExitCode(),
 		}); err != nil {
-			logger.Sugar().Error("call UpdateTransactionStatus error: %v", err)
+			logger.Sugar().Errorf("call UpdateTransactionStatus error: %v", err)
 			return
 		}
 	}
