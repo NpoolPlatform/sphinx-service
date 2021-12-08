@@ -18,6 +18,8 @@ func init() {
 	transactionDescName := transactionFields[1].Descriptor()
 	// transaction.DefaultName holds the default value on creation for the name field.
 	transaction.DefaultName = transactionDescName.Default.(string)
+	// transaction.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	transaction.NameValidator = transactionDescName.Validators[0].(func(string) error)
 	// transactionDescAmount is the schema descriptor for amount field.
 	transactionDescAmount := transactionFields[2].Descriptor()
 	// transaction.DefaultAmount holds the default value on creation for the amount field.

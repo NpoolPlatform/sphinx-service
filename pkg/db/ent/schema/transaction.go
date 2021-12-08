@@ -18,7 +18,7 @@ func (Transaction) Fields() []ent.Field {
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New).
 			Unique(),
-		field.String("name").Default(""),
+		field.String("name").NotEmpty().Default(""),
 		field.Uint64("amount").Default(0),
 		field.String("from").NotEmpty().Default(""),
 		field.String("to").NotEmpty().Default(""),

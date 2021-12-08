@@ -246,6 +246,11 @@ func (tu *TransactionUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (tu *TransactionUpdate) check() error {
+	if v, ok := tu.mutation.Name(); ok {
+		if err := transaction.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf("ent: validator failed for field \"name\": %w", err)}
+		}
+	}
 	if v, ok := tu.mutation.From(); ok {
 		if err := transaction.FromValidator(v); err != nil {
 			return &ValidationError{Name: "from", err: fmt.Errorf("ent: validator failed for field \"from\": %w", err)}
@@ -631,6 +636,11 @@ func (tuo *TransactionUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (tuo *TransactionUpdateOne) check() error {
+	if v, ok := tuo.mutation.Name(); ok {
+		if err := transaction.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf("ent: validator failed for field \"name\": %w", err)}
+		}
+	}
 	if v, ok := tuo.mutation.From(); ok {
 		if err := transaction.FromValidator(v); err != nil {
 			return &ValidationError{Name: "from", err: fmt.Errorf("ent: validator failed for field \"from\": %w", err)}
